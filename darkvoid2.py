@@ -136,8 +136,6 @@ class Ship(GameObject):
 		super().__init__(position, SHIP, Vector2(0))
 
 	def accelerate(self):
-		# add stream of fire
-		# add_stream(x, y, amount, color, direction, tolerance, psizemax, opacitydelta, gravity=True, secondcolor=(255,255,255))
 		now = pygame.time.get_ticks()
 		if now > self.last + self.EXHAUST_INTERVAL:
 			self.last = now

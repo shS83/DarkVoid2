@@ -4,15 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Added gitgnore">
-      <change afterPath="$PROJECT_DIR$/poof_module.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/create_ship.py" beforeDir="false" />
+    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Added quite a bit of things">
       <change beforePath="$PROJECT_DIR$/darkvoid2.py" beforeDir="false" afterPath="$PROJECT_DIR$/darkvoid2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pfx_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/pfx_module.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pox_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/pox_module.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spaceship_left.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spaceship_neutral.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spaceship_right.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -179,7 +172,14 @@
       <option name="presentableId" value="LOCAL−00004" />
       <updated>1778763981868</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL−00005" summary="Added quite a bit of things">
+      <option name="closed" value="true" />
+      <created>1778793877357</created>
+      <option name="number" value="LOCAL−00005" />
+      <option name="presentableId" value="LOCAL−00005" />
+      <updated>1778793877357</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -189,7 +189,8 @@
     <MESSAGE value="First commit" />
     <MESSAGE value="First real commit" />
     <MESSAGE value="Added gitgnore" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added gitgnore" />
+    <MESSAGE value="Added quite a bit of things" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added quite a bit of things" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
