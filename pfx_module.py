@@ -73,7 +73,8 @@ class Particle(pygame.sprite.Sprite):
 
 				self.rect.center = (self.x + int(deltax), self.y - int(deltay))
 				if self.opacity < 1:
-					stream.remove(self)
+					if self in stream:
+						stream.remove(self)
 					self.kill()
 
 				if not screen.get_rect().colliderect(self.rect) or (
@@ -83,7 +84,7 @@ class Particle(pygame.sprite.Sprite):
 
 	def draw(self, screen):
 		screen.blit(self.image, self.rect)
-		
+
 	def move(self, screen):
 		self.update(screen)
 

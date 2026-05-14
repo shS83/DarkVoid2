@@ -18,15 +18,15 @@ class Particle(pygame.sprite.Sprite):
 		self.color = color
 		self.size = random.randint(1, 8)
 		self.circle = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
-		# pygame.gfxdraw.aacircle(self.circle, int(self.size/2), int(self.size/2), int(self.size/2-1), self.color)
+		pygame.gfxdraw.aacircle(self.circle, int(self.size / 2), int(self.size / 2), int(self.size / 2 - 1), self.color)
 		pygame.gfxdraw.filled_circle(self.circle, int(self.size / 2), int(self.size / 2), int(self.size / 2 - 1),
 		                             self.color)
 		self.poly = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
-		# pygame.gfxdraw.aapolygon(self.poly, [(0, self.size), (self.size/2, 0), (self.size, self.size)], self.color)
+		pygame.gfxdraw.aapolygon(self.poly, [(0, self.size), (self.size / 2, 0), (self.size, self.size)], self.color)
 		pygame.gfxdraw.filled_polygon(self.poly, [(0, self.size), (self.size / 2, 0), (self.size, self.size)],
 		                              self.color)
 		self.surface = random.choice([self.poly, self.circle])
-		# self.surface = self.poly
+		self.surface = self.poly
 		if self.color == (255, 255, 255):
 			self.surface = self.circle
 		if self.surface == self.circle:
@@ -37,7 +37,7 @@ class Particle(pygame.sprite.Sprite):
 			self.rotdeltach = random.randint(1, 10)
 		self.image = self.surface
 		self.opacity = 255
-		self.opacitydelta = random.randint(5, 20) / 10
+		self.opacitydelta = random.randint(5, 20)
 		self.opacitych = random.randint(2, 5)
 		self.rect = self.image.get_rect()
 		self.ang = math.radians(random.randint(1, 360))
