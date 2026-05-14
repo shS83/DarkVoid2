@@ -54,7 +54,6 @@ render_cache: dict[Tuple[int, int, int], pg.Surface] = {}
 t = pg.time.get_ticks() * 0.001
 ship_scale = 0.3
 frame = 0
-laserinterval = 200
 
 
 # Icon
@@ -101,19 +100,18 @@ class GameObject:
 
 
 class Ship(GameObject):
-	MANEUVERABILITY = 4
-	ACCELERATION = 0.3
-	BULLET_SPEED = 3
-	EXHAUST_INTERVAL = 100
+	MANEUVERABILITY = 3
+	ACCELERATION = 0.2
+	BULLET_SPEED = 2
+	EXHAUST_INTERVAL = 50
 	LASER_IMAGE = pg.image.load(f'{HOME_DIR}/laser_2.png').convert_alpha()
-	LASER_IMAGE = pg.transform.rotate(LASER_IMAGE, 145)
+	LASER_IMAGE = pg.transform.rotate(LASER_IMAGE, 180)
 	angle: float = -math.pi
 	x: int = 1500
 	y: int = 1500
 
 	# def __init__(self, x=640, y=640, image=None):
 
-	# 	self.visible = True
 	def __init__(self, position, create_bullet_callback):
 		self.create_bullet_callback = create_bullet_callback
 		self.direction = Vector2(-math.pi)
@@ -142,16 +140,16 @@ class Ship(GameObject):
 			self.last = now
 			x, y = Vector2(self.position) - self.velocity
 			angle = int(self.position.angle_to(self.direction) - 52)
-			pfx_module.add_stream(self.x, self.y, 10, (255, 0, 0), angle, 5, 2, 5, False, (255, 255, 0))
+			pfx_module.add_stream(self.x, self.y, 30, (255, 0, 0), angle, 5, 2, 5, False, (255, 255, 0))
 		self.velocity += self.direction * self.ACCELERATION
 
 	def strafe_x(self, direction):
-		self.x += direction * 2
-		self.position.x += direction * 2
+		self.x += direction
+		self.position.x += direction
 
 	def strafe_y(self, direction):
-		self.y += direction * 2
-		self.position.y += direction * 2
+		self.y += direction
+		self.position.y += direction
 
 	def shine(self, screen):
 		for i in range(120):
@@ -162,11 +160,13 @@ class Ship(GameObject):
 				screen.set_at((px, py), c)
 
 	def rotate(self, clockwise=True):
+		now = pygame.time.get_ticks()
 		sign = 1 if clockwise else -1
 		angle = self.MANEUVERABILITY * sign
 		self.direction.rotate_ip(angle)
 
 	def update(self, mouse_x, mouse_y):
+		now = pygame.time.get_ticks()
 		self.velocity += self.acceleration
 		self.speed = self.velocity.length()
 		self.angle = angle_to(self.x, self.y, mouse_x, mouse_y)
@@ -175,12 +175,13 @@ class Ship(GameObject):
 		self.rotation += self.rotation_acceleration
 		self.rect.center = (self.x, self.y)
 		# Point ship nose toward mouse cursor
-		self.angle = angle_to(self.position.x, self.position.y, mouse_x, mouse_y)
+		# self.angle = angle_to(self.position.x, self.position.y, mouse_x, mouse_y)
 		self.direction = Vector2(math.cos(self.angle), math.sin(self.angle))
 		self.rotation += self.rotation_acceleration
 		self.rect.center = (self.position.x, self.position.y)
 
 	def thrust(self, x, y):
+		now = pygame.time.get_ticks()
 		direction = Vector2(x - self.x, y - self.y).normalize()
 		self.acceleration = direction * self.max_acceleration * self.angle
 		self.rotation_acceleration = self.rotation_speed
@@ -194,14 +195,14 @@ class Ship(GameObject):
 
 	def draw(self, surface):
 		# angle = self.direction.angle_to(Vector2(0, 1))
-		angle = self.direction.as_polar()[1]
+		angle = self.direction.angle_to(Vector2(0, 1))
 		rotated_surface = rotozoom(self.sprite, angle, 0.3)
 		rotated_surface_size = Vector2(rotated_surface.get_size())
 		blit_position = self.position - rotated_surface_size * 0.5
 		surface.blit(rotated_surface, blit_position)
 
 	def shoot(self):
-		# STREAMS.append(pox_module.flash_screen(255, screen))
+		STREAMS.append(pox_module.flash_screen(255, screen))
 		bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
 		bullet = Bullet(self.position, bullet_velocity)
 		BULLETS.append(bullet)
@@ -212,22 +213,20 @@ class Ship(GameObject):
 		return rot_image, rot_image.get_rect(center=image.get_rect(topleft=(self.x, self.y)).center)
 
 	def shoot_guns(self, ship_x, ship_y):
-		# STREAMS.append(pox_module.flash_screen(255, screen))
+		STREAMS.append(pox_module.flash_screen(255, screen))
 		bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
 		bullet = Bullet(self.position, bullet_velocity)
 		BULLETS.append(bullet)
-		# STREAMS.append(
-		#	pox_module.add_charge(ship_x + 300, ship_y + 300, int(random.randint(10, 30)), (255, 255, 0),
-		#	                      gravity=False))
+		STREAMS.append(pox_module.add_charge(ship_x + 300, ship_y + 300, int(random.randint(10, 30)), (255, 255, 0),
+		                                     gravity=False))
 		self.create_bullet_callback(bullet)
 
 
 enterprise = Ship((1280, 1024), lambda bullet: BULLETS.append(bullet))
 
-
-# enterprise.rotate_image(SHIP, enterprise.angle)
-# enterprise.draw(screen)
-# enterprise.shine(screen)
+enterprise.rotate_image(SHIP, 0)
+enterprise.draw(screen)
+enterprise.shine(screen)
 
 
 class Bullet(GameObject):
@@ -247,16 +246,16 @@ class Star:
 		self.size = size
 		self.color = color
 		self.surface = pg.Surface((size, size)).convert_alpha()
-		pg.gfxdraw.filled_circle(self.surface, int(size // 2), int(size // 2), int(size // 2), color)
+		pg.gfxdraw.filled_circle(self.surface, int(size // 3), int(size // 3), int(size // 3), color)
 
 	def update(self):
-		self.y += self.size / 1.2
+		self.y += self.size / 1.3
 		if self.y > screen.get_height():
 			jig = STARS.index(self)
 			STARS.pop(jig)
 
 	def move(self, screen):
-		self.y += self.size / 1.2
+		self.y += self.size / 1.5
 
 	def draw(self, screen):
 		screen.blit(self.surface, (self.x, self.y))
@@ -324,7 +323,7 @@ while running:
 
 	NOW_MS = 0
 	keyinterval = 100
-	laserinterval = 200
+	laserinterval = 500
 	keypress = pg.time.get_ticks()
 	if enterprise and enterprise.visible:
 		keys = pg.key.get_pressed()
@@ -334,8 +333,9 @@ while running:
 	# 			enterprise.accelerate()
 	if keys[pg.K_UP]:
 		keypress = pg.time.get_ticks()
-		enterprise.thrust(math.sin(enterprise.angle) * enterprise.max_speed,
-		                  math.cos(enterprise.angle) * enterprise.max_speed)
+		# enterprise.thrust(math.sin(enterprise.angle) * enterprise.max_speed,
+		#                 math.cos(enterprise.angle) * enterprise.max_speed)
+		enterprise.accelerate()
 	# 			enterprise.strafe_y(-2)
 	if keys[pg.K_DOWN]:
 		keypress = pg.time.get_ticks()
@@ -375,13 +375,13 @@ while running:
 			enterprise.accelerate()
 		# A key: strafe left
 		if keys[pg.K_a]:
-			enterprise.strafe_x(-1 * 0.1)
+			enterprise.strafe_x(-1 * 0.9)
 		# S key: accelerate backward
 		if keys[pg.K_s]:
-			enterprise.velocity -= enterprise.direction * enterprise.ACCELERATION * 0.1
+			enterprise.velocity -= enterprise.direction * enterprise.ACCELERATION * 0.001
 		# D key: strafe right
 		if keys[pg.K_d]:
-			enterprise.strafe_x(1 * 0.1)
+			enterprise.strafe_x(1 * 0.9)
 
 		if keys[K_SPACE]:
 			enterprise.shine(screen)
@@ -403,16 +403,16 @@ while running:
 					i.update(screen)
 				if hasattr(i, 'draw'):
 					i.draw(screen)
-					# if collide_rect(i, screen):
-					NO = STREAMS.index(i)
-					STREAMS.pop(NO)
+			# if collide_rect(i, screen):
+			# NO = STREAMS.index(i)
+			# STREAMS.pop(NO)
 			# STREAMS.clear()
 			for s in STARS:
 				s.update()
 				s.draw(screen)
 				if s.y > screen.get_height():
 					if s in STARS:
-						STARS.remove(s)
+						...  # STARS.remove(s)
 		except RuntimeError as e:
 			print(f"ERROR occurred in {e}")
 		starfield(screen.get_width(), screen.get_height(), single=True)
@@ -420,7 +420,7 @@ while running:
 		if len(ANIMATIONS) > 1:
 			ANIMATIONS.pop()
 			if len(ANIMATIONS) == 1:
-				ANIMATIONS.clear()
+				# ANIMATIONS.clear()
 				ANIMATIONS = [SHIP]
 
 		for b in pfx_module.stream:
@@ -433,7 +433,9 @@ while running:
 		for game_object in _get_game_objects():
 
 			if isinstance(game_object, Star):
-				continue
+				print(Star.__dict__)  # > screen.get_height():
+				STARS.remove(game_object)
+
 			if is_int(str(game_object)):
 				del game_object
 				continue
@@ -448,4 +450,4 @@ while running:
 		screen.blit(render_char("DarkVoid2 beta 0.012", (100, 100, 255)), (10, 10))
 
 		pg.display.flip()
-		clock.tick(159)
+		clock.tick(60)

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Added quite a bit of things">
+    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Something starting to emerge from the depths of night">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/darkvoid2.py" beforeDir="false" afterPath="$PROJECT_DIR$/darkvoid2.py" afterDir="false" />
     </list>
@@ -194,7 +194,14 @@
       <option name="presentableId" value="LOCAL−00007" />
       <updated>1778797730960</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL−00008" summary="Something starting to emerge from the depths of night">
+      <option name="closed" value="true" />
+      <created>1778799318033</created>
+      <option name="number" value="LOCAL−00008" />
+      <option name="presentableId" value="LOCAL−00008" />
+      <updated>1778799318033</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -205,7 +212,8 @@
     <MESSAGE value="First real commit" />
     <MESSAGE value="Added gitgnore" />
     <MESSAGE value="Added quite a bit of things" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added quite a bit of things" />
+    <MESSAGE value="Something starting to emerge from the depths of night" />
+    <option name="LAST_COMMIT_MESSAGE" value="Something starting to emerge from the depths of night" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
