@@ -101,7 +101,7 @@ class GameObject:
 
 class Ship(GameObject):
 	MANEUVERABILITY = 3
-	ACCELERATION = 0.2
+	ACCELERATION = 0.4
 	BULLET_SPEED = 2
 	EXHAUST_INTERVAL = 50
 	LASER_IMAGE = pg.image.load(f'{HOME_DIR}/laser_2.png').convert_alpha()
@@ -140,15 +140,13 @@ class Ship(GameObject):
 			self.last = now
 			x, y = Vector2(self.position) - self.velocity
 			angle = int(self.position.angle_to(self.direction) - 52)
-			pfx_module.add_stream(self.x, self.y, 30, (255, 0, 0), angle, 5, 2, 5, False, (255, 255, 0))
+			pfx_module.add_stream(self.position.x, self.position.y, 30, (255, 0, 0), angle, 5, 2, 5, False, (255, 255, 0))
 		self.velocity += self.direction * self.ACCELERATION
 
 	def strafe_x(self, direction):
-		self.x += direction
 		self.position.x += direction
 
 	def strafe_y(self, direction):
-		self.y += direction
 		self.position.y += direction
 
 	def shine(self, screen):
@@ -169,13 +167,13 @@ class Ship(GameObject):
 		now = pygame.time.get_ticks()
 		self.velocity += self.acceleration
 		self.speed = self.velocity.length()
-		self.angle = angle_to(self.x, self.y, mouse_x, mouse_y)
-		self.y = math.cos(self.angle)
-		self.x = math.sin(self.angle)
-		self.rotation += self.rotation_acceleration
-		self.rect.center = (self.x, self.y)
+		# Limit max speed
+		if self.speed > self.max_speed:
+			self.velocity = self.velocity.normalize() * self.max_speed
+		# Update position with velocity
+		self.position += self.velocity
 		# Point ship nose toward mouse cursor
-		# self.angle = angle_to(self.position.x, self.position.y, mouse_x, mouse_y)
+		self.angle = angle_to(self.position.x, self.position.y, mouse_x, mouse_y)
 		self.direction = Vector2(math.cos(self.angle), math.sin(self.angle))
 		self.rotation += self.rotation_acceleration
 		self.rect.center = (self.position.x, self.position.y)
@@ -188,8 +186,8 @@ class Ship(GameObject):
 		self.rotation_speed += 1.5
 
 		PARTICLES.append(
-			pfx_module.add_stream(self.x,
-			                      self.y + 50, 43, (255, 0, 0),
+			pfx_module.add_stream(self.position.x,
+			                      self.position.y + 50, 43, (255, 0, 0),
 			                      random.randint(300, 360), 10, 4, 5, 0,
 			                      secondcolor=(255, 255, 180)))
 
@@ -210,7 +208,7 @@ class Ship(GameObject):
 
 	def rotate_image(self, image, angle):
 		rot_image = pg.transform.rotate(image, angle)
-		return rot_image, rot_image.get_rect(center=image.get_rect(topleft=(self.x, self.y)).center)
+		return rot_image, rot_image.get_rect(center=image.get_rect(topleft=(self.position.x, self.position.y)).center)
 
 	def shoot_guns(self, ship_x, ship_y):
 		STREAMS.append(pox_module.flash_screen(255, screen))
@@ -298,10 +296,6 @@ while running:
 	mx, my = pg.mouse.get_pos()
 
 	if keys[K_j]:
-		# SHIP = SHIP_L1
-		# ANIMATIONS.append(SHIP_L1)
-		# ANIMATIONS.append(SHIP_L2)
-		# ANIMATIONS.append(SHIP_L3)
 		ANIMATIONS.append(SHIP_L)
 		ship_x -= 2
 
@@ -309,145 +303,100 @@ while running:
 		enterprise.thrust(math.sin(enterprise.angle) * enterprise.max_speed,
 		                  math.cos(enterprise.angle) * enterprise.max_speed)
 		PARTICLES.append(
-			ship_particle := pfx_module.add_stream(enterprise.rect.x + enterprise.rect.x * 2,
-			                                       enterprise.rect.y + enterprise.rect.y * 2, 30, (255, 180, 0),
+			ship_particle := pfx_module.add_stream(enterprise.position.x,
+			                                       enterprise.position.y, 30, (255, 180, 0),
 			                                       180, 10, 12, 0.6))
-		print(enterprise.rect.x, enterprise.rect, enterprise.x)
+
 	if keys[K_l]:
-		# SHIP = SHIP_R1
-		# ANIMATIONS.append(SHIP_R1)
-		# ANIMATIONS.append(SHIP_R2)
-		# ANIMATIONS.append(SHIP_R3)
 		ANIMATIONS.append(SHIP_R)
 		ship_x += 2
 
-	NOW_MS = 0
-	keyinterval = 100
-	laserinterval = 500
-	keypress = pg.time.get_ticks()
-	if enterprise and enterprise.visible:
-		keys = pg.key.get_pressed()
-	# 	if NOW_MS > keypress + keyinterval:
-	# 		if keys[pg.K_w]:
-	# 			keypress = pg.time.get_ticks()
-	# 			enterprise.accelerate()
-	if keys[pg.K_UP]:
-		keypress = pg.time.get_ticks()
-		# enterprise.thrust(math.sin(enterprise.angle) * enterprise.max_speed,
-		#                 math.cos(enterprise.angle) * enterprise.max_speed)
+	# WASD and Arrow key controls
+	# W key: accelerate forward
+	if keys[pg.K_w]:
 		enterprise.accelerate()
-	# 			enterprise.strafe_y(-2)
+	# A key: strafe left
+	if keys[pg.K_a]:
+		enterprise.strafe_x(-3)
+	# S key: accelerate backward
+	if keys[pg.K_s]:
+		enterprise.velocity -= enterprise.direction * enterprise.ACCELERATION * 0.5
+	# D key: strafe right
+	if keys[pg.K_d]:
+		enterprise.strafe_x(3)
+
+	# Arrow key controls
+	if keys[pg.K_UP]:
+		enterprise.accelerate()
 	if keys[pg.K_DOWN]:
-		keypress = pg.time.get_ticks()
 		velocity = enterprise.velocity.length()
 		enterprise.velocity = enterprise.direction * (velocity - enterprise.ACCELERATION)
-		enterprise.strafe_y(2)
-	# 		if keys[pg.K_a]:
-	# 			keypress = pg.time.get_ticks()
-	# 			enterprise.rotate(clockwise=False)
 	if keys[pg.K_LEFT]:
-		keypress = pg.time.get_ticks()
 		enterprise.rotate(clockwise=False)
-	# 			keypress = pg.time.get_ticks()
-	# 			enterprise.strafe_x = -2
-	# 		if keys[pg.K_d]:
-	# 			keypress = pg.time.get_ticks()
-	# 			enterprise.rotate(clockwise=True)
 	if keys[pg.K_RIGHT]:
-		keypress = pg.time.get_ticks()
 		enterprise.rotate(clockwise=True)
-		# 			keypress = pg.time.get_ticks()
-		# 			enterprise.strafe_x = 2
-		# #	if keys[pg.K_SPACE]:
-		# #		keypress = pg.time.get_ticks()
-		# #		laserkey += 1
-		# #		if laserkey > laserinterval:
-		# #			enterprise.shoot()
-		# #			laserkey = 0
-		# if keys[K_h]:
-		# 	enterprise.rotate_image(SHIP, enterprise.angle - 0.4)
-		# if keys[K_k]:
-		# 	enterprise.rotate_image(SHIP, enterprise.angle + 0.4)
-		if keys[K_ESCAPE]:
-			running = False
-		# W key: accelerate forward
-		if keys[pg.K_w]:
-			enterprise.accelerate()
-		# A key: strafe left
-		if keys[pg.K_a]:
-			enterprise.strafe_x(-1 * 0.9)
-		# S key: accelerate backward
-		if keys[pg.K_s]:
-			enterprise.velocity -= enterprise.direction * enterprise.ACCELERATION * 0.001
-		# D key: strafe right
-		if keys[pg.K_d]:
-			enterprise.strafe_x(1 * 0.9)
 
-		if keys[K_SPACE]:
-			enterprise.shine(screen)
-			enterprise.shoot_guns(ship_x, ship_y)
-			laserkey += 1
-			if laserkey > laserinterval:
-				enterprise.shoot()
-				laserkey = 0
-
-		frame += 1
-		if frame > len(ANIMATIONS):
-			frame = 0
-
-		enterprise.update(mx, my)
-		enterprise.draw(screen)
-		try:
-			for i in STREAMS:
-				if hasattr(i, 'update'):
-					i.update(screen)
-				if hasattr(i, 'draw'):
-					i.draw(screen)
-			# if collide_rect(i, screen):
-			# NO = STREAMS.index(i)
-			# STREAMS.pop(NO)
-			# STREAMS.clear()
-			for s in STARS:
-				s.update()
-				s.draw(screen)
-				if s.y > screen.get_height():
-					if s in STARS:
-						...  # STARS.remove(s)
-		except RuntimeError as e:
-			print(f"ERROR occurred in {e}")
-		starfield(screen.get_width(), screen.get_height(), single=True)
-
-		if len(ANIMATIONS) > 1:
-			ANIMATIONS.pop()
-			if len(ANIMATIONS) == 1:
-				# ANIMATIONS.clear()
-				ANIMATIONS = [SHIP]
-
-		for b in pfx_module.stream:
-			for p in pfx_module.spriteGroup:
-				p.update(screen)
-				screen.blit(p.image, (p.rect.x + 4000, p.rect.y + 4000))
-		pfx_module.stream.clear()
-
-		ANIMATIONS = [SHIP]
-		for game_object in _get_game_objects():
-
-			if isinstance(game_object, Star):
-				print(Star.__dict__)  # > screen.get_height():
-				STARS.remove(game_object)
-
-			if is_int(str(game_object)):
-				del game_object
-				continue
-			if hasattr(game_object, 'rotate_in_place'):
-				game_object.rotate_in_place()
-			if hasattr(game_object, 'move'):
-				game_object.move(screen)
-
-			game_object.draw(screen)
-
+	if keys[K_SPACE]:
 		enterprise.shine(screen)
-		screen.blit(render_char("DarkVoid2 beta 0.012", (100, 100, 255)), (10, 10))
+		laserkey += 1
+		if laserkey > 500:
+			enterprise.shoot()
+			laserkey = 0
 
-		pg.display.flip()
-		clock.tick(60)
+	frame += 1
+	if frame > len(ANIMATIONS):
+		frame = 0
+
+	enterprise.update(mx, my)
+	enterprise.draw(screen)
+	
+	try:
+		for i in STREAMS:
+			if hasattr(i, 'update'):
+				i.update(screen)
+			if hasattr(i, 'draw'):
+				i.draw(screen)
+		STREAMS.clear()
+		for s in STARS:
+			s.update()
+			s.draw(screen)
+			if s.y > screen.get_height():
+				if s in STARS:
+					STARS.remove(s)
+	except RuntimeError as e:
+		print(f"ERROR occurred in {e}")
+	
+	starfield(screen.get_width(), screen.get_height(), single=True)
+
+	if len(ANIMATIONS) > 1:
+		ANIMATIONS.pop()
+		if len(ANIMATIONS) == 1:
+			ANIMATIONS = [SHIP]
+
+	for b in pfx_module.stream:
+		for p in pfx_module.spriteGroup:
+			p.update(screen)
+			screen.blit(p.image, (p.rect.x + 4000, p.rect.y + 4000))
+	pfx_module.stream.clear()
+
+	ANIMATIONS = [SHIP]
+	for game_object in _get_game_objects():
+
+		if isinstance(game_object, Star):
+			continue
+
+		if is_int(str(game_object)):
+			del game_object
+			continue
+		if hasattr(game_object, 'rotate_in_place'):
+			game_object.rotate_in_place()
+		if hasattr(game_object, 'move'):
+			game_object.move(screen)
+
+		game_object.draw(screen)
+
+	enterprise.shine(screen)
+	screen.blit(render_char("DarkVoid2 beta 0.012", (100, 100, 255)), (10, 10))
+
+	pg.display.flip()
+	clock.tick(60)
