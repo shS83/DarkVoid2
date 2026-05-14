@@ -1,0 +1,9 @@
+[project]
+name = "darkvoid2"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "black>=26.3.1",
+    "pillow>=12.2.0",
+    "pygame>=2.6.1",
+]
