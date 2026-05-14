@@ -140,7 +140,8 @@ class Ship(GameObject):
 			self.last = now
 			x, y = Vector2(self.position) - self.velocity
 			angle = int(self.position.angle_to(self.direction) - 52)
-			pfx_module.add_stream(self.position.x, self.position.y, 30, (255, 0, 0), angle, 5, 2, 5, False, (255, 255, 0))
+			pfx_module.add_stream(self.position.x, self.position.y, 30, (255, 0, 0), angle, 5, 2, 5, False,
+			                      (255, 255, 0))
 		self.velocity += self.direction * self.ACCELERATION
 
 	def strafe_x(self, direction):
@@ -244,7 +245,7 @@ class Star:
 		self.size = size
 		self.color = color
 		self.surface = pg.Surface((size, size)).convert_alpha()
-		pg.gfxdraw.filled_circle(self.surface, int(size // 3), int(size // 3), int(size // 3), color)
+		pg.gfxdraw.filled_circle(self.surface, int(size // 4), int(size // 4), int(size // 4), color)
 
 	def update(self):
 		self.y += self.size / 1.3
@@ -261,10 +262,9 @@ class Star:
 
 def starfield(width, height, single=False):
 	if single:
-		i = random.randint(0, 1000) // 100
-		if i % 2 == 0:
-			STARS.append(star := Star(random.randint(0, width), -2, random.randint(2, 4),
-			                          star_color := (255, 255, 255)))
+		# i = random.randint(0, 1000) // 100
+		# if i % 2 == 0:
+		STARS.append(Star(random.randint(0, width), -2, random.randint(2, 3), (255, 255, 255)))
 	return STARS
 
 
@@ -299,12 +299,15 @@ while running:
 		ANIMATIONS.append(SHIP_L)
 		ship_x -= 2
 
+	if keys[K_RETURN]:
+		enterprise.shoot_guns(ship_x, ship_y)
+
 	if keys[K_i]:
 		enterprise.thrust(math.sin(enterprise.angle) * enterprise.max_speed,
 		                  math.cos(enterprise.angle) * enterprise.max_speed)
 		PARTICLES.append(
-			ship_particle := pfx_module.add_stream(enterprise.position.x,
-			                                       enterprise.position.y, 30, (255, 180, 0),
+			ship_particle := pfx_module.add_stream(enterprise.position.x + enterprise.x,
+			                                       enterprise.position.y + enterprise.y, 30, (255, 180, 0),
 			                                       180, 10, 12, 0.6))
 
 	if keys[K_l]:
@@ -314,16 +317,16 @@ while running:
 	# WASD and Arrow key controls
 	# W key: accelerate forward
 	if keys[pg.K_w]:
-		enterprise.accelerate()
+		enterprise.velocity += enterprise.direction * enterprise.ACCELERATION
 	# A key: strafe left
 	if keys[pg.K_a]:
-		enterprise.strafe_x(-3)
+		enterprise.strafe_x(-2)
 	# S key: accelerate backward
 	if keys[pg.K_s]:
-		enterprise.velocity -= enterprise.direction * enterprise.ACCELERATION * 0.5
+		enterprise.velocity -= enterprise.direction * enterprise.ACCELERATION * 0.2
 	# D key: strafe right
 	if keys[pg.K_d]:
-		enterprise.strafe_x(3)
+		enterprise.strafe_x(2)
 
 	# Arrow key controls
 	if keys[pg.K_UP]:
@@ -339,7 +342,7 @@ while running:
 	if keys[K_SPACE]:
 		enterprise.shine(screen)
 		laserkey += 1
-		if laserkey > 500:
+		if laserkey > 30:
 			enterprise.shoot()
 			laserkey = 0
 
@@ -349,7 +352,7 @@ while running:
 
 	enterprise.update(mx, my)
 	enterprise.draw(screen)
-	
+
 	try:
 		for i in STREAMS:
 			if hasattr(i, 'update'):
@@ -365,7 +368,7 @@ while running:
 					STARS.remove(s)
 	except RuntimeError as e:
 		print(f"ERROR occurred in {e}")
-	
+
 	starfield(screen.get_width(), screen.get_height(), single=True)
 
 	if len(ANIMATIONS) > 1:
@@ -377,7 +380,7 @@ while running:
 		for p in pfx_module.spriteGroup:
 			p.update(screen)
 			screen.blit(p.image, (p.rect.x + 4000, p.rect.y + 4000))
-	pfx_module.stream.clear()
+	# pfx_module.stream.clear()
 
 	ANIMATIONS = [SHIP]
 	for game_object in _get_game_objects():
@@ -399,4 +402,4 @@ while running:
 	screen.blit(render_char("DarkVoid2 beta 0.012", (100, 100, 255)), (10, 10))
 
 	pg.display.flip()
-	clock.tick(60)
+	clock.tick(159)
