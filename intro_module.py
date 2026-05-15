@@ -21,11 +21,11 @@ font = pygame.font.SysFont(fonts[0], 72)
 font2 = pygame.font.SysFont('msgothic', 48)
 screen.blit(fontti.render("シ", True, (255, 255, 255)), (screen.get_width() // 2, screen.get_height() // 2))
 running = True
-cooldown = 5000
+cooldown = 500
 switch = True
 i = 0
 last = 0
-logointerval = 2000
+logointerval = 200
 screen = pygame.display.set_mode([x_res, y_res], pygame.SHOWN)
 pygame.display.set_caption("Dark Void 2 - The Voidling")
 INITEVENT = pygame.USEREVENT + 1
@@ -42,9 +42,9 @@ begin = False
 LOGOEVENT = pygame.USEREVENT + 2
 pygame.event.post(pygame.event.Event(LOGOEVENT))
 
-pygame.time.set_timer(LOGOEVENT, 10000, 20000)
+pygame.time.set_timer(LOGOEVENT, 1000, 2000)
 FADEOUTEVENT = pygame.USEREVENT + 3
-pygame.time.set_timer(FADEOUTEVENT, 100000, 20000)
+pygame.time.set_timer(FADEOUTEVENT, 1000, 20000)
 INITGAME = pygame.USEREVENT + 4
 
 pygame.event.post(pygame.event.Event(LOGOEVENT))
@@ -62,14 +62,14 @@ while running:
 				print("space pressed")
 
 				pygame.event.clear()
-				in_logo = False
+				in_logo = True
 
-				pygame.event.post(pygame.event.Event(LOGOEVENT))
+				pygame.event.post(pygame.event.Event(USEREVENT))
 
 		if event.type == INITEVENT and i < 255:
 			now = pygame.time.get_ticks()
-			# if now - last >= cooldown:
-			# last = now
+			if now - last >= cooldown:
+				last = now
 			screen.fill((0, 0, 0))
 			screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
 			            (x_res / 2 / 2, y_res / 2 / 2))
@@ -91,19 +91,19 @@ while running:
 
 				if now - last >= logointerval:
 					last = now
-					switch = not switch
+					switch = True
 					screen.fill((0, 0, 0))
 					screen.blit(fontti.render("ヾ", True, (255, 255, 255)),
 					            (screen.get_width() // 2, screen.get_height() // 2))
 					if switch:
 						screen.blit(pygame.image.load(f'{HOME_DIR}/assets/stimu_wallpaper.png'), (0, 0))
 						screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
-						            (x_res / 2 - xd / 2, y_res / 2 - yd / 2))
+						            (x_res / 2 - xd2 / 2, y_res / 2 - yd2 / 2))
 						screen.blit(font2.render("press space to continue", True, (255, 0, 0)),
 						            (x_res / 2 - xd2 / 2, y_res - yd2 * 2))
 					else:
 						screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
-						            (x_res / 2 - xd / 2, y_res / 2 - yd / 2))
+						            (x_res / 2 - xd2 / 2, y_res / 2 - yd2 / 2))
 				pygame.event.post(pygame.event.Event(LOGOEVENT))
 
 		if event.type == FADEOUTEVENT:
@@ -113,7 +113,7 @@ while running:
 				if now - last >= cooldown:
 					screen.fill((0, 0, 0))
 					screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
-					            (x_res / 2 - xd / 2, y_res / 2 - yd / 2))
+					            (x_res / 2 - xd2 / 2, y_res / 2 - yd2 / 2))
 					i -= 2
 					if i < 2:
 						print("fadeout anim finished")
