@@ -12,10 +12,11 @@ import pox_module, pfx_module
 # import lvl_module
 # import hs_module
 from typing import Tuple
+import pygame.mixer
 
 # import intro_module
 # Do an intro
-HOME_DIR = "/home/shs/OneDrive/Documents/Code"
+HOME_DIR = "/home/shs/PycharmProjects/DarkVoid2"
 pg.init()
 
 screen = pg.display.set_mode((2000, 1500), SRCALPHA)
@@ -24,20 +25,22 @@ ANIMATIONS = []
 PARTICLES = []
 STREAMS = []
 BULLETS = []
-SHIP = pg.image.load("ship_neutral_2.png", "Ship neutral").convert_alpha()
-SHIP_L1 = pg.image.load("ship_left_1.png", "Ship left").convert_alpha()
-SHIP_L2 = pg.image.load("ship_left_2.png", "Ship left").convert_alpha()
-SHIP_L3 = pg.image.load("ship_left_3.png", "Ship left").convert_alpha()
-SHIP_L = pg.image.load("ship_left.png", "Ship left").convert_alpha()
-SHIP_R1 = pg.image.load("ship_right_1.png", "Ship right").convert_alpha()
-SHIP_R2 = pg.image.load("ship_right_2.png", "Ship right").convert_alpha()
-SHIP_R3 = pg.image.load("ship_right_3.png", "Ship right").convert_alpha()
-SHIP_R = pg.image.load("ship_right.png", "Ship right").convert_alpha()
-LASER_IMAGE = pg.image.load(f'{HOME_DIR}/laser_2.png', "Laser beam").convert_alpha()
-LASER_IMAGE = pg.transform.rotate(LASER_IMAGE, 145)
+SHIP = pg.image.load(f"{HOME_DIR}/assets/ship_neutral_2.png", "Ship neutral").convert_alpha()
+SHIP_L1 = pg.image.load(f"{HOME_DIR}/assets/ship_left_1.png", "Ship left").convert_alpha()
+SHIP_L2 = pg.image.load(f"{HOME_DIR}/assets/ship_left_2.png", "Ship left").convert_alpha()
+SHIP_L3 = pg.image.load(f"{HOME_DIR}/assets/ship_left_3.png", "Ship left").convert_alpha()
+SHIP_L = pg.image.load(f"{HOME_DIR}/assets/ship_left.png", "Ship left").convert_alpha()
+SHIP_R1 = pg.image.load(f"{HOME_DIR}/assets/ship_right_1.png", "Ship right").convert_alpha()
+SHIP_R2 = pg.image.load(f"{HOME_DIR}/assets/ship_right_2.png", "Ship right").convert_alpha()
+SHIP_R3 = pg.image.load(f"{HOME_DIR}/assets/ship_right_3.png", "Ship right").convert_alpha()
+SHIP_R = pg.image.load(f"{HOME_DIR}/assets/ship_right.png", "Ship right").convert_alpha()
+LASER_IMAGE = pg.image.load(f'/home/shs/PycharmProjects/DarkVoid2/assets/laser_2.png', "Laser beam").convert_alpha()
+LASER_IMAGE = pg.transform.rotate(LASER_IMAGE, 180)
 running = True
 clock = pg.time.Clock()
 ship_x, ship_y = screen.get_width() // 2, screen.get_height() - SHIP.get_height() - 50
+pygame.mixer.music.load(f'{HOME_DIR}/assets/Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3')
+pg.mixer.music.play(-1)
 
 
 def wrap_position(position, surface):
@@ -52,7 +55,7 @@ def angle_to(from_x, from_y, to_x, to_y):
 
 render_cache: dict[Tuple[int, int, int], pg.Surface] = {}
 t = pg.time.get_ticks() * 0.001
-ship_scale = 0.3
+ship_scale = 0.6
 frame = 0
 
 
@@ -104,7 +107,6 @@ class Ship(GameObject):
 	ACCELERATION = 0.4
 	BULLET_SPEED = 2
 	EXHAUST_INTERVAL = 50
-	LASER_IMAGE = pg.image.load(f'{HOME_DIR}/laser_2.png').convert_alpha()
 	LASER_IMAGE = pg.transform.rotate(LASER_IMAGE, 180)
 	angle: float = -math.pi
 	x: int = 1500
@@ -201,6 +203,7 @@ class Ship(GameObject):
 		surface.blit(rotated_surface, blit_position)
 
 	def shoot(self):
+		pg.mixer.Sound(f'{HOME_DIR}/assets/lasersound.wav').play()
 		STREAMS.append(pox_module.flash_screen(255, screen))
 		bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
 		bullet = Bullet(self.position, bullet_velocity)
@@ -212,6 +215,7 @@ class Ship(GameObject):
 		return rot_image, rot_image.get_rect(center=image.get_rect(topleft=(self.position.x, self.position.y)).center)
 
 	def shoot_guns(self, ship_x, ship_y):
+		pg.mixer.Sound(f'{HOME_DIR}/assets/lasersound.wav').play()
 		STREAMS.append(pox_module.flash_screen(255, screen))
 		bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
 		bullet = Bullet(self.position, bullet_velocity)

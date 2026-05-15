@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Something starting to emerge from the depths of night">
+    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Audiovisual mighty fun">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/darkvoid2.py" beforeDir="false" afterPath="$PROJECT_DIR$/darkvoid2.py" afterDir="false" />
     </list>
@@ -208,7 +208,21 @@
       <option name="presentableId" value="LOCAL−00009" />
       <updated>1778800638839</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL−00010" summary="Something starting to emerge from the depths of night">
+      <option name="closed" value="true" />
+      <created>1778801797632</created>
+      <option name="number" value="LOCAL−00010" />
+      <option name="presentableId" value="LOCAL−00010" />
+      <updated>1778801797632</updated>
+    </task>
+    <task id="LOCAL−00011" summary="Audiovisual mighty fun">
+      <option name="closed" value="true" />
+      <created>1778803557544</created>
+      <option name="number" value="LOCAL−00011" />
+      <option name="presentableId" value="LOCAL−00011" />
+      <updated>1778803557544</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -220,7 +234,8 @@
     <MESSAGE value="Added gitgnore" />
     <MESSAGE value="Added quite a bit of things" />
     <MESSAGE value="Something starting to emerge from the depths of night" />
-    <option name="LAST_COMMIT_MESSAGE" value="Something starting to emerge from the depths of night" />
+    <MESSAGE value="Audiovisual mighty fun" />
+    <option name="LAST_COMMIT_MESSAGE" value="Audiovisual mighty fun" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
