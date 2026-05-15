@@ -6,7 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Now it works">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/commons.py" beforeDir="false" afterPath="$PROJECT_DIR$/commons.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/darkvoid2.py" beforeDir="false" afterPath="$PROJECT_DIR$/darkvoid2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/intro_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/intro_module.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,6 +102,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.commons.executor": "Run",
     "Python.darkvoid2.executor": "Run",
     "Python.darkvoid21.executor": "Run",
     "Python.darkvoid_03.executor": "Run",
@@ -351,7 +353,14 @@
       <option name="presentableId" value="LOCAL−00020" />
       <updated>1778858320631</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL−00021" summary="Now it works">
+      <option name="closed" value="true" />
+      <created>1778858586217</created>
+      <option name="number" value="LOCAL−00021" />
+      <option name="presentableId" value="LOCAL−00021" />
+      <updated>1778858586217</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

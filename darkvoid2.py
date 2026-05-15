@@ -19,6 +19,7 @@ from sprite_anim import draw_anim
 
 intro_module.LOGOEVENT = pg.USEREVENT + 1
 intro_module.FADEOUTEVENT = pg.USEREVENT + 2
+
 intro_module.INITEVENT = pg.USEREVENT + 3
 intro_module.INITGAME = pg.USEREVENT + 4
 

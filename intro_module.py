@@ -64,7 +64,7 @@ while running:
 				pygame.event.clear()
 				in_logo = True
 
-				pygame.event.post(pygame.event.Event(USEREVENT))
+				pygame.event.post(pygame.event.Event(INITGAME))
 
 		if event.type == INITEVENT and i < 255:
 			now = pygame.time.get_ticks()
