@@ -14,11 +14,7 @@ import hs_module
 from typing import Tuple
 import pygame.mixer
 import os
-import commons as c
-from sprite_anim import draw_anim
 
-msg_font = pygame.font.SysFont(
-	os.path.expanduser('~') + '/PycharmProjects/DarkVoid2/assets/GoMonoNerdFontPropo-Bold.ttf', 36)
 intro_module.LOGOEVENT = pg.USEREVENT + 1
 intro_module.FADEOUTEVENT = pg.USEREVENT + 2
 
@@ -39,6 +35,9 @@ class Level:
 		self.asteroid_speed += 0.20
 		self.asteroid_hp += 0.20
 
+
+# Import commons AFTER defining Level to avoid circular import
+import commons as c
 
 def zoom_text(msg, color, opacity, rot=1.00, sca=4.00, zoomfont=c.msg_font):
 	fs = zoomfont.render(msg, True, color)
