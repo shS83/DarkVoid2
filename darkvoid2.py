@@ -160,6 +160,7 @@ class Ship(GameObject):
 	angle: float = Vector2(0, 0)
 	x: int = 1920 // 2
 	y: int = 800
+	SHIP_SCALE = 0.6  # Increased from 0.4 to make ship visible
 
 	def __init__(self, position, create_bullet_callback):
 		self.create_bullet_callback = create_bullet_callback
@@ -181,7 +182,7 @@ class Ship(GameObject):
 		self.rotation = 0
 		self.rect = self.image.get_rect()
 		self.rect.center = (self.x, self.y)
-		super().__init__(position, rotozoom(self.image, 0, 0.4), -Vector2(0))
+		super().__init__(position, rotozoom(self.image, 0, Ship.SHIP_SCALE), -Vector2(0))
 
 	def accelerate(self):
 		c.now = pg.time.get_ticks()
@@ -230,7 +231,7 @@ class Ship(GameObject):
 
 	def draw(self, surface):
 		angle = self.direction.angle_to(Vector2(0, 1))
-		rotated_surface = rotozoom(self.sprite, angle, 0.4)
+		rotated_surface = rotozoom(self.sprite, angle, Ship.SHIP_SCALE)
 		rotated_surface_size = Vector2(rotated_surface.get_size())
 		blit_position = self.position - rotated_surface_size * 0.5
 		surface.blit(rotated_surface, blit_position)
@@ -461,33 +462,26 @@ while c.running:
 			                                       90, (255, 180, 0),
 			                                       180, 10, 12, 0.6))
 
-	c.NOW_MS = 0
-	keys = pg.key.get_pressed()
-	if c.NOW_MS > c.keypress + c.keyinterval:
-		if keys[pygame.K_UP] or keys[pygame.K_w]:
-			keypress = pygame.time.get_ticks()
-			enterprise.strafe_y(5)
-		if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-			keypress = pygame.time.get_ticks()
-			enterprise.strafe_y(-5)
-		if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-			draw_left()
-			keypress = pygame.time.get_ticks()
-			enterprise.strafe_x(-5)
-		if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-			draw_right()
-			keypress = pygame.time.get_ticks()
-			enterprise.strafe_y(5)
-		if keys[pygame.K_SPACE]:
-			keypress = pygame.time.get_ticks()
-			c.laserkey += 1
-			if c.laserkey > c.laserinterval:
-				pg.mixer.Sound(f'{c.HOME_DIR}/assets/lasersound.wav').play()
-				enterprise.shoot_guns(c.ship_x, c.ship_y)
-				c.STREAMS.append(
-					poof_module.add_smoke(enterprise.position.x + enterprise.x, enterprise.position.y + enterprise.y,
-					                      100))
-				c.laserkey = 0
+	# Direct key input (no delay check needed for responsive 1942-style movement)
+	if keys[pygame.K_UP] or keys[pygame.K_w]:
+		enterprise.strafe_y(-5)  # UP = negative Y
+	if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+		enterprise.strafe_y(5)   # DOWN = positive Y
+	if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+		draw_left()
+		enterprise.strafe_x(-5)  # LEFT = negative X
+	if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+		draw_right()
+		enterprise.strafe_x(5)   # RIGHT = positive X
+	if keys[pygame.K_SPACE]:
+		c.laserkey += 1
+		if c.laserkey > c.laserinterval:
+			pg.mixer.Sound(f'{c.HOME_DIR}/assets/lasersound.wav').play()
+			enterprise.shoot_guns(c.ship_x, c.ship_y)
+			c.STREAMS.append(
+				poof_module.add_smoke(enterprise.position.x + enterprise.x, enterprise.position.y + enterprise.y,
+				                      100))
+			c.laserkey = 0
 
 	c.frame += 1
 	if c.frame > len(c.ANIMATIONS):
@@ -660,7 +654,7 @@ while c.running:
 				try:
 					if game_object.hp <= 0:
 						asteroids.remove(game_object)
-					if game_object not in aASTEROIDS:
+					if game_object not in ASTEROIDS:
 						continue
 				except ValueError as e:
 					print(f"{game_object}")
