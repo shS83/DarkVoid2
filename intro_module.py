@@ -1,4 +1,4 @@
-import pygame, random
+import pygame, random, os
 
 pygame.init()
 
@@ -9,8 +9,9 @@ x_res = 1920
 y_res = 1080
 screen = pygame.display.set_mode([x_res, y_res], pygame.SHOWN)
 font_size = 200
-HOME_DIR = "/home/shs/PycharmProjects/DarkVoid2"
+HOME_DIR = HOME = os.path.expanduser('~') + '/PycharmProjects/DarkVoid2'
 fontti = pygame.font.Font(f'{HOME_DIR}/assets/VL-Gothic-Regular.ttf', font_size)
+textfont = pygame.font.Font(f'{HOME_DIR}/assets/GoMonoNerdFontPropo-Bold.ttf', 100)
 pygame.display.set_icon(fontti.render("シ", True, (0, 255, 0)))
 font = pygame.font.SysFont(fonts[0], 72)
 # font = pygame.font.SysFont('msgothic', 72)
@@ -23,8 +24,8 @@ i = 0
 last = 0
 logointerval = 1000
 screen = pygame.display.set_mode([x_res, y_res], pygame.SHOWN)
-pygame.display.set_caption("Dark Void 2 - The Voidening")
-xd, yd = font.size("DARK VOID 2")
+pygame.display.set_caption("Dark Void 2 - The Voidling")
+xd, yd = textfont.size("DARK VOID 2")
 xd2, yd2 = font2.size("press space to continue")
 f = 0
 finished = True
@@ -59,7 +60,7 @@ while running:
 			if now - last >= cooldown:
 				last = now
 				screen.fill((0, 0, 0))
-				screen.blit(font.render("DARK VOID 2", True, (i, 0, 0)),
+				screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
 				            (x_res / 2 - xd / 2, y_res / 2 - yd / 2))
 				screen.blit(fontti.render("ヾ", True, (255, 255, 255)),
 				            (screen.get_width() // 2, screen.get_height() // 2))
@@ -85,12 +86,12 @@ while running:
 					            (screen.get_width() // 2, screen.get_height() // 2))
 					if switch:
 
-						screen.blit(font.render("DARK VOID 2", True, (i, 0, 0)),
+						screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
 						            (x_res / 2 - xd / 2, y_res / 2 - yd / 2))
 						screen.blit(font2.render("press space to continue", True, (255, 0, 0)),
 						            (x_res / 2 - xd2 / 2, y_res - yd2 * 2))
 					else:
-						screen.blit(font.render("DARK VOID 2", True, (i, 0, 0)),
+						screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
 						            (x_res / 2 - xd / 2, y_res / 2 - yd / 2))
 				pygame.event.post(pygame.event.Event(LOGOEVENT))
 
@@ -100,7 +101,8 @@ while running:
 				now = pygame.time.get_ticks()
 				if now - last >= cooldown:
 					screen.fill((0, 0, 0))
-					screen.blit(font.render("DARK VOID 2", True, (i, 0, 0)), (x_res / 2 - xd / 2, y_res / 2 - yd / 2))
+					screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
+					            (x_res / 2 - xd / 2, y_res / 2 - yd / 2))
 					i -= 2
 					if i < 2:
 						print("fadeout anim finished")
