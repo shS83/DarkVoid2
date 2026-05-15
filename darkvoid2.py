@@ -164,7 +164,7 @@ class Ship(GameObject):
 
 	def __init__(self, position, create_bullet_callback):
 		self.create_bullet_callback = create_bullet_callback
-		self.direction = Vector2(1, 0)
+		self.direction = Vector2(0, -1)
 		self.last = 0
 		self.visible = True
 		self.position = Vector2(Ship.x, Ship.y)
@@ -349,7 +349,7 @@ if key[K_KP_MINUS]:
 	spawn_enemy(1, new=True)
 
 # Spawn the asteroids
-spawn_enemy(random.randint(1, MAX_ASTEROIDS), new=True)
+# spawn_enemy(random.randint(1, MAX_ASTEROIDS), new=True)
 
 c.STREAMS.append(add_one_charge(c.ship_x + 300, c.ship_y + 300, int(random.randint(10, 300)), c.last))
 
@@ -357,11 +357,11 @@ c.STREAMS.append(add_one_charge(c.ship_x + 300, c.ship_y + 300, int(random.randi
 def asteroidium(level_instance):
 	for _ in range(level_instance.asteroids):
 		ASTEROIDS.append(Asteroid(get_random_position(
-			pg.Surface((c.screen.get_width() * 4, c.screen.get_height() * 4))),
+			pg.Surface((c.screen.get_width(), c.screen.get_height()))),
 			asteroids.append, random.randint(1, 5)))
 
 
-# asteroidium(level)
+asteroidium(level)
 
 
 class Bullet(GameObject):
@@ -400,7 +400,7 @@ class Star:
 
 
 def _get_particles():
-	particles = [*STARS, *c.STREAMS, *pox_module.spriteGroup, *pfx_module.spriteGroup, *poof_module.spriteGroup]
+	particles = [*c.STREAMS, *pox_module.spriteGroup, *pfx_module.spriteGroup, *poof_module.spriteGroup]
 	return particles
 
 
@@ -418,22 +418,26 @@ def length2(dx, dy):
 
 STARS = []
 
-
-def starfield(width, height, single=False):
-	global STARS
-	stars = []
-	for i in range(100):
-		stars.append(Star(random.randint(0, width), random.randint(0, height), random.randint(1, 2), (255, 255, 255)))
-	if single:
-		STARS = stars
-	else:
-		STARS = pg.sprite.Group(stars)
-
+#
+# def starfield(width, height, single=False):
+# 	global STARS
+# 	stars = []
+# 	for i in range(100):
+# 		stars.append(Star(random.randint(0, width), random.randint(0, height), random.randint(1, 2), (255, 255, 255)))
+# 	if single:
+# 		STARS = stars
+# 	else:
+# 		STARS = pg.sprite.Group(stars)
+# 		for star in STARS:
+# 			star.rect.y += 1
+#
+#
+# starfield(random.randint(1, c.screen.get_width()), random.randint(1, c.screen.get_height()), single=False)
 
 while c.running:
 	c.screen.fill((0, 0, 10))
-	starfield(random.randint(1, c.screen.get_width()), random.randint(1, c.screen.get_height()), single=True)
-	c.screen.blit(c.BACKGROUND, (0, 0))
+
+	# c.screen.blit(c.BACKGROUND, (0, 0))
 
 	if pg.event.get() == QUIT:
 		c.running = False
@@ -466,13 +470,13 @@ while c.running:
 	if keys[pygame.K_UP] or keys[pygame.K_w]:
 		enterprise.strafe_y(-5)  # UP = negative Y
 	if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-		enterprise.strafe_y(5)   # DOWN = positive Y
+		enterprise.strafe_y(5)  # DOWN = positive Y
 	if keys[pygame.K_LEFT] or keys[pygame.K_a]:
 		draw_left()
 		enterprise.strafe_x(-5)  # LEFT = negative X
 	if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
 		draw_right()
-		enterprise.strafe_x(5)   # RIGHT = positive X
+		enterprise.strafe_x(5)  # RIGHT = positive X
 	if keys[pygame.K_SPACE]:
 		c.laserkey += 1
 		if c.laserkey > c.laserinterval:
@@ -513,7 +517,7 @@ while c.running:
 		for rock in asteroids:
 			if rock.collides_with_tolerance(asteroid, -15):
 				random.choice([pg.mixer.Sound(f'{c.HOME_DIR}/assets/boom.wav').play(),
-				               pg.mixer.Sound(f'{c.HOME_DIR}/assets/boom5.wav').play()])
+				               pg.mixer.Sound(f'{c.HOME_DIR}/assets/boom4.wav').play()])
 				temp = asteroid.velocity
 				asteroid.velocity = rock.velocity
 				asteroid.rotdelta = -asteroid.rotdelta
@@ -527,14 +531,14 @@ while c.running:
 		for asteroid in ASTEROIDS[:]:
 			if asteroid.collides_with(bullet):
 				random.choice([pg.mixer.Sound(f'{c.HOME_DIR}/assets/boom2.wav').play(),
-				               pg.mixer.Sound(f'{c.HOME_DIR}/assets/boom5.wav').play()])
+				               pg.mixer.Sound(f'{c.HOME_DIR}/assets/boom4.wav').play()])
 				asteroid.hp -= 1
 				c.BULLETS.remove(bullet)
 				asteroid.hit = 5
 				if asteroid.hp < 1:
 					c.SCORE += 1
 					c.STREAMS.append(
-						pox_module.add_charge(asteroid.position[0], asteroid.position[1], 300 * asteroid.size,
+						pox_module.add_charge(asteroid.position[0], asteroid.position[1], 30 * asteroid.size,
 						                      (255, 0, 0),
 						                      False))
 					ASTEROIDS.remove(asteroid)
@@ -546,13 +550,12 @@ while c.running:
 
 	if not enterprise and c.message == "YOU DIED":
 		State = State.DIED_WATCHING_ROCKS
-		c.once = True
+		once = True
 		pg.event.clear()
 
 	if not asteroids and enterprise and enterprise.visible:
-		if c.once:
-			c.lvl_timer = pg.time.get_ticks()
-		c.once = False
+		c.lvl_timer = pg.time.get_ticks()
+		once = False
 		c.message = "ENEMIES FELLED"
 		pg.mixer.Sound(f'{c.HOME_DIR}/assets/levelup.wav').play()
 		c.msg_opacity = 255
@@ -562,7 +565,7 @@ while c.running:
 		State = State.NEXTLEVEL
 		if c.now > c.lvl_timer + 2000:
 			c.message = ""
-			c.once = True
+			once = True
 			enterprise.visible = False
 			level.up()
 			pg.event.clear()
@@ -574,16 +577,15 @@ while c.running:
 
 	for particle in _get_particles():
 		particle.update(c.screen)
-		if not hasattr(particle, 'rect'):
-			particle.draw(random.randint(0, c.screen.get_width()))
-			continue
-		if not hasattr(particle, "blit"):
-			print(particle, type(particle), dir(particle), particle.__dict__)
-			# particle.move(c.screen)
-			c.screen.blit(particle.surface, (0, c.screen.get_width()))
-			continue
-		else:
-			c.screen.blit(particle, particle.rect)
+	# if not hasattr(particle, 'rect'):
+	#	particle.draw(random.randint(0, c.screen.get_width()))
+	#	continue
+	# if not hasattr(particle, "blit"):
+	# particle.move(c.screen)
+	#
+	for a in ASTEROIDS:
+		a.sprite = rotozoom(a.ASTEROID_IMAGE, 0, a.scale / 20).convert_alpha()
+		print(a.sprite.get_width())
 
 	for game_object in _get_game_objects():
 
@@ -598,12 +600,12 @@ while c.running:
 		if hasattr(game_object, 'move'):
 			game_object.move(c.screen)
 		if not hasattr(game_object, 'position') or not hasattr(game_object, 'draw'):
-			c.screen.blit(game_object.image, game_object.rect)
+			c.screen.blit(game_object.sprite, game_object.position)
 		else:
-			game_object.draw(c.screen)
+			c.screen.blit(game_object.sprite, game_object.position)
 
-	c.screen.blit(render_char("DarkVoid2 beta 0.0146", (100, 100, 255)), (10, 10))
-
+	c.screen.blit(render_char("DarkVoid2 beta 0.0149", (100, 100, 255)), (10, 10))
+	c.screen.blit(render_char(f"Asteroids: {len(ASTEROIDS)}", (100, 255, 100)), (10, 50))
 	pg.display.flip()
 	c.clock.tick(159)
 
