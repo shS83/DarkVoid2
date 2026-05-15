@@ -159,13 +159,13 @@ class Ship(GameObject):
 	LASER_IMAGE = pg.transform.rotate(LASER_IMAGE, 0)
 	angle: float = Vector2(0, 0)
 	x: int = 1920 // 2
-	y: int = 900
+	y: int = 800
 
 	def __init__(self, position, create_bullet_callback):
 		self.create_bullet_callback = create_bullet_callback
-		self.direction = Vector2(0, -1)
+		self.direction = Vector2(1, 0)
 		self.last = 0
-		self.visible = False
+		self.visible = True
 		self.position = Vector2(Ship.x, Ship.y)
 		self.x = Ship.x
 		self.y = Ship.y
@@ -194,10 +194,16 @@ class Ship(GameObject):
 			self.velocity += self.direction * self.ACCELERATION
 
 	def strafe_x(self, direction):
-		self.position.x += direction
+		new_x = self.position.x + direction
+		# Clamp to screen bounds
+		if 0 < new_x < c.screen.get_width():
+			self.position.x = new_x
 
 	def strafe_y(self, direction):
-		self.position.y += direction
+		new_y = self.position.y + direction
+		# Clamp to screen bounds
+		if 0 < new_y < c.screen.get_height():
+			self.position.y = new_y
 
 	def update(self):
 		c.now = pg.time.get_ticks()
