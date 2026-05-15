@@ -534,16 +534,33 @@ while running:
 		enterprise.strafe_x(2)
 
 	# Arrow key controls
-	if keys[pg.K_UP]:
-		enterprise.accelerate()
-	if keys[pg.K_DOWN]:
-		velocity = enterprise.velocity.length()
-		enterprise.velocity = enterprise.direction * (velocity - enterprise.ACCELERATION)
-	if keys[pg.K_LEFT]:
-		enterprise.rotate(clockwise=False)
-	if keys[pg.K_RIGHT]:
-		enterprise.rotate(clockwise=True)
-
+	# if keys[pg.K_UP]:
+	# 	enterprise.accelerate()
+	# if keys[pg.K_DOWN]:
+	# 	velocity = enterprise.velocity.length()
+	# 	enterprise.velocity = enterprise.direction * (velocity - enterprise.ACCELERATION)
+	# if keys[pg.K_LEFT]:
+	# 	enterprise.rotate(clockwise=False)
+	# if keys[pg.K_RIGHT]:
+	# 	enterprise.rotate(clockwise=True)
+	NOW_MS = 0
+	keys = pygame.key.get_pressed()
+	if NOW_MS > keypress + keyinterval:
+		if keys[pygame.K_w] or keys[pygame.K_UP]:
+			keypress = pygame.time.get_ticks()
+			enterprise.accelerate()
+		if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+			keypress = pygame.time.get_ticks()
+			enterprise.rotate(clockwise=False)
+		if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+			keypress = pygame.time.get_ticks()
+			enterprise.rotate(clockwise=True)
+		if keys[pygame.K_SPACE]:
+			keypress = pygame.time.get_ticks()
+			laserkey += 1
+			if laserkey > laserinterval:
+				enterprise.shoot()
+				laserkey = 0
 	if keys[K_SPACE]:
 		# enterprise.shine(screen)
 		laserkey += 1
@@ -576,8 +593,60 @@ while running:
 	except RuntimeError as e:
 		print(f"ERROR occurred in {e}")
 
-	starfield(screen.get_width(), screen.get_height(), single=True)
+	# (screen.get_width(), screen.get_height(), single=True)
+	SCORE = 0
+	collision_delay = 150
+	now = pygame.time.get_ticks()
+	if now > collidetime + collision_delay:
+		for rock in rocks:
+			if rock.collides_with_tolerance(asteroid, -15):
+				temp = asteroid.velocity
+				asteroid.velocity = rock.velocity
+				asteroid.rotdelta = -asteroid.rotdelta
+				asteroid.position = wrap_position(asteroid.position + asteroid.velocity * 2, screen)
+				rock.velocity = temp
+				rock.position = wrap_position(rock.position + rock.velocity * 2, screen)
+				collidetime = pygame.time.get_ticks()
+				break
 
+	for bullet in BULLETS[:]:
+		for asteroid in ASTEROIDS[:]:
+			if asteroid.collides_with(bullet):
+				asteroid.hp -= 1
+				BULLETS.remove(bullet)
+				asteroid.hit = 5
+				if asteroid.hp < 1:
+					SCORE += 1
+					pox_module.add_charge(asteroid.position[0], asteroid.position[1], 300 * asteroid.size, (255, 0, 0),
+					                      False)
+					ASTEROIDS.remove(asteroid)
+				break
+
+	for bullet in BULLETS[:]:
+		if not screen.get_rect().collidepoint(bullet.position):
+			BULLETS.remove(bullet)
+
+	if not enterprise and message == "YOU DIED":
+		once = True
+		pygame.event.clear()
+		pygame.event.post(pygame.event.Event(DIED))
+
+	if not asteroids and enterprise and enterprise.visible:
+		if once:
+			lvl_timer = pygame.time.get_ticks()
+		once = False
+		message = "ENEMIES FELLED"
+		msg_opacity = 255
+		msg_rot = 1
+		msg_sca = 1
+		now = pygame.time.get_ticks()
+		if now > lvl_timer + 2000:
+			message = ""
+			once = True
+			enterprise.visible = False
+			level.up()
+			pygame.event.clear()
+			pygame.event.post(pygame.event.Event(LEVELCHANGE))
 	if len(ANIMATIONS) > 1:
 		ANIMATIONS.pop()
 		if len(ANIMATIONS) == 1:
@@ -632,7 +701,7 @@ while running:
 	except RuntimeError as e:
 		print(f"ERROR occurred in {e}")
 
-	starfield(screen.get_width(), screen.get_height(), single=True)
+	# (screen.get_width(), screen.get_height(), single=True)
 
 	if len(ANIMATIONS) > 1:
 		ANIMATIONS.pop()
@@ -656,8 +725,8 @@ while running:
 			if isinstance(game_object2, Asteroid):
 				game_object2.velocity = -game_object2.velocity
 				game_object.velocity = -game_object.velocity
-				game_object.hit = 100
-				game_object2.hit = 100
+				game_object.radius = game_object.sprite.get_width() / 2
+				game_object2.radius = game_object2.sprite.get_width() / 2
 				game_object.hp -= 1
 				game_object2.hp -= 1
 
