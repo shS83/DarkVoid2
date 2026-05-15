@@ -291,9 +291,9 @@ def spawn_enemy(amount, new=True):
 	MAX_ASTEROIDS = [amount in range(random.randint(1, 10))]
 
 	while len(c.asteroids) < len(MAX_ASTEROIDS):
-		for amount in range(ASTEROID_COUNT := len(MAX_ASTEROIDS)):
+		for asteroid_count in range(ASTEROID_COUNT := len(MAX_ASTEROIDS)):
 			while True:
-				position = get_random_position(random.randint(1, 1000))
+				position = get_random_position(c.screen)
 
 				if new:
 					print(f"new on {position}")
@@ -310,11 +310,11 @@ def spawn_enemy(amount, new=True):
 
 		if len(c.asteroids) > 0:
 			for a in c.asteroids:
-				for c in range(0, len(c.asteroids)):
-					if a == c.asteroids[c]:
+				for idx in range(0, len(c.asteroids)):
+					if a == c.asteroids[idx]:
 						continue
-					if a.position.distance_to(c.asteroids[c].position) < c.MIN_ASTEROID_DISTANCE:
-						del c.asteroids[c]
+					if a.position.distance_to(c.asteroids[idx].position) < c.MIN_ASTEROID_DISTANCE:
+						del c.asteroids[idx]
 						break
 
 
