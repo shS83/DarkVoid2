@@ -3,9 +3,10 @@ import random
 import pygame as pg
 import pygame.gfxdraw
 from pygame.locals import *
+from core.spritegroups import particles_group
 
 
-class Particle(pygame.sprite.Sprite):
+class Smoke(pygame.sprite.Sprite):
 
 	def __init__(self, x, y, power, size, color=(255, 255, 255), lift=13):
 		super().__init__()
@@ -85,11 +86,6 @@ class Particle(pygame.sprite.Sprite):
 def add_smoke(x, y, amount, color=(255, 255, 255), power=15, size=10, lift=13):
 	for i in range(1, amount):
 		if not i % 10:
-			particles.append(Particle(x, y, power, size, color, lift=False))
+			particles_group.add(Smoke(x, y, power, size, color, lift=False))
 		else:
-			particles.append(Particle(x, y, power, size, (255, 255, 255), lift))
-	spriteGroup.add(particles)
-
-
-particles = []
-spriteGroup = pygame.sprite.Group()
+			particles_group.add(Smoke(x, y, power, size, (255, 255, 255), lift))

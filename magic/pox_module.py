@@ -1,7 +1,12 @@
-import pygame, pygame.gfxdraw, random, math
+import pygame as pg
+import pygame.gfxdraw
+import random
+import math
+from core import commons as c
+from core.spritegroups import particles_group
 
 xRES = 1920
-yRES = 1200
+yRES = 1080
 NOW_MS = 0
 timer = pygame.time.Clock()
 pygame.init()
@@ -92,11 +97,9 @@ class Particle(pygame.sprite.Sprite):
 def add_charge(x, y, amount, color, gravity=True):
 	for i in range(1, amount):
 		if not i % 10:
-			charges.append(Particle(x, y, (255, 255, 255), gravity))
+			particles_group.add(Particle(x, y, (255, 255, 255), gravity))
 		else:
-			charges.append(Particle(x, y, color, gravity))
-	spriteGroup.add(charges)
-	return spriteGroup
+			particles_group.add(Particle(x, y, color, gravity))
 
 
 def flash_screen(col, screen):

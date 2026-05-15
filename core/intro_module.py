@@ -2,11 +2,6 @@ import pygame, random, os
 from pygame.transform import rotozoom
 
 pygame.init()
-pygame.mixer.music.load(
-	f'/home/shs/PycharmProjects/DarkVoid2/assets/Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3')
-pygame.mixer.init(48000, -16, 2, 4096)
-pygame.mixer.music.play(-1)
-pygame.mixer.music.set_volume(0.2)
 timer = pygame.time.Clock()
 # fonts = ['arial black', 'constantia', 'warheliosconcbold', 'averiasansbold', 'goodtimes', 'prceltic', 'novaround', 'xfiles']
 fonts = ['prceltic']
@@ -14,6 +9,11 @@ x_res = 1920
 y_res = 1080
 screen = pygame.display.set_mode([x_res, y_res], pygame.SHOWN)
 HOME_DIR = HOME = os.path.expanduser('~') + '/PycharmProjects/DarkVoid2'
+pygame.mixer.music.load(
+	f'{HOME_DIR}/assets/Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3')
+pygame.mixer.init(48000, -16, 2, 4096)
+pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(0.2)
 pygame.event.clear()
 
 font_size = 200
@@ -48,7 +48,7 @@ pygame.event.post(pygame.event.Event(LOGOEVENT))
 
 pygame.time.set_timer(LOGOEVENT, 1000, 2000)
 FADEOUTEVENT = pygame.USEREVENT + 3
-pygame.time.set_timer(FADEOUTEVENT, 1000, 20000)
+pygame.time.set_timer(FADEOUTEVENT, 1000, 2000)
 INITGAME = pygame.USEREVENT + 4
 
 pygame.event.post(pygame.event.Event(LOGOEVENT))
@@ -65,7 +65,7 @@ while running:
 			if in_logo and event.key == pygame.K_SPACE:
 				print("space pressed")
 
-				pygame.event.clear()
+				# pygame.event.clear()
 				in_logo = True
 
 				pygame.event.post(pygame.event.Event(INITGAME))

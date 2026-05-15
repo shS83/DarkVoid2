@@ -1,7 +1,12 @@
-import pygame, pygame.gfxdraw, random, math
+import pygame
+import pygame.gfxdraw
+import random
+import math
+import pygame.transform as tf
+from core.spritegroups import particles_group
 
-xRES = 1024
-yRES = 768
+x_res = 1920
+y_res = 1080
 NOW_MS = 0
 timer = pygame.time.Clock()
 pygame.init()
@@ -25,7 +30,7 @@ class Particle(pygame.sprite.Sprite):
 		pygame.gfxdraw.aapolygon(self.poly, [(0, self.size), (self.size / 2, 0), (self.size, self.size)], self.color)
 		pygame.gfxdraw.filled_polygon(self.poly, [(0, self.size), (self.size / 2, 0), (self.size, self.size)],
 		                              self.color)
-		# self.surface = random.choice([self.poly, self.circle])
+		self.surface = random.choice([self.poly, self.circle])
 		self.surface = self.poly
 		if self.color == (255, 255, 255):
 			self.surface = self.circle
@@ -79,13 +84,12 @@ class Particle(pygame.sprite.Sprite):
 
 				self.rect.center = (self.x + int(deltax), self.y - int(deltay))
 				if self.opacity < 1:
-					if self in stream:
-						stream.remove(self)
+					if self in particles_group:
+						particles_group.remove(self)
 					self.kill()
 
 				if not screen.get_rect().colliderect(self.rect) or (
 						self.gravity and self.rect.y > 0 and not screen.get_rect().colliderect(self.rect)):
-					# particles.remove(self)
 					self.kill()
 
 	def draw(self, screen):
@@ -99,12 +103,11 @@ def add_stream(x, y, amount, color, direction, tolerance, psizemax, opacitydelta
                secondcolor=(255, 255, 255)):
 	for i in range(1, amount):
 		if not i % 2:
-			stream.append(Particle(x, y, secondcolor, direction, tolerance, psizemax, opacitydelta, gravity))
+			particles_group.add(Particle(x, y, secondcolor, direction, tolerance, psizemax, opacitydelta, gravity))
 		else:
-			stream.append(Particle(x, y, color, direction, tolerance, psizemax, opacitydelta, gravity))
-	spriteGroup.add(stream)
+			particles_group.add(Particle(x, y, color, direction, tolerance, psizemax, opacitydelta, gravity))
 
 
-stream = []
-spriteGroup = pygame.sprite.Group()
+particles_group.add(ship_particle=add_stream(700, 700, 90, (255, 180, 0), 180, 10, 12, 0.6))
+
 startTime = pygame.time.get_ticks()

@@ -5,8 +5,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Now it works">
+      <change afterPath="$PROJECT_DIR$/core/gameobject.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/input.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/space.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/spritegroups.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/entities/asteroids.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/entities/bullet.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/entities/level.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/entities/ship.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/entities/stars.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/entities/states.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/magic/blasting.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/magic/colors.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/magic/fadeout.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/magic/katakana.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/commons.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/commons.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/darkvoid2.py" beforeDir="false" afterPath="$PROJECT_DIR$/darkvoid2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/darkvoid21.py" beforeDir="false" afterPath="$PROJECT_DIR$/darkvoid21.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hs_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/hs_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/intro_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/intro_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pfx_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/magic/pfx_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/platforms.py" beforeDir="false" afterPath="$PROJECT_DIR$/platforms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/poof_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/magic/poof_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pox_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/magic/pox_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sprite_anim.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/sprite_anim.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,7 +77,7 @@
     </selectedModels>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="68" />
+    <option name="cachedIndexableFilesCount" value="85" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -106,8 +131,10 @@
     "Python.darkvoid21.executor": "Run",
     "Python.darkvoid_03.executor": "Run",
     "Python.intro_module.executor": "Run",
+    "Python.main.executor": "Run",
     "Python.pfx_module.executor": "Run",
     "Python.pox_module.executor": "Run",
+    "Python.spritegroups.executor": "Run",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -118,7 +145,7 @@
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "root",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/home/shs/PycharmProjects/DarkVoid2",
+    "last_opened_file_path": "/home/shs/Code/Matrixia/matrixia.py",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -134,6 +161,9 @@
       <recent name="$PROJECT_DIR$/assets" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/core" />
+      <recent name="$PROJECT_DIR$/magic" />
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/assets" />
     </key>
   </component>
@@ -178,7 +208,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="DEBUG_JUST_MY_CODE" value="false" />
       <option name="RUN_TOOL" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/intro_module.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/core/intro_module.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -408,7 +438,14 @@
       <option name="presentableId" value="LOCAL−00028" />
       <updated>1778863822153</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL−00029" summary="Now it works">
+      <option name="closed" value="true" />
+      <created>1778866608319</created>
+      <option name="number" value="LOCAL−00029" />
+      <option name="presentableId" value="LOCAL−00029" />
+      <updated>1778866608319</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

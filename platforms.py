@@ -44,7 +44,3 @@ def zoom_text(screen, msg, color, opacity, rot=1.00, sca=1.00):
 	xd = rotated.get_width()
 	yd = rotated.get_height()
 	screen.blit(rotated, (x_res / 2 - xd / 2, y_res / 2 - yd / 2))
-
-
-pygame.event.post(pygame.event.Event(GAME))
-curr_state = GAME

@@ -57,10 +57,6 @@ loadsprite_1()
 loadsprite_2()
 
 
-# screen.fill((0, 0, 0))
-
-# def draw_left(screen, pos, rot, sca):
-#    screen.blit(leftship[current_frame], (pos[0] * sca, pos[1] * sca), (0, 0, leftship[current_frame].get_width() * sca, leftship[current_frame].get_height() * sca), rot)
 def draw_left():
 	for event in pygame.event.get():
 		if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:

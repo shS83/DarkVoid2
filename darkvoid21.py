@@ -4,12 +4,9 @@ import pygame as pg
 from pygame.locals import *
 import pygame.gfxdraw, random, math
 from pygame.math import Vector2
-from pygame.sprite import collide_rect, collide_circle
 from pygame.transform import rotozoom
-import pox_module, pfx_module
-import poof_module
+from magic import pfx_module, pox_module
 # import lvl_module
-import hs_module
 from typing import Tuple
 from darkvoid2 import Ship, spawn_enemy
 
