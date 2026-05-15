@@ -46,6 +46,12 @@ class Particle(pygame.sprite.Sprite):
 		self.power = random.randint(1, 100)
 		self.start_time = pygame.time.get_ticks()
 
+	def collides_with_any(self, any):
+		...
+
+	def collides_with_tolerance(self, tolerance):
+		...
+
 	def update(self, screen):
 		time_now = pygame.time.get_ticks()
 		if (self.power > 0):

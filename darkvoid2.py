@@ -38,9 +38,10 @@ level = Level()
 msg_font = pygame.font.SysFont('msgothic', 36)
 
 
-def zoom_text(msg, color, opacity, rot=1.00, sca=1.00, zoomfont=msg_font):
+def zoom_text(msg, color, opacity, rot=1.00, sca=4.00, zoomfont=msg_font):
 	fs = zoomfont.render(msg, True, color)
 	rotated = pygame.transform.rotozoom(fs, rot, sca)
+	sca -= 0.05
 	rotated.set_alpha(opacity)
 	xd = rotated.get_width()
 	yd = rotated.get_height()
@@ -63,21 +64,23 @@ SHIP_R1 = pg.image.load(f"{HOME_DIR}/assets/ship_right_1.png", "Ship right").con
 SHIP_R2 = pg.image.load(f"{HOME_DIR}/assets/ship_right_2.png", "Ship right").convert_alpha()
 SHIP_R3 = pg.image.load(f"{HOME_DIR}/assets/ship_right_3.png", "Ship right").convert_alpha()
 SHIP_R = pg.image.load(f"{HOME_DIR}/assets/ship_right.png", "Ship right").convert_alpha()
-LASER_IMAGE = pg.image.load(f'/home/shs/PycharmProjects/DarkVoid2/assets/laser_2.png', "Laser beam").convert_alpha()
+LASER_IMAGE = pg.image.load(f'/home/shs/PycharmProjects/DarkVoid2/assets/laser.png', "Laser beam").convert_alpha()
 LASER_IMAGE = pg.transform.rotate(LASER_IMAGE, 145)
 running = True
 clock = pg.time.Clock()
 ship_x, ship_y = screen.get_width() // 2, screen.get_height() - SHIP.get_height() - 50
 
-pygame.mixer.music.load(f'{HOME_DIR}/assets/Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3')
-pygame.mixer.init(48000, -16, 2, 4096)
-pygame.mixer.music.play(-1)
-pygame.mixer.music.set_volume(0.2)
-# pygame.mixer.music.load(f'{HOME_DIR}/assets/Jahzzar - Forest Pan.mp3')
-# pygame.mixer.init(48000, -16, 2, 4096)
-# pygame.mixer.music.play(-1)
-# pygame.mixer.music.set_volume(0.2)
-zoom_text("DARK VOID 2", (255, 255, 255), 255, rot=0.00, sca=2.0)
+if level == 1:
+	pygame.mixer.music.load(f'{HOME_DIR}/assets/Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3')
+	pygame.mixer.init(48000, -16, 2, 4096)
+	pygame.mixer.music.play(-1)
+	pygame.mixer.music.set_volume(0.2)
+if level == 2:
+	pygame.mixer.music.load(f'{HOME_DIR}/assets/Jahzzar - Forest Pan.mp3')
+	pygame.mixer.init(48000, -16, 2, 4096)
+	pygame.mixer.music.play(-1)
+	pygame.mixer.music.set_volume(0.2)
+zoom_text("DARK VOID 2", (255, 255, 255), 255, rot=0.00, sca=4.0)
 
 from enum import Enum
 
@@ -163,6 +166,8 @@ class GameObject:
 	def collides_with_any(self, other_obj_list):
 		colliders = False
 		for obj in other_obj_list:
+			if not hasattr(obj, 'position'):
+				continue
 			distance = self.position.distance_to(obj.position)
 			if distance < self.radius + obj.radius:
 				colliders = True
@@ -170,15 +175,15 @@ class GameObject:
 
 
 class Ship(GameObject):
-	MANEUVERABILITY = 10
-	ACCELERATION = 0.1
-	BULLET_SPEED = 5
+	MANEUVERABILITY = 8
+	ACCELERATION = 0.01
+	BULLET_SPEED = 2
 	EXHAUST_INTERVAL = 50
 	LASER_IMAGE = pg.image.load(f'{HOME_DIR}/assets/laser_2.png').convert_alpha()
 	LASER_IMAGE = pg.transform.rotate(LASER_IMAGE, 180)
 	LASER_IMAGE2 = pg.image.load(f'{HOME_DIR}/assets/laser.png').convert_alpha()
 	LASER_IMAGE2 = pg.transform.rotate(LASER_IMAGE2, 0)
-	angle: float = -math.pi
+	angle: float = -Vector2(0, -1).angle_to(Vector2(0, -1))
 	x: int = 1500
 	y: int = 1500
 
@@ -202,17 +207,17 @@ class Ship(GameObject):
 		self.rotation = 0
 		self.rect = self.image.get_rect()
 		self.rect.center = (self.x, self.y)
-		super().__init__(position, rotozoom(self.image, 0, 0.5), -Vector2(0))
+		super().__init__(position, rotozoom(self.image, 0, 0.4), -Vector2(0))
 
 	def accelerate(self):
 		now = pygame.time.get_ticks()
 		if now > self.last + self.EXHAUST_INTERVAL:
 			self.last = now
-			x, y = Vector2(self.position) - self.velocity
+			self.x, self.y = Vector2(self.position) - self.velocity
 			angle = int(self.position.angle_to(self.direction) - 52)
-			pfx_module.add_stream(self.position.x, self.position.y, 30, (255, 0, 0), angle, 5, 2, 5, False,
+			pfx_module.add_stream(self.x, self.y + 50, 30, (255, 0, 0), angle, 5, 2, 5, False,
 			                      (255, 255, 0))
-		self.velocity += self.direction * self.ACCELERATION
+			self.velocity += self.direction * self.ACCELERATION
 
 	def strafe_x(self, direction):
 		self.position.x += direction
@@ -249,14 +254,11 @@ class Ship(GameObject):
 		self.rotation_speed += 1.5
 
 		PARTICLES.append(
-			pfx_module.add_stream(self.position.x,
-			                      self.position.y + 50, 478, (255, 0, 0),
-			                      random.randint(300, 360), 10, 4, 5, 0,
-			                      secondcolor=(255, 255, 180)))
+			pfx_module.add_stream(self.x, self.y + 50, 300, (255, 0, 0), random.randint(300, 360), 10, 4, 5, 0, ))
 
 	def draw(self, surface):
 		angle = self.direction.angle_to(Vector2(0, 1))
-		rotated_surface = rotozoom(self.sprite, angle, 0.3)
+		rotated_surface = rotozoom(self.sprite, angle, 0.4)
 		rotated_surface_size = Vector2(rotated_surface.get_size())
 		blit_position = self.position - rotated_surface_size * 0.5
 		surface.blit(rotated_surface, blit_position)
@@ -279,8 +281,8 @@ class Ship(GameObject):
 		bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
 		bullet = Bullet(self.position, bullet_velocity)
 		BULLETS.append(bullet)
-		STREAMS.append(pox_module.add_charge(ship_x + 300, ship_y + 300, int(random.randint(10, 30)), (255, 255, 0),
-		                                     gravity=False))
+		# STREAMS.append(pox_module.add_charge(ship_x + 300, ship_y + 300, int(random.randint(10, 30)), (255, 255, 0),
+		#                                   gravity=False))
 		self.create_bullet_callback(bullet)
 
 
@@ -288,7 +290,6 @@ enterprise = Ship((1920, 1080), lambda bullet: BULLETS.append(bullet))
 
 enterprise.rotate_image(SHIP, 0)
 enterprise.draw(screen)
-# enterprise.shine(screen)
 
 ASTEROID_COUNT = 5
 MAX_ASTEROIDS = 10
@@ -297,8 +298,8 @@ asteroids = []
 
 
 def spawn_enemy(amount, new=True):
-	# MAX_ASTEROIDS = [amount in range(random.randint(1, 10))]
-	MAX_ASTEROIDS = 7
+	MAX_ASTEROIDS = [amount in range(random.randint(1, 10))]
+
 	while len(asteroids) < len(MAX_ASTEROIDS):
 		for amount in range(ASTEROID_COUNT):
 			while True:
@@ -315,7 +316,7 @@ def spawn_enemy(amount, new=True):
 				):
 					break
 
-			asteroids.append(Asteroid(position, asteroids.append, random.randint(1, 1)))
+			asteroids.append(Asteroid(position, asteroids.append, random.randint(1, 5)))
 
 		if len(asteroids) > 0:
 			for a in asteroids:
@@ -347,7 +348,7 @@ def add_one_charge(x, y, amount, last):
 key = pg.key.get_pressed()
 if key[K_KP_MINUS]:
 	spawn_enemy(1, new=True)
-leveler = Level()
+
 add_one_charge(ship_x + 300, ship_y + 300, int(random.randint(10, 300)), last)
 
 
@@ -396,10 +397,6 @@ BACKGROUND = pygame.image.load(f'{HOME_DIR}/assets/01362_overtime_1920x1080.jpg'
 ROCK_IMAGES = [ROCK1, ROCK2, ROCK3, ROCK4]
 
 
-# for a in range(ASTEROID_COUNT, MAX_ASTEROIDS):
-#	ASTEROIDS.append(spawn_enemy(Asteroid(get_random_position(screen), asteroids.append, random.randint(1, 3))))
-
-
 def asteroidium(level_instance):
 	for _ in range(level_instance.asteroids):
 		ASTEROIDS.append(Asteroid(get_random_position(
@@ -420,7 +417,7 @@ asteroidium(level)
 
 class Bullet(GameObject):
 	def __init__(self, position, velocity):
-		ang_delta = position.angle_to(enterprise.direction)
+		ang_delta = position.angle_to((mx, my))
 		super().__init__(position, pg.transform.rotate(LASER_IMAGE, -ang_delta), -velocity)
 
 	def move(self, surface):
@@ -453,17 +450,10 @@ class Star:
 		screen.blit(self.surface, (self.x, self.y))
 
 
-# def starfield(width, height, single=False):
-# 	if single:
-# 		# i = random.randint(0, 1000) // 100
-# 		# if i % 2 == 0:
-# 		STARS.append(Star(random.randint(0, width), -2, random.randint(2, 3), (255, 255, 255)))
-# 	return STARS
-
-
 def _get_game_objects():
-	game_objects = [*pfx_module.stream, *STREAMS, *ASTEROIDS, *STARS, enterprise, *BULLETS]
-	print(*ASTEROIDS, ASTEROID_COUNT)
+	game_objects = [*poof_module.spriteGroup, *pox_module.spriteGroup, *pfx_module.spriteGroup, *STREAMS, *ASTEROIDS,
+	                *STARS,
+	                enterprise, *BULLETS]
 	if enterprise and enterprise.visible:
 		game_objects.append(enterprise)
 	return game_objects
@@ -479,7 +469,7 @@ SCORE = 0
 
 while running:
 	screen.fill((0, 0, 10))
-	screen.blit(BACKGROUND, (0, 0))
+	# screen.blit(BACKGROUND, (0, 0))
 
 	for event in pg.event.get():
 		if event == QUIT:
@@ -502,60 +492,54 @@ while running:
 	if keys[K_RETURN]:
 		pg.mixer.Sound(f'{HOME_DIR}/assets/lasersound.wav').play()
 		enterprise.shoot_guns(ship_x, ship_y)
-		poof_module.add_smoke(1400, 1400, 1000,
-		                      (255, 180, 150))
-
+		poof_module.add_smoke(enterprise.position.x + enterprise.x, enterprise.position.y + enterprise.y, 100)
 	if keys[K_i]:
 		enterprise.thrust(math.sin(enterprise.angle) * math.pi * 5,
 		                  math.cos(enterprise.angle) * math.pi * 5)
 		PARTICLES.append(
 			ship_particle := pfx_module.add_stream(700, 700,
-			                                       900, (255, 180, 0),
+			                                       90, (255, 180, 0),
 			                                       180, 10, 12, 0.6))
 
 	if keys[K_l]:
 		ANIMATIONS.append(SHIP_R)
 		ship_x += 2
 
-	# WASD and Arrow key controls
-	# W key: accelerate forward
 	if keys[pg.K_w]:
-		enterprise.velocity += enterprise.direction * enterprise.ACCELERATION
-	# A key: strafe left
+		enterprise.velocity -= enterprise.direction * enterprise.ACCELERATION
 	if keys[pg.K_a]:
 		enterprise.strafe_x(-2)
-	# S key: accelerate backward
 	if keys[pg.K_s]:
-		enterprise.velocity -= enterprise.direction * enterprise.ACCELERATION * 0.2
-	# D key: strafe right
+		enterprise.thrust = 0
+		enterprise.velocity = 0
+		enterprise.velocity += enterprise.direction * enterprise.ACCELERATION * 0.2
 	if keys[pg.K_d]:
 		enterprise.strafe_x(2)
 
 	NOW_MS = 0
 	keys = pygame.key.get_pressed()
 	if NOW_MS > keypress + keyinterval:
-		if keys[pygame.K_w] or keys[pygame.K_UP]:
+		if keys[pygame.K_UP]:
 			keypress = pygame.time.get_ticks()
-			enterprise.accelerate()
-		if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+			# enterprise.accelerate()
+			enterprise.strafe_x(2)
+		if keys[pygame.K_DOWN]:
+			keypress = pygame.time.get_ticks()
+			enterprise.strafe_x(-2)
+		if keys[pygame.K_LEFT]:
 			keypress = pygame.time.get_ticks()
 			enterprise.rotate(clockwise=False)
-		if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+		if keys[pygame.K_RIGHT]:
 			keypress = pygame.time.get_ticks()
 			enterprise.rotate(clockwise=True)
 		if keys[pygame.K_SPACE]:
 			keypress = pygame.time.get_ticks()
 			laserkey += 1
 			if laserkey > laserinterval:
-				enterprise.shoot()
+				pygame.mixer.Sound(f'{HOME_DIR}/assets/lasersound.wav').play()
+				enterprise.shoot_guns(ship_x, ship_y)
+				poof_module.add_smoke(enterprise.position.x + enterprise.x, enterprise.position.y + enterprise.y, 100)
 				laserkey = 0
-	if keys[K_SPACE]:
-		# enterprise.shine(screen)
-		laserkey += 1
-		if laserkey > 30:
-			pygame.mixer.Sound(f'{HOME_DIR}/assets/lasersound.wav').play()
-			enterprise.shoot()
-			laserkey = 0
 
 	frame += 1
 	if frame > len(ANIMATIONS):
@@ -563,7 +547,6 @@ while running:
 
 	enterprise.update(mx, my)
 	enterprise.draw(screen)
-	# enterprise.shine(enterprise)
 
 	try:
 		for i in STREAMS:
@@ -581,12 +564,11 @@ while running:
 	except RuntimeError as e:
 		print(f"ERROR occurred in {e}")
 
-	# (screen.get_width(), screen.get_height(), single=True)
 	collidetime = pygame.time.get_ticks()
 	collision_delay = 150
 	now = pygame.time.get_ticks()
 	if now > collidetime + collision_delay:
-		for rock in rocks:
+		for rock in asteroids:
 			if rock.collides_with_tolerance(asteroid, -15):
 				temp = asteroid.velocity
 				asteroid.velocity = rock.velocity
@@ -615,6 +597,7 @@ while running:
 			BULLETS.remove(bullet)
 
 	if not enterprise and message == "YOU DIED":
+		State = State.DIED_WATCHING_ROCKS
 		once = True
 		pygame.event.clear()
 		pygame.event.post(pygame.event.Event(DIED))
@@ -640,32 +623,31 @@ while running:
 		if len(ANIMATIONS) == 1:
 			ANIMATIONS = [SHIP]
 
-	for b in pfx_module.stream:
-		for p in pfx_module.spriteGroup:
-			p.update(screen)
-			screen.blit(p.image, (p.rect.x + 4000, p.rect.y + 4000))
-	# pfx_module.stream.clear()
-
 	ANIMATIONS = [SHIP]
 	for game_object in _get_game_objects():
 
-		if isinstance(game_object, Star):
-			continue
 		if game_object is None:
 			del game_object
 			continue
-		if is_int(str(game_object)):
+		if is_int(int(str(game_object))):
 			del game_object
 			continue
 		if hasattr(game_object, 'rotate_in_place'):
 			game_object.rotate_in_place()
 		if hasattr(game_object, 'move'):
 			game_object.move(screen)
+		if not hasattr(game_object, 'position'):
+			screen.blit(game_object.image, game_object.rect)
+			# for i in pox_module.spriteGroup:
+			#	screen.blit(i.image, i.rect)
+			# for i in poof_module.spriteGroup:
+			# 		screen.blit(i.image, i.rect)
+			# 	for i in pfx_module.spriteGroup:
+			#		screen.blit(i.image, i.rect)
 
-		game_object.draw(screen)
+			game_object.draw(screen)
 
-	# enterprise.shine(screen)
-	screen.blit(render_char("DarkVoid2 beta 0.013", (100, 100, 255)), (10, 10))
+	screen.blit(render_char("DarkVoid2 beta 0.014", (100, 100, 255)), (10, 10))
 
 	pg.display.flip()
 	clock.tick(159)
@@ -689,26 +671,16 @@ while running:
 	except RuntimeError as e:
 		print(f"ERROR occurred in {e}")
 
-	# (screen.get_width(), screen.get_height(), single=True)
-
-	if len(ANIMATIONS) > 1:
-		ANIMATIONS.pop()
-		if len(ANIMATIONS) == 1:
-			ANIMATIONS = [SHIP]
-
 	for b in pfx_module.stream:
 		for p in pfx_module.spriteGroup:
 			p.update(screen)
-			screen.blit(p.image, (p.rect.x + 4000, p.rect.y + 4000))
-	pfx_module.stream.clear()
+			screen.blit(p.image, (p.rect.x + enterprise.x, p.rect.y + enterprise.y + 500))
+	# pfx_module.stream.clear()
 
 	ANIMATIONS = [SHIP]
 	for game_object in _get_game_objects():
-
-		if game_object is None:
-			print(game_object)
-			print(game_object.__dir__)
-
+		if not hasattr(game_object, 'position'):
+			continue
 		if game_object.collides_with_any(game_object2 := _get_game_objects()):
 			if isinstance(game_object2, Asteroid):
 				game_object2.velocity = -game_object2.velocity
@@ -718,8 +690,8 @@ while running:
 				game_object.hp -= 1
 				game_object2.hp -= 1
 
-			if isinstance(game_object, Asteroid):
-				game_object.hit = 100
+		if isinstance(game_object, Asteroid):
+			game_object.hit = 100
 		if game_object.collides_with_any(BULLETS):
 			if isinstance(game_object, Asteroid):
 				game_object.hp -= 1
@@ -733,8 +705,6 @@ while running:
 					print(f"{game_object}")
 				add_one_charge(game_object.position.x, game_object.position.y, int(random.randint(10, 300)), last)
 
-				print(dir(game_object))
-				print(game_object.__dict__)
 		if isinstance(game_object, Star):
 			continue
 		if game_object is None:
@@ -748,9 +718,9 @@ while running:
 		if hasattr(game_object, 'move'):
 			game_object.move(screen)
 
+		if not hasattr(game_object, 'sprite'):
+			continue
 		screen.blit(game_object.sprite, game_object.position)
-
-# enterprise.shine(screen)
 
 pygame.quit()
 pygame.mixer.fadeout(2000)
