@@ -14,7 +14,6 @@ pygame.display.set_caption("Dark Void 2")
 pygame.init()
 clock = pygame.time.Clock()
 running = True
-msg_font = pygame.font.SysFont(f'{HOME_DIR}/assets/GoMonoNerdFontPropo-Bold.ttf', 36)
 laserinterval = 3
 laserkey = 0
 keyinterval = 5

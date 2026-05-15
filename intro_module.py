@@ -2,7 +2,11 @@ import pygame, random, os
 from pygame.transform import rotozoom
 
 pygame.init()
-
+pygame.mixer.music.load(
+	f'/home/shs/PycharmProjects/DarkVoid2/assets/Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3')
+pygame.mixer.init(48000, -16, 2, 4096)
+pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(0.2)
 timer = pygame.time.Clock()
 # fonts = ['arial black', 'constantia', 'warheliosconcbold', 'averiasansbold', 'goodtimes', 'prceltic', 'novaround', 'xfiles']
 fonts = ['prceltic']
@@ -78,7 +82,7 @@ while running:
 			i += 1
 			if i > 254:
 				i = 255
-				print("init anim finished")
+				# print("init anim finished")
 				pygame.event.clear()
 				in_logo = True
 				last = 0

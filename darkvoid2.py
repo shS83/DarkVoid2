@@ -17,6 +17,8 @@ import os
 import commons as c
 from sprite_anim import draw_anim
 
+msg_font = pygame.font.SysFont(
+	os.path.expanduser('~') + '/PycharmProjects/DarkVoid2/assets/GoMonoNerdFontPropo-Bold.ttf', 36)
 intro_module.LOGOEVENT = pg.USEREVENT + 1
 intro_module.FADEOUTEVENT = pg.USEREVENT + 2
 
@@ -51,11 +53,6 @@ def zoom_text(msg, color, opacity, rot=1.00, sca=4.00, zoomfont=c.msg_font):
 c.running = True
 c.clock = pg.time.Clock()
 
-if c.level.stage <= 1:
-	pygame.mixer.music.load(f'{c.HOME_DIR}/assets/Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3')
-	pygame.mixer.init(48000, -16, 2, 4096)
-	pygame.mixer.music.play(-1)
-	pygame.mixer.music.set_volume(0.2)
 if c.level.stage == 2:
 	pygame.mixer.music.load(f'{c.HOME_DIR}/assets/Jahzzar - Forest Pan.mp3')
 	pygame.mixer.init(48000, -16, 2, 4096)
