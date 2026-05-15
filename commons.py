@@ -1,7 +1,6 @@
 import pygame as pg
 from pygame.locals import *
 import os
-from darkvoid2 import State, Level
 from typing import Tuple
 import pygame.gfxdraw, random, math
 
@@ -9,6 +8,8 @@ x_res = 1920
 y_res = 1080
 HOME_DIR = os.path.expanduser('~') + '/PycharmProjects/DarkVoid2'
 pg.init()
+msg_font = pygame.font.SysFont(
+	os.path.expanduser('~') + '/PycharmProjects/DarkVoid2/assets/GoMonoNerdFontPropo-Bold.ttf', 36)
 screen = pygame.display.set_mode([x_res, y_res], pg.SRCALPHA)
 pygame.display.set_caption("Dark Void 2")
 pygame.init()
@@ -21,12 +22,7 @@ keypress = 0
 message = ""
 blastinterval = 1000
 last = 0
-ASTEROID_COUNT = 5
-MAX_ASTEROIDS = 10
-MIN_ASTEROID_DISTANCE = 200
-asteroids = []
-curr_state = State.WAITINGFORGAME
-ASTEROIDS = []
+
 laserkey = 0
 SCORE = 0
 ROCK1 = pygame.image.load(f'{HOME_DIR}/assets/rock_3_2.png').convert_alpha()
@@ -46,7 +42,7 @@ ANIMATIONS = []
 PARTICLES = []
 STREAMS = []
 BULLETS = []
-ASTEROIDS = []
+
 SHIP = pg.image.load(f"{HOME_DIR}/assets/ship_neutral_2.png", "Ship neutral").convert_alpha()
 ship_x, ship_y = screen.get_width() // 2, screen.get_height() - SHIP.get_height() - 50
 SHIP_L1 = pg.image.load(f"{HOME_DIR}/assets/ship_left_1.png", "Ship left").convert_alpha()
@@ -61,5 +57,4 @@ LASER_IMAGE = pg.image.load(f'{HOME_DIR}/assets/laser.png', "Laser beam").conver
 LASER_IMAGE = pg.transform.rotate(LASER_IMAGE, 145)
 LASER_IMAGE2 = pg.image.load(f'{HOME_DIR}/assets/laser_2.png', "Laser beam 2").convert_alpha()
 LASER_IMAGE2 = pg.transform.rotate(LASER_IMAGE2, 145)
-level = Level()
 now = pg.time.get_ticks()

@@ -9,7 +9,7 @@ from pygame.sprite import collide_rect, collide_circle
 from pygame.transform import rotozoom
 import pox_module, pfx_module
 import poof_module
-import intro_module
+# import intro_module
 import hs_module
 from typing import Tuple
 import pygame.mixer
@@ -17,13 +17,15 @@ import os
 import commons as c
 from sprite_anim import draw_anim
 
-msg_font = pygame.font.SysFont(
-	os.path.expanduser('~') + '/PycharmProjects/DarkVoid2/assets/GoMonoNerdFontPropo-Bold.ttf', 36)
-intro_module.LOGOEVENT = pg.USEREVENT + 1
-intro_module.FADEOUTEVENT = pg.USEREVENT + 2
 
-intro_module.INITEVENT = pg.USEREVENT + 3
-intro_module.INITGAME = pg.USEREVENT + 4
+# intro_module.LOGOEVENT = pg.USEREVENT + 1
+
+
+# intro_module.FADEOUTEVENT = pg.USEREVENT + 2
+
+
+# intro_module.INITEVENT = pg.USEREVENT + 3
+# intro_module.INITGAME = pg.USEREVENT + 4
 
 
 class Level:
@@ -40,6 +42,9 @@ class Level:
 		self.asteroid_hp += 0.20
 
 
+level = Level()
+
+
 def zoom_text(msg, color, opacity, rot=1.00, sca=4.00, zoomfont=c.msg_font):
 	fs = zoomfont.render(msg, True, color)
 	rotated = pygame.transform.rotozoom(fs, rot, sca)
@@ -53,7 +58,7 @@ def zoom_text(msg, color, opacity, rot=1.00, sca=4.00, zoomfont=c.msg_font):
 c.running = True
 c.clock = pg.time.Clock()
 
-if c.level.stage == 2:
+if level.stage == 2:
 	pygame.mixer.music.load(f'{c.HOME_DIR}/assets/Jahzzar - Forest Pan.mp3')
 	pygame.mixer.init(48000, -16, 2, 4096)
 	pygame.mixer.music.play(-1)
@@ -74,6 +79,8 @@ class State(Enum):
 	HIGHSCORETYPING = 6
 	HIGHSCORES = 7
 
+
+curr_state = State.WAITINGFORGAME
 
 curr_state = State.INTRO
 
@@ -254,6 +261,10 @@ enterprise = Ship((1920, 1080), lambda bullet: c.BULLETS.append(bullet))
 
 enterprise.rotate_image(c.SHIP, 0)
 enterprise.draw(c.screen)
+asteroids = []
+ASTEROID_COUNT = 5
+MAX_ASTEROIDS = 10
+MIN_ASTEROID_DISTANCE = 200
 
 
 class Asteroid(GameObject):
@@ -291,7 +302,7 @@ class Asteroid(GameObject):
 def spawn_enemy(amount, new=True):
 	MAX_ASTEROIDS = [amount in range(random.randint(1, 10))]
 
-	while len(c.asteroids) < len(MAX_ASTEROIDS):
+	while len(asteroids) < len(MAX_ASTEROIDS):
 		for amount in range(ASTEROID_COUNT := len(MAX_ASTEROIDS)):
 			while True:
 				position = get_random_position(random.randint(1, 1000))
@@ -303,19 +314,19 @@ def spawn_enemy(amount, new=True):
 
 				if (
 						position.distance_to(enterprise.position)
-						> c.MIN_ASTEROID_DISTANCE
+						> MIN_ASTEROID_DISTANCE
 				):
 					break
 
-			c.asteroids.append(Asteroid(position, c.asteroids.append, random.randint(1, 5)))
+			asteroids.append(Asteroid(position, asteroids.append, random.randint(1, 5)))
 
-		if len(c.asteroids) > 0:
-			for a in c.asteroids:
-				for c in range(0, len(c.asteroids)):
-					if a == c.asteroids[c]:
+		if len(asteroids) > 0:
+			for a in asteroids:
+				for c in range(0, len(asteroids)):
+					if a == asteroids[c]:
 						continue
-					if a.position.distance_to(c.asteroids[c].position) < c.MIN_ASTEROID_DISTANCE:
-						del c.asteroids[c]
+					if a.position.distance_to(asteroids[c].position) < MIN_ASTEROID_DISTANCE:
+						del asteroids[c]
 						break
 
 
@@ -332,7 +343,7 @@ if key[K_KP_MINUS]:
 	spawn_enemy(1, new=True)
 
 # Spawn the asteroids
-spawn_enemy(random.randint(1, c.MAX_ASTEROIDS), new=True)
+spawn_enemy(random.randint(1, MAX_ASTEROIDS), new=True)
 
 c.STREAMS.append(add_one_charge(c.ship_x + 300, c.ship_y + 300, int(random.randint(10, 300)), c.last))
 
