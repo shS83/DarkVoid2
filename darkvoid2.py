@@ -17,6 +17,8 @@ import os
 import commons as c
 from sprite_anim import draw_anim
 
+intro_module.LOGOEVENT
+
 
 class Level:
 	def __init__(self):
@@ -148,9 +150,9 @@ class Ship(GameObject):
 	ACCELERATION = 0.5
 	BULLET_SPEED = 2
 	EXHAUST_INTERVAL = 50
-	LASER_IMAGE2 = pg.image.load(f'{HOME_DIR}/assets/laser_2.png').convert_alpha()
+	LASER_IMAGE2 = pg.image.load(f'{c.HOME_DIR}/assets/laser_2.png').convert_alpha()
 	LASER_IMAGE2 = pg.transform.rotate(LASER_IMAGE2, 180)
-	LASER_IMAGE = pg.image.load(f'{HOME_DIR}/assets/laser.png').convert_alpha()
+	LASER_IMAGE = pg.image.load(f'{c.HOME_DIR}/assets/laser.png').convert_alpha()
 	LASER_IMAGE = pg.transform.rotate(LASER_IMAGE, 0)
 	angle: float = Vector2(0, 0)
 	x: int = 1920 // 2
