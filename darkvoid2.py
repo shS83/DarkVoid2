@@ -220,14 +220,6 @@ class Ship(GameObject):
 	def strafe_y(self, direction):
 		self.position.y += direction
 
-	# def shine(self, screen):
-	# 	for i in range(120):
-	# 		px = (i * 131) % enterprise.image.get_width()
-	# 		py = int((math.sin(t + i * 0.27) * 0.5 + 0.5) * 500)
-	# 		c = (200 + (i * 3) % 55, 200 + (i * 5) % 55, 220 + (i * 7) % 35)
-	# 		if 0 <= px < 500 and 0 <= py < 500:
-	# 			screen.set_at((px, py), c)
-
 	def rotate(self, clockwise=True):
 		now = pygame.time.get_ticks()
 		sign = 1 if clockwise else -1
@@ -305,7 +297,8 @@ asteroids = []
 
 
 def spawn_enemy(amount, new=True):
-	MAX_ASTEROIDS = [amount in range(random.randint(1, 10))]
+	# MAX_ASTEROIDS = [amount in range(random.randint(1, 10))]
+	MAX_ASTEROIDS = 7
 	while len(asteroids) < len(MAX_ASTEROIDS):
 		for amount in range(ASTEROID_COUNT):
 			while True:
@@ -322,7 +315,7 @@ def spawn_enemy(amount, new=True):
 				):
 					break
 
-			asteroids.append(Asteroid(position, asteroids.append, random.randint(1, 5)))
+			asteroids.append(Asteroid(position, asteroids.append, random.randint(1, 1)))
 
 		if len(asteroids) > 0:
 			for a in asteroids:
@@ -391,8 +384,8 @@ class Asteroid(GameObject):
 
 
 curr_state = State.WAITINGFORGAME
-ASTEROID_COUNT = 5
-MAX_ASTEROIDS = 10
+ASTEROID_COUNT = 2
+MAX_ASTEROIDS = 5
 MIN_ASTEROID_DISTANCE = 200
 ASTEROIDS = []
 ROCK1 = pygame.image.load(f'{HOME_DIR}/assets/rock_3_2.png').convert_alpha()
@@ -409,7 +402,9 @@ ROCK_IMAGES = [ROCK1, ROCK2, ROCK3, ROCK4]
 
 def asteroidium(level_instance):
 	for _ in range(level_instance.asteroids):
-		ASTEROIDS.append(Asteroid(get_random_position(screen), asteroids.append, random.randint(1, 1)))
+		ASTEROIDS.append(Asteroid(get_random_position(
+			pg.Surface((screen.get_width() * 4, screen.get_height() * 4))),
+			asteroids.append, random.randint(1, 5)))
 
 
 for a, b in ASTEROIDS:
@@ -417,6 +412,8 @@ for a, b in ASTEROIDS:
 		pg.mixer.Sound(f'{HOME}/assets/boom.wav').play()
 	if b.collidewith(enterprise) or b.collidewith(*BULLETS) or b.collidewith(*ASTEROIDS):
 		pg.mixer.Sound(f'{HOME}/assets/boom2.wav').play()
+		if i := random.random() / 2 <= 0.5 and b.collidewith(*ASTEROIDS):
+			pg.mixer.Sound(f'{HOME}/assets/boom5.wav').play()
 
 asteroidium(level)
 
@@ -478,6 +475,7 @@ def length2(dx, dy):
 
 # starfield(screen.get_width(), screen.get_height(), single=False)
 laserkey = 0
+SCORE = 0
 
 while running:
 	screen.fill((0, 0, 10))
@@ -504,15 +502,15 @@ while running:
 	if keys[K_RETURN]:
 		pg.mixer.Sound(f'{HOME_DIR}/assets/lasersound.wav').play()
 		enterprise.shoot_guns(ship_x, ship_y)
-		poof_module.add_smoke(enterprise.position.x + enterprise.x, enterprise.position.y + enterprise.y, 1000,
+		poof_module.add_smoke(1400, 1400, 1000,
 		                      (255, 180, 150))
 
 	if keys[K_i]:
 		enterprise.thrust(math.sin(enterprise.angle) * math.pi * 5,
 		                  math.cos(enterprise.angle) * math.pi * 5)
 		PARTICLES.append(
-			ship_particle := pfx_module.add_stream(enterprise.position.x + enterprise.x,
-			                                       enterprise.position.y + enterprise.y, 900, (255, 180, 0),
+			ship_particle := pfx_module.add_stream(700, 700,
+			                                       900, (255, 180, 0),
 			                                       180, 10, 12, 0.6))
 
 	if keys[K_l]:
@@ -533,16 +531,6 @@ while running:
 	if keys[pg.K_d]:
 		enterprise.strafe_x(2)
 
-	# Arrow key controls
-	# if keys[pg.K_UP]:
-	# 	enterprise.accelerate()
-	# if keys[pg.K_DOWN]:
-	# 	velocity = enterprise.velocity.length()
-	# 	enterprise.velocity = enterprise.direction * (velocity - enterprise.ACCELERATION)
-	# if keys[pg.K_LEFT]:
-	# 	enterprise.rotate(clockwise=False)
-	# if keys[pg.K_RIGHT]:
-	# 	enterprise.rotate(clockwise=True)
 	NOW_MS = 0
 	keys = pygame.key.get_pressed()
 	if NOW_MS > keypress + keyinterval:
@@ -594,7 +582,7 @@ while running:
 		print(f"ERROR occurred in {e}")
 
 	# (screen.get_width(), screen.get_height(), single=True)
-	SCORE = 0
+	collidetime = pygame.time.get_ticks()
 	collision_delay = 150
 	now = pygame.time.get_ticks()
 	if now > collidetime + collision_delay:
@@ -736,11 +724,17 @@ while running:
 			if isinstance(game_object, Asteroid):
 				game_object.hp -= 1
 				game_object.radius = game_object.sprite.get_width() / 2
-				if game_object.hp <= 0:
-					asteroids.remove(game_object)
-					if game_object in ASTEROIDS:
+				try:
+					if game_object.hp <= 0:
+						asteroids.remove(game_object)
+					if game_object not in ASTEROIDS:
 						ASTEROIDS.remove(game_object)
+				except ValueError as e:
+					print(f"{game_object}")
 				add_one_charge(game_object.position.x, game_object.position.y, int(random.randint(10, 300)), last)
+
+				print(dir(game_object))
+				print(game_object.__dict__)
 		if isinstance(game_object, Star):
 			continue
 		if game_object is None:
