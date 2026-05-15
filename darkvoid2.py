@@ -39,6 +39,9 @@ class Level:
 # Import commons AFTER defining Level to avoid circular import
 import commons as c
 
+level = Level()
+
+
 def zoom_text(msg, color, opacity, rot=1.00, sca=4.00, zoomfont=c.msg_font):
 	fs = zoomfont.render(msg, True, color)
 	rotated = pygame.transform.rotozoom(fs, rot, sca)
@@ -52,7 +55,7 @@ def zoom_text(msg, color, opacity, rot=1.00, sca=4.00, zoomfont=c.msg_font):
 c.running = True
 c.clock = pg.time.Clock()
 
-if c.level.stage == 2:
+if level.stage == 2:
 	pygame.mixer.music.load(f'{c.HOME_DIR}/assets/Jahzzar - Forest Pan.mp3')
 	pygame.mixer.init(48000, -16, 2, 4096)
 	pygame.mixer.music.play(-1)
@@ -259,7 +262,7 @@ class Asteroid(GameObject):
 	def __init__(self, position, create_asteroid_callback, size=4):
 		self.create_asteroid_callback = create_asteroid_callback
 		self.size = size
-		self.hp = size * c.level.asteroid_hp
+		self.hp = size * level.asteroid_hp
 		self.hit = False
 		self.rotation = 0
 		size_to_scale = {5: 0.5, 4: 0.4, 3: 0.3, 2: 0.2, 1: 0.15}
@@ -267,7 +270,7 @@ class Asteroid(GameObject):
 		self.ASTEROID_IMAGE = random.choice(c.ROCK_IMAGES)
 		self.sprite = rotozoom(self.ASTEROID_IMAGE, 0, self.scale).convert_alpha()
 		self.rotdelta = random.randint(-100, 100) / 100
-		super().__init__(position, self.sprite, get_random_velocity(2, 10) / 8 * c.level.asteroid_speed)
+		super().__init__(position, self.sprite, get_random_velocity(2, 10) / 8 * level.asteroid_speed)
 
 	def draw(self, surface):
 		if self.hit:
@@ -287,10 +290,18 @@ class Asteroid(GameObject):
 			self.radius = self.sprite.get_width() / 2
 
 
+MAX_ASTEROIDS = 10
+asteroids = []
+ASTEROIDS = []
+asteroid_count = 0
+MIN_ASTEROID_DISTANCE = 200
+MAX_ASTEROID_DISTANCE = 1000
+
+
 def spawn_enemy(amount, new=True):
 	MAX_ASTEROIDS = [amount in range(random.randint(1, 10))]
 
-	while len(c.asteroids) < len(MAX_ASTEROIDS):
+	while len(asteroids) < len(MAX_ASTEROIDS):
 		for asteroid_count in range(ASTEROID_COUNT := len(MAX_ASTEROIDS)):
 			while True:
 				position = get_random_position(c.screen)
@@ -302,19 +313,19 @@ def spawn_enemy(amount, new=True):
 
 				if (
 						position.distance_to(enterprise.position)
-						> c.MIN_ASTEROID_DISTANCE
+						> MIN_ASTEROID_DISTANCE
 				):
 					break
 
-			c.asteroids.append(Asteroid(position, c.asteroids.append, random.randint(1, 5)))
+			asteroids.append(Asteroid(position, asteroids.append, random.randint(1, 5)))
 
-		if len(c.asteroids) > 0:
-			for a in c.asteroids:
-				for idx in range(0, len(c.asteroids)):
-					if a == c.asteroids[idx]:
+		if len(asteroids) > 0:
+			for a in asteroids:
+				for idx in range(0, len(asteroids)):
+					if a == asteroids[idx]:
 						continue
-					if a.position.distance_to(c.asteroids[idx].position) < c.MIN_ASTEROID_DISTANCE:
-						del c.asteroids[idx]
+					if a.position.distance_to(asteroids[idx].position) < MIN_ASTEROID_DISTANCE:
+						del asteroids[idx]
 						break
 
 
@@ -331,16 +342,16 @@ if key[K_KP_MINUS]:
 	spawn_enemy(1, new=True)
 
 # Spawn the asteroids
-spawn_enemy(random.randint(1, c.MAX_ASTEROIDS), new=True)
+spawn_enemy(random.randint(1, MAX_ASTEROIDS), new=True)
 
 c.STREAMS.append(add_one_charge(c.ship_x + 300, c.ship_y + 300, int(random.randint(10, 300)), c.last))
 
 
 def asteroidium(level_instance):
 	for _ in range(level_instance.asteroids):
-		c.ASTEROIDS.append(Asteroid(get_random_position(
+		ASTEROIDS.append(Asteroid(get_random_position(
 			pg.Surface((c.screen.get_width() * 4, c.screen.get_height() * 4))),
-			c.asteroids.append, random.randint(1, 5)))
+			asteroids.append, random.randint(1, 5)))
 
 
 # asteroidium(level)
@@ -550,7 +561,7 @@ while c.running:
 			c.message = ""
 			c.once = True
 			enterprise.visible = False
-			c.level.up()
+			level.up()
 			pg.event.clear()
 
 	if len(c.ANIMATIONS) > 1:
