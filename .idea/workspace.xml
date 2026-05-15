@@ -7,6 +7,18 @@
     <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Something starting to emerge from the depths of night">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/darkvoid2.py" beforeDir="false" afterPath="$PROJECT_DIR$/darkvoid2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ship_left.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ship_left_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ship_left_2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ship_left_3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ship_neutral.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ship_neutral_2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ship_right.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ship_right_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ship_right_2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ship_right_3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/spaceship.xcf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/spaceship2.xcf" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -208,7 +220,14 @@
       <option name="presentableId" value="LOCAL−00009" />
       <updated>1778800638839</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL−00010" summary="Something starting to emerge from the depths of night">
+      <option name="closed" value="true" />
+      <created>1778801797632</created>
+      <option name="number" value="LOCAL−00010" />
+      <option name="presentableId" value="LOCAL−00010" />
+      <updated>1778801797632</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
