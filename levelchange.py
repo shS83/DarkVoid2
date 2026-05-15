@@ -46,7 +46,7 @@ def zoom_text(msg, color, opacity, rot=1.00, sca=1.00):
 	screen.blit(rotated, (x_res / 2 - xd / 2, y_res / 2 - yd / 2))
 
 
-level = Level()
+leveler = Level()
 pygame.event.post(pygame.event.Event(LEVELCHANGE))
 while running:
 
@@ -63,13 +63,13 @@ while running:
 			opacity = 255
 			rot = 1
 			sca = 1
-			level.up()
+			leveler.up()
 			pygame.event.clear()
-			print(LEVEL + level.stage)
+			print(LEVEL + leveler.stage)
 			pygame.event.post(pygame.event.Event(LEVELCHANGE))
 
 		if event.type == LEVELCHANGE:
-			TEXT = f"LEVEL {level.stage}"
+			TEXT = f"LEVEL {leveler.stage}"
 			if opacity > 1:
 				zoom_text(TEXT, (255, 0, 0), opacity, rot, sca)
 				opacity -= 1.5
@@ -81,26 +81,28 @@ while running:
 				rot = 1
 				sca = 1
 				pygame.event.clear()
-				print(LEVEL + level.stage)
-				pygame.event.post(pygame.event.Event(LEVEL + level.stage))
-				level.up()
+				print(LEVEL + leveler.stage)
+				pygame.event.post(pygame.event.Event(LEVEL + leveler.stage))
+				leveler.up()
 
-		if event.type == LEVEL + level.stage:
+		if event.type == LEVEL + leveler.stage:
 			TEXT = "START"
 			if opacity > 1:
 				zoom_text(TEXT, (0, 255, 0), opacity, rot, sca)
 				opacity -= 4
 				sca += 0.05
-				print(LEVEL + level.stage)
-				pygame.event.post(pygame.event.Event(LEVEL + level.stage))
+				print(LEVEL + leveler.stage)
+				pygame.event.post(pygame.event.Event(LEVEL + leveler.stage))
 			else:
+				ASTEROIDS = [ROCK1, ROCK2, ROCK3, ROCK4, ROCK1, ROCK2]
 				pygame.event.post(pygame.event.Event(GAME))
 
 		if event.type == GAME:
 			print("game")
 
-	info1 = infofont.render(f"level: {level.stage}, rocks: {level.asteroids}", True, (255, 255, 255))
-	info2 = infofont.render(f"ast_speed: {level.asteroid_speed}, ast_hp: {level.asteroid_hp}", True, (255, 255, 255))
+	info1 = infofont.render(f"level: {leveler.stage}, rocks: {leveler.asteroids}", True, (255, 255, 255))
+	info2 = infofont.render(f"ast_speed: {leveler.asteroid_speed}, ast_hp: {leveler.asteroid_hp}", True,
+	                        (255, 255, 255))
 	screen.blit(info1, (30, 30))
 	screen.blit(info2, (30, 50))
 	pygame.display.flip()

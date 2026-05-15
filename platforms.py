@@ -16,8 +16,8 @@ sca = 1
 opacity = 255
 
 
-class Level:
-	def __init__(self):
+class Platform:
+	def __init__(self, stage=1, asteroids=7, asteroid_speed=1, asteroid_hp=1):
 		self.stage = 1
 		self.asteroids = 7
 		self.asteroid_speed = 1

@@ -46,9 +46,9 @@ class Particle(pygame.sprite.Sprite):
 
 	def update(self, screen):
 		time_now = pygame.time.get_ticks()
-		if (self.power > 0):
+		if self.power > 0:
 			time_change = (time_now - self.start_time)
-			if (time_change > 0):
+			if time_change > 0:
 				time_change /= 200.0
 				self.image = pygame.transform.rotate(self.surface, self.rotdelta)
 				self.image.set_alpha(self.opacity)
@@ -56,11 +56,11 @@ class Particle(pygame.sprite.Sprite):
 					self.rotdelta -= self.rotdeltach
 				else:
 					self.rotdelta += self.rotdeltach
-				# if self.color == (255, 255, 255):
-				#    self.opacity += self.opacitych
-				#    if self.opacity < 1 or self.opacity > 255:
-				#        self.opacitych = -self.opacitych
-				# else:
+				if self.color == (255, 255, 255):
+					self.opacity += self.opacitych
+			if self.opacity < 1 or self.opacity > 255:
+				self.opacitych = -self.opacitych
+			else:
 				self.opacity -= self.opacitydelta
 				gravitydelta = self.GRAVITY * time_change * time_change / 2.0
 				deltax = self.power * time_change * math.sin(self.ang)
@@ -96,7 +96,7 @@ def add_charge(x, y, amount, color, gravity=True):
 def flash_screen(col, screen):
 	if col > 1:
 		screen.fill((int(col), int(col), int(col)))
-		col -= 50
+		col -= 75
 	return col
 
 
