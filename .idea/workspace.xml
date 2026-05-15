@@ -4,21 +4,28 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Something starting to emerge from the depths of night">
+    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Merge branch 'root' of https://github.com/shS83/DarkVoid2 into root&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;darkvoid2.py">
+      <change afterPath="$PROJECT_DIR$/assets/01362_overtime_1920x1080.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/VL-Gothic-Regular.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/kivi_1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/kivi_2.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/kivi_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/rock_3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/rock_3_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/rock_3_2_hit.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/rock_4.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/rock_4_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/rock_4_2_hit.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/rock_5_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/rock_6_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/darkvoid21.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/intro_module.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/levelchange.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/platforms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/darkvoid2.py" beforeDir="false" afterPath="$PROJECT_DIR$/darkvoid2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ship_left.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ship_left_1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ship_left_2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ship_left_3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ship_neutral.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ship_neutral_2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ship_right.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ship_right_1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ship_right_2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ship_right_3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spaceship.xcf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spaceship2.xcf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lvl_module.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +71,7 @@
     </selectedModels>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="30" />
+    <option name="cachedIndexableFilesCount" value="59" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -114,7 +121,9 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.darkvoid2.executor": "Run",
+    "Python.darkvoid21.executor": "Run",
     "Python.darkvoid_03.executor": "Run",
+    "Python.intro_module.executor": "Run",
     "Python.pfx_module.executor": "Run",
     "Python.pox_module.executor": "Run",
     "RunOnceActivity.MCP Project settings loaded": "true",
@@ -127,7 +136,7 @@
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "root",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/home/shs/PycharmProjects/DarkVoid2",
+    "last_opened_file_path": "/home/shs/PycharmProjects/DarkVoid2/darkvoid2.py",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -139,8 +148,72 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets" />
       <recent name="$PROJECT_DIR$" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.darkvoid2">
+    <configuration name="darkvoid2" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="DarkVoid2" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="uv (DarkVoid2)" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="false" />
+      <option name="RUN_TOOL" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/darkvoid2.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="intro_module" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="DarkVoid2" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="false" />
+      <option name="RUN_TOOL" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/intro_module.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.darkvoid2" />
+      <item itemvalue="Python.intro_module" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.intro_module" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -234,7 +307,14 @@
       <option name="presentableId" value="LOCAL−00011" />
       <updated>1778803557544</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL−00012" summary="Merge branch 'root' of https://github.com/shS83/DarkVoid2 into root&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;darkvoid2.py">
+      <option name="closed" value="true" />
+      <created>1778804678277</created>
+      <option name="number" value="LOCAL−00012" />
+      <option name="presentableId" value="LOCAL−00012" />
+      <updated>1778804678277</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -247,6 +327,17 @@
     <MESSAGE value="Added quite a bit of things" />
     <MESSAGE value="Something starting to emerge from the depths of night" />
     <option name="LAST_COMMIT_MESSAGE" value="Something starting to emerge from the depths of night" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/darkvoid2.py</url>
+          <line>400</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
