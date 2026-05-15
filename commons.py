@@ -14,6 +14,7 @@ pygame.display.set_caption("Dark Void 2")
 pygame.init()
 clock = pygame.time.Clock()
 running = True
+msg_font = pygame.font.SysFont(f'{HOME_DIR}/assets/GoMonoNerdFontPropo-Bold.ttf', 36)
 laserinterval = 3
 laserkey = 0
 keyinterval = 5
@@ -62,5 +63,4 @@ LASER_IMAGE = pg.transform.rotate(LASER_IMAGE, 145)
 LASER_IMAGE2 = pg.image.load(f'{HOME_DIR}/assets/laser_2.png', "Laser beam 2").convert_alpha()
 LASER_IMAGE2 = pg.transform.rotate(LASER_IMAGE2, 145)
 level = Level()
-msg_font = pygame.font.SysFont(f'{HOME_DIR}/assets/GoMonoNerdFontPropo-Bold.ttf', 36)
 now = pg.time.get_ticks()
