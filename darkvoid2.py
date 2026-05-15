@@ -9,17 +9,18 @@ from pygame.sprite import collide_rect, collide_circle
 from pygame.transform import rotozoom
 import pox_module, pfx_module
 import poof_module
-import intro_module
+# import intro_module
 import hs_module
 from typing import Tuple
 import pygame.mixer
 import os
 
-intro_module.LOGOEVENT = pg.USEREVENT + 1
-intro_module.FADEOUTEVENT = pg.USEREVENT + 2
 
-intro_module.INITEVENT = pg.USEREVENT + 3
-intro_module.INITGAME = pg.USEREVENT + 4
+# intro_module.LOGOEVENT = pg.USEREVENT + 1
+# intro_module.FADEOUTEVENT = pg.USEREVENT + 2
+#
+# intro_module.INITEVENT = pg.USEREVENT + 3
+# intro_module.INITGAME = pg.USEREVENT + 4
 
 
 class Level:
@@ -36,7 +37,6 @@ class Level:
 		self.asteroid_hp += 0.20
 
 
-# Import commons AFTER defining Level to avoid circular import
 import commons as c
 
 level = Level()
@@ -382,8 +382,8 @@ class Star:
 	def update(self, screen):
 		self.y += self.size / 1.3
 		if self.y > c.screen.get_height():
-			jig = c.STARS.index(self)
-			c.STARS.pop(jig)
+			jig = STARS.index(self)
+			STARS.pop(jig)
 
 	def move(self, screen):
 		self.x += self.size / 1.5
@@ -398,7 +398,7 @@ def _get_particles():
 
 
 def _get_game_objects():
-	game_objects = [*c.ASTEROIDS,
+	game_objects = [*ASTEROIDS,
 	                enterprise, *c.BULLETS]
 	if enterprise and enterprise.visible:
 		game_objects.append(enterprise)
@@ -407,6 +407,9 @@ def _get_game_objects():
 
 def length2(dx, dy):
 	return dx * dx + dy * dy
+
+
+STARS = []
 
 
 def starfield(width, height, single=False):
@@ -494,12 +497,12 @@ while c.running:
 			if hasattr(i, 'draw'):
 				i.draw(c.screen)
 		c.STREAMS.clear()
-		for s in c.STARS:
+		for s in STARS:
 			s.update(c.screen)
 			s.draw(c.screen)
 			if s.y > c.screen.get_height():
-				if s in c.STARS:
-					c.STARS.remove(s)
+				if s in STARS:
+					STARS.remove(s)
 	except RuntimeError as e:
 		print(f"ERROR occurred in {e}")
 
@@ -507,8 +510,8 @@ while c.running:
 	c.collision_delay = 150
 	c.now = pygame.time.get_ticks()
 	if c.now > c.collidetime + c.collision_delay:
-		for rock in c.asteroids:
-			if rock.collides_with_tolerance(c.asteroid, -15):
+		for rock in asteroids:
+			if rock.collides_with_tolerance(asteroid, -15):
 				random.choice([pg.mixer.Sound(f'{c.HOME_DIR}/assets/boom.wav').play(),
 				               pg.mixer.Sound(f'{c.HOME_DIR}/assets/boom5.wav').play()])
 				temp = asteroid.velocity
@@ -521,7 +524,7 @@ while c.running:
 				break
 
 	for bullet in c.BULLETS[:]:
-		for asteroid in c.ASTEROIDS[:]:
+		for asteroid in ASTEROIDS[:]:
 			if asteroid.collides_with(bullet):
 				random.choice([pg.mixer.Sound(f'{c.HOME_DIR}/assets/boom2.wav').play(),
 				               pg.mixer.Sound(f'{c.HOME_DIR}/assets/boom5.wav').play()])
@@ -534,7 +537,7 @@ while c.running:
 						pox_module.add_charge(asteroid.position[0], asteroid.position[1], 300 * asteroid.size,
 						                      (255, 0, 0),
 						                      False))
-					c.ASTEROIDS.remove(asteroid)
+					ASTEROIDS.remove(asteroid)
 				break
 
 	for bullet in c.BULLETS[:]:
@@ -546,7 +549,7 @@ while c.running:
 		c.once = True
 		pg.event.clear()
 
-	if not c.asteroids and enterprise and enterprise.visible:
+	if not asteroids and enterprise and enterprise.visible:
 		if c.once:
 			c.lvl_timer = pg.time.get_ticks()
 		c.once = False
@@ -556,7 +559,7 @@ while c.running:
 		c.msg_rot = 1
 		c.msg_sca = 1
 		c.now = pg.time.get_ticks()
-		c.State = State.NEXTLEVEL
+		State = State.NEXTLEVEL
 		if c.now > c.lvl_timer + 2000:
 			c.message = ""
 			c.once = True
@@ -576,7 +579,7 @@ while c.running:
 			continue
 		if not hasattr(particle, "blit"):
 			print(particle, type(particle), dir(particle), particle.__dict__)
-			particle.move()
+			# particle.move(c.screen)
 			c.screen.blit(particle.surface, (0, c.screen.get_width()))
 			continue
 		else:
@@ -614,12 +617,12 @@ while c.running:
 			if hasattr(i, 'draw'):
 				i.draw(c.screen)
 		c.STREAMS.clear()
-		for s in c.STARS:
-			s.update()
+		for s in STARS:
+			s.update(c.screen)
 			s.draw(c.screen)
 			if s.y > c.screen.get_height():
-				if s in c.STARS:
-					c.STARS.remove(s)
+				if s in STARS:
+					STARS.remove(s)
 	except RuntimeError as e:
 		print(f"ERROR occurred in {e}")
 
@@ -650,8 +653,8 @@ while c.running:
 				game_object.radius = game_object.sprite.get_width() / 2
 				try:
 					if game_object.hp <= 0:
-						c.asteroids.remove(game_object)
-					if game_object not in c.ASTEROIDS:
+						asteroids.remove(game_object)
+					if game_object not in aASTEROIDS:
 						continue
 				except ValueError as e:
 					print(f"{game_object}")

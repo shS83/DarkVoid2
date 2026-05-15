@@ -37,7 +37,7 @@ render_cache: dict[Tuple[int, int, int], pg.Surface] = {}
 t = pg.time.get_ticks() * 0.001
 ship_scale = 0.3
 frame = 0
-STARS = []
+
 ANIMATIONS = []
 PARTICLES = []
 STREAMS = []
