@@ -1,3 +1,5 @@
+from typing import Tuple
+
 MIDNIGHT_BLUE = (20, 20, 50)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)

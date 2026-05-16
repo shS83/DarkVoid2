@@ -9,11 +9,6 @@ x_res = 1920
 y_res = 1080
 screen = pygame.display.set_mode([x_res, y_res], pygame.SHOWN)
 HOME_DIR = HOME = os.path.expanduser('~') + '/PycharmProjects/DarkVoid2'
-pygame.mixer.music.load(
-	f'{HOME_DIR}/assets/Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3')
-pygame.mixer.init(48000, -16, 2, 4096)
-pygame.mixer.music.play(-1)
-pygame.mixer.music.set_volume(0.2)
 pygame.event.clear()
 
 font_size = 200

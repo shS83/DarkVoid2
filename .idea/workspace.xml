@@ -4,21 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Totally broken down.. time to rebuild">
-      <change afterPath="$PROJECT_DIR$/assets/space_background.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/space_background.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/space_background_2.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="time flows backwards">
+      <change afterPath="$PROJECT_DIR$/Dark_Void_2.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/entities/boss.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/entities/enemy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/entities/events.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/entities/player.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lvl1.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/systems/bullet_manager.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/systems/bullet_patterns.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/systems/collisiions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/systems/ovject_pooling.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/systems/scoring.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/systems/stage_manager.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ui/hud.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/commons.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/darkvoid2.py" beforeDir="false" afterPath="$PROJECT_DIR$/darkvoid2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/darkvoid21.py" beforeDir="false" afterPath="$PROJECT_DIR$/darkvoid21.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/ship.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/ship.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/intro_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/intro_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/spritegroups.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/spritegroups.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/asteroids.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/asteroids.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/bullet.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/bullet.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/stars.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/stars.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/magic/blasting.py" beforeDir="false" afterPath="$PROJECT_DIR$/magic/blasting.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/magic/pfx_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/magic/pfx_module.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/magic/pox_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/magic/pox_module.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/old_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/magic/colors.py" beforeDir="false" afterPath="$PROJECT_DIR$/magic/colors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +74,7 @@
     </selectedModels>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="91" />
+    <option name="cachedIndexableFilesCount" value="110" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -113,12 +123,15 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.Dark_Void_2.executor": "Run",
     "Python.asteroids.executor": "Run",
     "Python.commons.executor": "Run",
     "Python.darkvoid2.executor": "Run",
     "Python.darkvoid21.executor": "Run",
     "Python.darkvoid_03.executor": "Run",
+    "Python.game.executor": "Run",
     "Python.intro_module.executor": "Run",
+    "Python.lvl1.executor": "Run",
     "Python.main.executor": "Run",
     "Python.main2.executor": "Run",
     "Python.old_main.executor": "Run",
@@ -137,7 +150,7 @@
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "root",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/home/shs/PycharmProjects/DarkVoid2/assets",
+    "last_opened_file_path": "/home/shs/Code/DarkVoid",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -153,10 +166,10 @@
       <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets" />
       <recent name="$PROJECT_DIR$/core" />
       <recent name="$PROJECT_DIR$/magic" />
       <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/assets" />
     </key>
   </component>
   <component name="RunManager">
@@ -240,8 +253,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.intro_module" />
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.intro_module" />
       </list>
     </recent_temporary>
   </component>
@@ -477,7 +490,14 @@
       <option name="presentableId" value="LOCAL−00031" />
       <updated>1778892413523</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL−00032" summary="time flows backwards">
+      <option name="closed" value="true" />
+      <created>1778904917850</created>
+      <option name="number" value="LOCAL−00032" />
+      <option name="presentableId" value="LOCAL−00032" />
+      <updated>1778904917850</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -494,7 +514,8 @@
     <MESSAGE value="Few minor changes" />
     <MESSAGE value="Now it works" />
     <MESSAGE value="Totally broken down.. time to rebuild" />
-    <option name="LAST_COMMIT_MESSAGE" value="Totally broken down.. time to rebuild" />
+    <MESSAGE value="time flows backwards" />
+    <option name="LAST_COMMIT_MESSAGE" value="time flows backwards" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

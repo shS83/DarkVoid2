@@ -1,16 +1,42 @@
-from core.gameobject import GameObject
 import pygame as pg
+import config as c
 
 
-class Bullet(GameObject):
-	def __init__(self, position, velocity):
-		image = pg.Surface((6, 12))
-		image.fill((255, 255, 0))
-
-		super().__init__(position, image, velocity)
+class PlayerBullet(pg.sprite.Sprite):
+	def __init__(self, game, pos):
+		super().__init__()
+		self.game = game
+		self.image = pg.Surface((5, 18), pg.SRCALPHA)
+		pg.draw.rect(self.image, (120, 220, 255), (0, 0, 5, 18))
+		self.rect = self.image.get_rect(center=pos)
+		self.pos = pg.Vector2(pos)
+		self.vel = pg.Vector2(0, -c.PLAYER_BULLET_SPEED)
+		self.damage = 1
 
 	def update(self, dt):
-		super().update(dt)
+		self.pos += self.vel * dt
+		self.rect.center = self.pos
+		if self.rect.bottom < 0:
+			self.kill()
 
-		if not pg.display.get_surface().get_rect().collidepoint(self.position):
+
+class EnemyBullet(pg.sprite.Sprite):
+	def __init__(self, game, pos, velocity):
+		super().__init__()
+		self.game = game
+		self.image = pg.Surface((12, 12), pg.SRCALPHA)
+		pg.draw.circle(self.image, (255, 80, 120), (6, 6), 6)
+		self.rect = self.image.get_rect(center=pos)
+		self.pos = pg.Vector2(pos)
+		self.vel = pg.Vector2(velocity)
+		self.radius = 6
+
+	def update(self, dt):
+		self.pos += self.vel * dt
+		self.rect.center = self.pos
+
+		if (
+				self.rect.right < -40 or self.rect.left > c.WIDTH + 40 or
+				self.rect.bottom < -40 or self.rect.top > c.HEIGHT + 40
+		):
 			self.kill()

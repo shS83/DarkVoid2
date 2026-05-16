@@ -1,5 +1,6 @@
 import pygame as pg
 import random
+import game
 
 
 class Asteroid(pg.sprite.Sprite):
@@ -7,6 +8,7 @@ class Asteroid(pg.sprite.Sprite):
 		super().__init__()
 		self.image = image
 		self.rect = self.image.get_rect(center=position)
+		self.game = game
 
 
 class Laser(pg.sprite.Sprite):
@@ -14,6 +16,7 @@ class Laser(pg.sprite.Sprite):
 		super().__init__()
 		self.image = image
 		self.rect = self.image.get_rect(center=position)
+		self.game = game
 
 
 class Bullet(pg.sprite.Sprite):
@@ -21,6 +24,7 @@ class Bullet(pg.sprite.Sprite):
 		super().__init__()
 		self.image = image
 		self.rect = self.image.get_rect(center=position)
+		self.game = game
 
 
 class Enemies(pg.sprite.Sprite):
@@ -28,6 +32,7 @@ class Enemies(pg.sprite.Sprite):
 		super().__init__()
 		self.image = image
 		self.rect = self.image.get_rect(center=position)
+		self.game = game
 
 
 class Particles(pg.sprite.Sprite):
@@ -35,6 +40,7 @@ class Particles(pg.sprite.Sprite):
 		super().__init__()
 		self.image = image
 		self.rect = self.image.get_rect(center=position)
+		self.game = game
 
 
 class Terrain(pg.sprite.Sprite):
@@ -42,6 +48,7 @@ class Terrain(pg.sprite.Sprite):
 		super().__init__()
 		self.image = image
 		self.rect = self.image.get_rect(center=position)
+		self.game = game
 
 
 class Powerup(pg.sprite.Sprite):
@@ -49,6 +56,7 @@ class Powerup(pg.sprite.Sprite):
 		super().__init__()
 		self.image = image
 		self.rect = self.image.get_rect(center=position)
+		self.game = game
 
 
 class Stars(pg.sprite.Sprite):
@@ -56,12 +64,14 @@ class Stars(pg.sprite.Sprite):
 		super().__init__()
 		self.image = image
 		self.rect = self.image.get_rect(center=position)
+		self.game = game
 
 
 class Player(pg.sprite.Sprite):
 	def __init__(self, position, image):
 		super().__init__()
 		self.image = image
+		self.game = game
 		tight_rect = self.image.get_rect(center=position)
 		tight_rect.inflate_ip(-10, -10)
 		self.tight_rect = tight_rect

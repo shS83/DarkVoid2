@@ -4,6 +4,8 @@ import random
 import pygame.transform as tf
 from core.spritegroups import asteroid_group
 import pygame as pg
+from core.utils import get_random_position
+import core.commons as c
 
 
 class Asteroid(GameObject):
@@ -15,7 +17,7 @@ class Asteroid(GameObject):
 	def __init__(self, position, image, size, create_callback):
 		self.size = size
 		self.create_callback = create_callback
-
+		print(self.size)
 		self.scale = {5: 0.5, 4: 0.4, 3: 0.3, 2: 0.2, 1: 0.15}[size]
 
 		super().__init__(
@@ -26,14 +28,14 @@ class Asteroid(GameObject):
 
 		self.rotation_speed = random.uniform(-2, 2)
 
-		self.image = tf.rotozoom(self.original_image, 0, self.scale)
-		self.rect = self.image.get_rect(center=position)
+		self.image = tf.scale_by(self.original_image, self.scale)
+		self.rect = self.image.get_width(), self.image.get_height()
 
 	def update(self, dt):
 		self.rotation += self.rotation_speed * dt
 
 		self.image = tf.rotozoom(
-			self.original_image,
+			self.image,
 			self.rotation,
 			self.scale
 		)
@@ -55,18 +57,24 @@ def spawn_rock(amount, new=True):
 					new = False
 
 				if (
-						position.distance_to(enterprise.position)
+						position.distance_to(get_random_position(c.screen))
 						> Asteroid.MIN_ASTEROID_DISTANCE
 				):
 					break
 
 			for r in c.ROCK_IMAGES:
-				screen_rect = pg.Rect(0, 0, c.screen.get_width(), c.screen.get_height())
-				asteroid_group.add(Asteroid(get_random_position(screen_rect), r, random.randint(1, 5), None))
+				screen_surf = pg.Surface(1, 1, 1920, 1080)
+				try:
+					asteroid_group.add(
+						Asteroid(get_random_position(screen_surf), r, random.randint(1, 5), asteroid_group.add))
+				except ValueError as e:
+					asteroid_group.remove(r)
+					print(e)
+					continue
 
 
 def asteroidium(level_instance):
 	for _ in range(level_instance.asteroids):
 		screen_rect = pg.Rect(0, 0, c.screen.get_width(), c.screen.get_height())
 		asteroid_group.add(Asteroid(get_random_position(screen_rect), pg.image.load(random.choice(c.ROCK_IMAGES)),
-		                            random.randint(1, 5), None))
+		                            random.randint(1, 5), asteroid_group.add))
