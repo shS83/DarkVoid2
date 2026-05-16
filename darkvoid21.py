@@ -8,7 +8,7 @@ from pygame.transform import rotozoom
 from magic import pfx_module, pox_module
 # import lvl_module
 from typing import Tuple
-from darkvoid2 import Ship, spawn_enemy
+from emtities import Ship as enterprise
 
 # import intro_module
 

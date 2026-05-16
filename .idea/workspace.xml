@@ -5,22 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Totally broken down.. time to rebuild">
-      <change afterPath="$PROJECT_DIR$/main2.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/space_background.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/space_background.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/space_background_2.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/commons.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/space.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/spritegroups.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/spritegroups.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/commons.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/darkvoid2.py" beforeDir="false" afterPath="$PROJECT_DIR$/darkvoid2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/asteroids.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/asteroids.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/darkvoid21.py" beforeDir="false" afterPath="$PROJECT_DIR$/darkvoid21.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/ship.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/ship.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/stars.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/stars.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/magic/blasting.py" beforeDir="false" afterPath="$PROJECT_DIR$/magic/blasting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/magic/pfx_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/magic/pfx_module.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/magic/pox_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/magic/pox_module.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/old_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/old_main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uv.lock" beforeDir="false" afterPath="$PROJECT_DIR$/uv.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +64,7 @@
     </selectedModels>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="86" />
+    <option name="cachedIndexableFilesCount" value="91" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -123,9 +121,12 @@
     "Python.intro_module.executor": "Run",
     "Python.main.executor": "Run",
     "Python.main2.executor": "Run",
+    "Python.old_main.executor": "Run",
     "Python.pfx_module.executor": "Run",
     "Python.pox_module.executor": "Run",
+    "Python.ship.executor": "Run",
     "Python.spritegroups.executor": "Run",
+    "Python.stars.executor": "Run",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -136,7 +137,7 @@
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "root",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/home/shs/Code/Matrixia/matrixia.py",
+    "last_opened_file_path": "/home/shs/PycharmProjects/DarkVoid2/assets",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -148,8 +149,8 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/assets" />
+      <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/core" />
@@ -158,7 +159,7 @@
       <recent name="$PROJECT_DIR$/assets" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager">
     <configuration name="darkvoid2" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="darkvoid2" />
       <option name="ENV_FILES" value="" />
@@ -239,8 +240,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.main" />
         <item itemvalue="Python.intro_module" />
+        <item itemvalue="Python.main" />
       </list>
     </recent_temporary>
   </component>
@@ -469,7 +470,14 @@
       <option name="presentableId" value="LOCAL−00030" />
       <updated>1778888421846</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL−00031" summary="Totally broken down.. time to rebuild">
+      <option name="closed" value="true" />
+      <created>1778892413523</created>
+      <option name="number" value="LOCAL−00031" />
+      <option name="presentableId" value="LOCAL−00031" />
+      <updated>1778892413523</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -2,7 +2,7 @@ import pygame as pg
 import pygame.gfxdraw
 import random
 import math
-from core import config as c
+from core import commons as c
 from core.spritegroups import particles_group
 
 xRES = 1920

@@ -108,6 +108,6 @@ def add_stream(x, y, amount, color, direction, tolerance, psizemax, opacitydelta
 			particles_group.add(Particle(x, y, color, direction, tolerance, psizemax, opacitydelta, gravity))
 
 
-particles_group.add(ship_particle=add_stream(700, 700, 90, (255, 180, 0), 180, 10, 12, 0.6))
+particles_group.add(add_stream(700, 700, 90, (255, 180, 0), 180, 10, 12, 0.6))
 
 startTime = pygame.time.get_ticks()

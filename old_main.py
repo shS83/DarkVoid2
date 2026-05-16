@@ -1,23 +1,31 @@
-from core.config import commons as c
+from core import commons as c
 import pygame as pg
 import sys
+import entities.ship as enterprise
+from entities.stars import Star
+from entities.asteroids import Asteroid
+from core.spritegroups import asteroid_group, all_sprites
+from core.sprite_anim import draw_left, draw_right
+from entities import level, states
+import random
+from core import gameobject
 
 clock = pg.time.Clock()
 running = True
 while running:
-	c.screen = pg.display.set_mode((1920, 1080), pg.SRCALPHA)
-	c.screen.fill((0, 0, 10))
+	screen = pg.display.set_mode((1920, 1080), pg.SRCALPHA)
+	screen.fill((0, 0, 10))
 	dt = clock.tick(60) / 1000
 	all_sprites.update(dt)
 
 	pg.display.flip()
-	c.screen.blit(c.BACKGROUND, (0, 0))
+	screen.blit(c.BACKGROUND, (0, 0))
 	keys = pg.key.get_pressed()
 	mouse = pg.mouse.get_pressed()
-	if keys[K_ESCAPE]:
+	if keys[pg.K_ESCAPE]:
 		c.running = False
 
-	if keys[K_RETURN]:
+	if keys[pg.K_RETURN]:
 		pg.mixer.Sound(f'{c.HOME_DIR}/assets/lasersound.wav').play()
 		enterprise.shoot_guns(c.ship_x, c.ship_y)
 
@@ -45,7 +53,7 @@ while running:
 		once = True
 		pg.event.clear()
 
-	if not asteroids and enterprise and enterprise.visible:
+	if not asteroid_group and enterprise and enterprise.visible:
 		c.lvl_timer = pg.time.get_ticks()
 		once = False
 		c.message = "ENEMIES FELLED"
@@ -73,11 +81,11 @@ while running:
 		if hasattr(game_object, 'rotate_in_place'):
 			game_object.rotate_in_place()
 		if hasattr(game_object, 'move'):
-			game_object.move(c.screen)
+			game_object.move(screen)
 		if not hasattr(game_object, 'position') or not hasattr(game_object, 'draw'):
-			c.screen.blit(game_object.sprite, game_object.position)
+			screen.blit(game_object.sprite, game_object.position)
 		else:
-			c.screen.blit(game_object.sprite, game_object.position)
+			screen.blit(game_object.sprite, game_object.position)
 
 	screen.blit(render_char("DarkVoid2 beta 0.0149", (100, 100, 255)), (10, 10))
 	screen.blit(render_char(f"Asteroids: {len(asteroids_group)}", (100, 255, 100)), (10, 50))
@@ -97,10 +105,10 @@ while running:
 	if hasattr(game_object, 'rotate_in_place'):
 		game_object.rotate_in_place()
 	if hasattr(game_object, 'move'):
-		game_object.move(c.screen)
+		game_object.move(screen)
 	if not hasattr(game_object, 'sprite'):
 		continue
-	c.screen.blit(game_object.sprite, game_object.position)
+	screen.blit(game_object.sprite, game_object.position)
 
 pg.mixer.fadeout(2000)
 pg.mixer.stop()

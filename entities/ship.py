@@ -3,7 +3,11 @@ import pygame as pg
 from pygame.math import Vector2
 import pygame.transform as tf
 import math
-import core.config as c
+import core.commons as c
+from entities.bullet import Bullet
+from core.spritegroups import bullet_group
+import random
+from magic import pox_module
 
 
 class Ship(GameObject):
@@ -11,7 +15,7 @@ class Ship(GameObject):
 
 	def __init__(self, position, image, bullet_group):
 		super().__init__(position, image)
-
+		self.visible = True
 		self.bullet_group = bullet_group
 		self.direction = Vector2(0, -1)
 		self.speed = 0
@@ -74,7 +78,7 @@ class Ship(GameObject):
 
 	def shoot_guns(self, ship_x, ship_y):
 		c.STREAMS.append(pox_module.flash_screen(255, c.screen))
-		pygame.mixer.Sound(f'{c.HOME_DIR}/assets/lasersound.wav').play()
+		pg.mixer.Sound(f'{c.HOME_DIR}/assets/lasersound.wav').play()
 		bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
 		bullet = Bullet(self.position, bullet_velocity)
 		c.BULLETS.append(bullet)
@@ -83,7 +87,8 @@ class Ship(GameObject):
 		self.create_bullet_callback(bullet)
 
 
-enterprise = Ship((1920 // 2, 800), pg.image.load(f'{c.HOME_DIR}/assets/ship_neutral.png').convert_alpha(), bullets)
+enterprise = Ship((1920 // 2, 800), pg.image.load(f'{c.HOME_DIR}/assets/ship_neutral.png').convert_alpha(),
+                  bullet_group)
 
 enterprise.rotate_image(c.SHIP, 0)
 enterprise.draw(c.screen)
