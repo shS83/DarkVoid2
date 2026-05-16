@@ -1,4 +1,4 @@
-from core import commons as c
+from core import config as c
 import pygame as pg
 from pox_module import add_charge
 from pfx_module import Particle

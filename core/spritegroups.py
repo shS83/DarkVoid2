@@ -1,6 +1,4 @@
 import pygame as pg
-import commons as c
-from utils import get_random_position
 import random
 
 

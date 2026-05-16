@@ -3,7 +3,7 @@ import pygame as pg
 from pygame.math import Vector2
 import pygame.transform as tf
 import math
-import core.commons as c
+import core.config as c
 
 
 class Ship(GameObject):

@@ -1,6 +1,6 @@
 import pygame as pg
 from core.spritegroups import star_group
-from core import commons as c
+from core import config as c
 import pygame.gfxdraw
 import random
 

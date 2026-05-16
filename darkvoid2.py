@@ -6,7 +6,7 @@ import random
 from core.spritegroups import particles_group, asteroid_group, bullet_group, star_group
 from entities.level import Level
 from entities.states import State
-from core import commons
+from core import config
 from entities.ship import enterprise
 from core.utils import zoom_text
 

@@ -2,8 +2,6 @@ from core.gameobject import GameObject
 from pygame.math import Vector2
 import random
 import pygame.transform as tf
-from core.utils import get_random_position
-from core import commons as c
 from core.spritegroups import asteroid_group
 import pygame as pg
 

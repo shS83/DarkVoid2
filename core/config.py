@@ -1,5 +1,5 @@
 import pygame as pg
-from pygame.locals import *
+# from pygame.locals import *
 import os
 from typing import Tuple
 import pygame.gfxdraw, random, math

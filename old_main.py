@@ -1,4 +1,4 @@
-from core.commons import commons as c
+from core.config import commons as c
 import pygame as pg
 import sys
 
