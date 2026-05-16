@@ -12,7 +12,7 @@ from emtities import Ship as enterprise
 
 # import intro_module
 
-HOME_DIR = "/home/shs/PycharmProjects/DarkVoid2"
+HOME_DIR = "/"
 pg.init()
 font_size = 21
 font = pygame.font.Font(f'{HOME_DIR}/assets/VL-Gothic-Regular.ttf', font_size)

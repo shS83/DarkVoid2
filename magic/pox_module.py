@@ -5,8 +5,8 @@ import math
 from core import commons as c
 from core.spritegroups import particles_group
 
-xRES = 1920
-yRES = 1080
+x_res = 1920
+y_res = 1080
 NOW_MS = 0
 timer = pygame.time.Clock()
 pygame.init()

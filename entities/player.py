@@ -6,20 +6,29 @@ from entities.bullet import PlayerBullet
 class Player(pg.sprite.Sprite):
 	def __init__(self, game, pos):
 		super().__init__()
-		self.game = game
-		# self.image = pg.Surface((42, 52), pg.SRCALPHA)
-		# pg.draw.polygon(self.image, (220, 220, 255), [(21, 0), (42, 52), (21, 42), (0, 52)])
-		self.image = pg.image.load("assets/Proper_warship.png").convert_alpha()
-		self.rect = self.image.get_rect(center=pos)
-		self.pos = pg.Vector2(pos)
 		self.fire_timer = 0
-		self.alive = True
-		self.invuln = 0
+		self.fire_cooldown = 0.12
+		self.game = game
+		self.image = pg.image.load("assets/Proper_warship.png").convert_alpha()
+		self.image = pg.transform.scale(self.image, (96, 96))
+		self.rect = self.image.get_rect(center=pos)
+		self.pos = pg.Vector2(self.rect.center)
+		self.speed = 350
 
+	def shoot(self):
+		if self.fire_timer > 0:
+			return
+
+		self.fire_timer = self.fire_cooldown
+		bullet = PlayerBullet(self.game, self.rect.midtop)
+		self.game.player_bullets.add(bullet)
+		self.game.all_sprites.add(bullet)
+		
 	def update(self, dt):
 		keys = pg.key.get_pressed()
+		mouse = pg.mouse.get_pressed()
 		direction = pg.Vector2(0, 0)
-
+		self.fire_timer -= dt
 		if keys[pg.K_LEFT] or keys[pg.K_a]:
 			direction.x -= 1
 		if keys[pg.K_RIGHT] or keys[pg.K_d]:
@@ -28,32 +37,14 @@ class Player(pg.sprite.Sprite):
 			direction.y -= 1
 		if keys[pg.K_DOWN] or keys[pg.K_s]:
 			direction.y += 1
-
+		if keys[pg.K_SPACE] or mouse[0]:
+			self.shoot()
 		if direction.length_squared() > 0:
 			direction = direction.normalize()
 
-		focused = keys[pg.K_LSHIFT] or keys[pg.K_RSHIFT]
-		speed = c.PLAYER_FOCUS_SPEED if focused else c.PLAYER_SPEED
-		self.pos += direction * speed * dt
+		self.pos += direction * self.speed * dt
 
-		self.pos.x = max(20, min(c.WIDTH - 20, self.pos.x))
-		self.pos.y = max(20, min(c.HEIGHT - 20, self.pos.y))
+		self.pos.x = max(32, min(c.WIDTH - 32, self.pos.x))
+		self.pos.y = max(32, min(c.HEIGHT - 32, self.pos.y))
+
 		self.rect.center = self.pos
-
-		self.fire_timer -= dt
-		if keys[pg.K_z] or keys[pg.K_SPACE]:
-			self.shoot()
-
-		if self.invuln > 0:
-			self.invuln -= dt
-
-	def shoot(self):
-		if self.fire_timer > 0:
-			return
-
-		self.fire_timer = c.PLAYER_FIRE_COOLDOWN
-		offsets = [-10, 10]
-		for ox in offsets:
-			bullet = PlayerBullet(self.game, (self.pos.x + ox, self.pos.y - 24))
-			self.game.player_bullets.add(bullet)
-			self.game.all_sprites.add(bullet)

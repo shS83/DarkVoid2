@@ -1,5 +1,5 @@
-import pygame, pygame.gfxdraw, random, math
-from darkvoid2 import BACKGROUND, ASTEROIDS, ROCK_IMAGES, ROCK1, ROCK2, ROCK3, ROCK4
+import pygame, pygame.gfxdraw
+from trash.darkvoid2 import BACKGROUND, ASTEROIDS, ROCK_IMAGES, ROCK1, ROCK2, ROCK3, ROCK4
 
 x_res = 1920
 y_res = 1080

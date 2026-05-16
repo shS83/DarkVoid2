@@ -1,61 +1,54 @@
 import pygame as pg
 import config as c
-
 from entities.player import Player
-from systems.stage_manager import StageManager
-from systems.collision import CollisionSystem
-from systems.bullet_manager import BulletManager
-from systems.scoring import ScoreSystem
-from ui.hud import HUD
+from entities.enemy import Enemy
+
+from magic.anim_module import new_explosion
+from magic.pox_module import add_charge
 
 
 class Game:
 	def __init__(self):
 		pg.init()
+
 		self.screen = pg.display.set_mode((c.WIDTH, c.HEIGHT))
 		self.clock = pg.time.Clock()
 		self.running = True
-		self.dt = 0
 
-		self.all_sprites = pg.sprite.Group()
+		self.background = pg.image.load("assets/space_background_2.jpg").convert()
+		self.background = pg.transform.scale(self.background, (c.WIDTH, c.HEIGHT))
 		self.enemies = pg.sprite.Group()
-		self.player_bullets = pg.sprite.Group()
-		self.enemy_bullets = pg.sprite.Group()
-		self.effects = pg.sprite.Group()
-		self.items = pg.sprite.Group()
-
-		self.score = ScoreSystem()
-		self.bullets = BulletManager(self)
-		self.collision = CollisionSystem(self)
-		self.stage = StageManager(self)
-		self.hud = HUD(self)
-
-		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 80))
+		self.all_sprites = pg.sprite.Group()
+		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 90))
 		self.all_sprites.add(self.player)
+		self.player_bullets = pg.sprite.Group()
+		enemy = Enemy(self, (c.WIDTH // 2, 80))
+		self.enemies.add(enemy)
+		self.all_sprites.add(enemy)
 
 	def run(self):
 		while self.running:
-			self.dt = self.clock.tick(c.FPS) / 1000
-			self.handle_events()
-			self.update()
-			self.draw()
+			dt = self.clock.tick(c.FPS) / 1000
+
+			for event in pg.event.get():
+				if event.type == pg.QUIT:
+					self.running = False
+
+			self.all_sprites.update(dt)
+			self.all_sprites.update(dt)
+
+			hits = pg.sprite.groupcollide(
+				self.enemies,
+				self.player_bullets,
+				False,
+				True
+			)
+
+			for enemy, bullets in hits.items():
+				enemy.damage(len(bullets))
+			self.screen.blit(self.background, (0, 0))
+			self.all_sprites.draw(self.screen)
+
+			pg.display.flip()
 
 		pg.quit()
-
-	def handle_events(self):
-		for event in pg.event.get():
-			if event.type == pg.QUIT:
-				self.running = False
-			elif event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
-				self.running = False
-
-	def update(self):
-		self.stage.update(self.dt)
-		self.all_sprites.update(self.dt)
-		self.collision.update()
-
-	def draw(self):
-		self.screen.fill((8, 8, 16))
-		self.all_sprites.draw(self.screen)
-		self.hud.draw(self.screen)
-		pg.display.flip()

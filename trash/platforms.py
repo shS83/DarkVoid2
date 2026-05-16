@@ -1,5 +1,4 @@
-import pygame, pygame.gfxdraw, random, math
-from darkvoid2 import curr_state, State
+import pygame, pygame.gfxdraw
 
 x_res = 1920
 y_res = 1080
