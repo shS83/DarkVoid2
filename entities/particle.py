@@ -12,16 +12,16 @@ class Particle(pg.sprite.Sprite):
 		self.pos = pg.Vector2(pos)
 
 		angle = random.uniform(0, math.tau)
-		speed = random.uniform(180, 650)
+		speed = random.uniform(180, 1050)
 
 		self.velocity = pg.Vector2(
 			math.cos(angle),
 			math.sin(angle)
 		) * speed
 
-		self.gravity = pg.Vector2(0, 200)
+		self.gravity = pg.Vector2(0, 100)
 
-		self.life = random.uniform(0.25, 0.75)
+		self.life = random.uniform(0.25, 0.95)
 		self.max_life = self.life
 
 		self.size = random.randint(2, 5)

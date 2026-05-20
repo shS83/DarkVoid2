@@ -78,14 +78,14 @@ class Enemy(pg.sprite.Sprite):
 			self.destroy()
 
 	def destroy(self):
-		explosion_sounds = [f'{os.getcwd()}/assets/explosion2.wav', f'{os.getcwd()}/assets/explosion1-long.wav',
-		                    f'{os.getcwd()}/assets/explosion3.wav']
+		explosion_sounds = [f'{c.HOME_DIR}/assets/explosion2.wav', f'{c.HOME_DIR}/assets/explosion1-long.wav',
+		                    f'{c.HOME_DIR}/assets/explosion3.wav']
 		pg.mixer.Sound(random.choice(explosion_sounds)).play()
 
 		explosion = Explosion(self.game, self.rect.center)
 		self.game.effects.add(explosion)
 		self.game.all_sprites.add(explosion)
-		for _ in range(2000):
+		for _ in range(5000):
 			particle = Particle(self.game, self.rect.center)
 			self.game.effects.add(particle)
 			self.game.all_sprites.add(particle)

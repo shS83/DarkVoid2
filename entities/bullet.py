@@ -8,8 +8,9 @@ class PlayerBullet(pg.sprite.Sprite):
 
 		self.game = game
 
-		self.image = pg.Surface((6, 20), pg.SRCALPHA)
-		pg.draw.rect(self.image, (100, 220, 255), (0, 0, 6, 20))
+		self.image = pg.image.load(f"{c.HOME_DIR}/assets/laser.png").convert_alpha()
+		# self.image = pg.Surface((6, 20), pg.SRCALPHA)
+		# pg.draw.rect(self.image, (100, 220, 255), (0, 0, 6, 20))
 
 		self.rect = self.image.get_rect(center=pos)
 		self.pos = pg.Vector2(self.rect.center)

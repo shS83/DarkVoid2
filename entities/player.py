@@ -4,7 +4,6 @@ import config as c
 from entities.bullet import PlayerBullet
 from entities.explosion import Explosion
 from entities.particle import Particle
-from core.gameover_text import Gameover
 
 
 class Player(pg.sprite.Sprite):
@@ -70,7 +69,7 @@ class Player(pg.sprite.Sprite):
 				self.game.effects.add(particle)
 				self.game.all_sprites.add(particle)
 			self.alive = False
-			self.game.gameover = True
+			self.game.game_over = True
 			self.kill()
 
 	def update(self, dt):
@@ -90,6 +89,10 @@ class Player(pg.sprite.Sprite):
 			self.shoot()
 		if keys[pg.K_ESCAPE]:
 			pg.quit()
+		# For debugging
+		if keys[pg.K_F11]:
+			self.alive = False
+
 		if direction.length_squared() > 0:
 			direction = direction.normalize()
 

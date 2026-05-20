@@ -12,8 +12,10 @@ from pygame.transform import rotozoom
 # from entities.stars import roll_the_drops, starfield, starfields
 
 
-class Dark_Void_2:
-	def run(self):
+class Dark_Void_2(pg.sprite.Sprite):
+	def __init__(self, game):
+		super().__init__()
+		self.game = game
 		pg.mixer.music.load(
 			f'{os.getcwd()}/assets/Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3')
 		pg.mixer.init(48000, -16, 2, 4096)
@@ -30,12 +32,22 @@ class Dark_Void_2:
 		clock = pg.time.Clock()
 		running = True
 
+		def update(dt):
+			...
+
+		def draw(screen):
+			...
+
+		def spawn_rock(screen):
+			#		self.asteroids.add(Asteroid(self, 100, 100))
+			...
+
 		while running:
 			dt = clock.tick(60) / 1000
 			self.screen.fill((0, 0, 10))
 			# if Event == 1:
 
-			spawn_rock(self.screen)
+			# self.spawn_rock(self.screen)
 			# else:
 			x_res, y_res = 1920, 1080
 			textfont = pg.font.Font(f'{os.getcwd()}/assets/JetBrainsMonoNerdFont-SemiBold.ttf', 200)
