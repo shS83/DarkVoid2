@@ -27,20 +27,25 @@ class PlayerBullet(pg.sprite.Sprite):
 class EnemyBullet(pg.sprite.Sprite):
 	def __init__(self, game, pos, velocity):
 		super().__init__()
+
 		self.game = game
+		self.pos = pg.Vector2(pos)
+		self.velocity = pg.Vector2(velocity)
+
 		self.image = pg.Surface((12, 12), pg.SRCALPHA)
 		pg.draw.circle(self.image, (255, 80, 120), (6, 6), 6)
-		self.rect = self.image.get_rect(center=pos)
-		self.pos = pg.Vector2(pos)
-		self.vel = pg.Vector2(velocity)
+
+		self.rect = self.image.get_rect(center=self.pos)
 		self.radius = 6
 
 	def update(self, dt):
-		self.pos += self.vel * dt
+		self.pos += self.velocity * dt
 		self.rect.center = self.pos
 
 		if (
-				self.rect.right < -40 or self.rect.left > c.WIDTH + 40 or
-				self.rect.bottom < -40 or self.rect.top > c.HEIGHT + 40
+				self.rect.top > c.HEIGHT
+				or self.rect.bottom < 0
+				or self.rect.right < 0
+				or self.rect.left > c.WIDTH
 		):
 			self.kill()

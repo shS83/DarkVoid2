@@ -4,8 +4,8 @@ import os
 from typing import Tuple
 import pygame.gfxdraw, random, math
 
-x_res = 1920
-y_res = 1080
+WIDTH, x_res = 1920, 1920
+HEIGHT, y_res = 1080, 1080
 HOME_DIR = os.path.expanduser('~') + '/PycharmProjects/DarkVoid2'
 pg.init()
 msg_font = pygame.font.SysFont(
@@ -37,11 +37,6 @@ render_cache: dict[Tuple[int, int, int], pg.Surface] = {}
 t = pg.time.get_ticks() * 0.001
 ship_scale = 0.3
 frame = 0
-
-ANIMATIONS = []
-PARTICLES = []
-STREAMS = []
-BULLETS = []
 
 SHIP = pg.image.load(f"{HOME_DIR}/assets/ship_neutral_2.png", "Ship neutral").convert_alpha()
 ship_x, ship_y = screen.get_width() // 2, screen.get_height() - SHIP.get_height() - 50

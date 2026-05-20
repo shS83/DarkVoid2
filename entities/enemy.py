@@ -3,9 +3,9 @@ import config as c
 from pygame.transform import rotozoom
 import os
 import random
-from magic.pox_module import add_charge
-from magic.anim_module import new_explosion
 from entities.explosion import Explosion
+from entities.particle import Particle
+from entities.bullet import EnemyBullet
 
 
 class Enemy(pg.sprite.Sprite):
@@ -13,7 +13,8 @@ class Enemy(pg.sprite.Sprite):
 		super().__init__()
 
 		self.game = game
-
+		self.shoot_timer = 1.0
+		self.shoot_delay = 1.4
 		self.image = rotozoom(pg.image.load("assets/alus2.png").convert_alpha(), 180, 0.3)
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
@@ -39,6 +40,11 @@ class Enemy(pg.sprite.Sprite):
 	def update(self, dt):
 		self.pos.y += self.speed * dt
 		self.rect.center = self.pos
+		self.shoot_timer -= dt
+		if self.shoot_timer <= 0:
+			self.shoot_timer = self.shoot_delay
+			self.shoot()
+
 		if self.flash_timer > 0:
 			self.flash_timer -= dt
 			self.image = self.flash_image
@@ -46,6 +52,23 @@ class Enemy(pg.sprite.Sprite):
 			self.image = self.base_image
 		if self.rect.top > c.HEIGHT:
 			self.kill()
+
+	def shoot(self):
+		direction = self.game.player.pos - self.pos
+
+		if direction.length_squared() == 0:
+			direction = pg.Vector2(0, 1)
+		else:
+			direction = direction.normalize()
+
+		bullet = EnemyBullet(
+			self.game,
+			self.rect.center,
+			direction * 260
+		)
+
+		self.game.enemy_bullets.add(bullet)
+		self.game.all_sprites.add(bullet)
 
 	def damage(self, amount):
 		self.hp -= amount
@@ -55,12 +78,16 @@ class Enemy(pg.sprite.Sprite):
 			self.destroy()
 
 	def destroy(self):
-		if r := random.random() < 0.5:
-			pg.mixer.Sound(f'{os.getcwd()}/assets/explosion2.wav').play()
-		else:
-			pg.mixer.Sound(f'{os.getcwd()}/assets/explosion3.wav').play()
+		explosion_sounds = [f'{os.getcwd()}/assets/explosion2.wav', f'{os.getcwd()}/assets/explosion1-long.wav',
+		                    f'{os.getcwd()}/assets/explosion3.wav']
+		pg.mixer.Sound(random.choice(explosion_sounds)).play()
+
 		explosion = Explosion(self.game, self.rect.center)
 		self.game.effects.add(explosion)
 		self.game.all_sprites.add(explosion)
+		for _ in range(2000):
+			particle = Particle(self.game, self.rect.center)
+			self.game.effects.add(particle)
+			self.game.all_sprites.add(particle)
 
 		self.kill()

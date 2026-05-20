@@ -4,8 +4,7 @@ from entities.player import Player
 from entities.enemy import Enemy
 from entities.star import Star
 import random
-from magic.anim_module import new_explosion
-from magic.pox_module import add_charge
+from core.gameover_text import Gameover
 
 
 class Game:
@@ -25,7 +24,11 @@ class Game:
 		self.background = pg.image.load("assets/space_background_2.jpg").convert()
 		self.background = pg.transform.scale(self.background, (c.WIDTH, c.HEIGHT))
 		self.enemies = pg.sprite.Group()
+		self.enemy_bullets = pg.sprite.Group()
+		self.texts = pg.sprite.Group()
 		self.all_sprites = pg.sprite.Group()
+		self.gameover = False
+		self.gameovertext = Gameover()
 		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 90))
 		self.all_sprites.add(self.player)
 		self.player_bullets = pg.sprite.Group()
@@ -38,11 +41,25 @@ class Game:
 			self.stars.add(Star())
 
 	def spawn_enemy(self):
-		x = random.randint(40, c.WIDTH - 40)
-		y = -80
-		enemy = Enemy(self, (x, y))
-		self.enemies.add(enemy)
-		self.all_sprites.add(enemy)
+		for _ in range(20):  # try 20 times
+			x = random.randint(50, c.WIDTH - 50)
+			y = -60
+
+			test_rect = pg.Rect(0, 0, 64, 64)
+			test_rect.center = (x, y)
+
+			overlap = False
+
+			for enemy in self.enemies:
+				if test_rect.colliderect(enemy.rect.inflate(20, 20)):
+					overlap = True
+					break
+
+			if not overlap:
+				enemy = Enemy(self, (x, y))
+				self.enemies.add(enemy)
+				self.all_sprites.add(enemy)
+				return
 
 	def update(self, dt):
 		self.stars.update(dt)
@@ -61,6 +78,18 @@ class Game:
 			True
 		)
 
+		if self.player.alive and self.player.invincible_timer <= 0:
+			for bullet in self.enemy_bullets:
+				distance = self.player.pos.distance_to(bullet.pos)
+
+				if distance < self.player.hitbox_radius + bullet.radius:
+					bullet.kill()
+					self.player.hit()
+					break
+
+		if self.gameover:
+			self.gameovertext.update(dt)
+
 		for enemy, bullets in hits.items():
 			enemy.damage(len(bullets))
 
@@ -68,6 +97,9 @@ class Game:
 		self.screen.blit(self.background, (0, 0))
 		self.all_sprites.draw(self.screen)
 		self.stars.draw(self.screen)
+		self.texts.draw(self.screen)
+		if self.gameover:
+			self.gameovertext.draw(self.screen)
 		pg.display.flip()
 
 	def run(self):

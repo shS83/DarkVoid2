@@ -4,15 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="some progress">
-      <change afterPath="$PROJECT_DIR$/entities/star.py" afterDir="false" />
+    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="added sounds for explosions and stars">
+      <change afterPath="$PROJECT_DIR$/core/gameover_text.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/entities/particle.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/commons.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/commons.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/intro_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/intro_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/bullet.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/bullet.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/enemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/enemy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/player.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/stars.py" beforeDir="false" afterPath="$PROJECT_DIR$/trash/stars.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trash/old_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/trash/old_main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +60,7 @@
     </selectedModels>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="148" />
+    <option name="cachedIndexableFilesCount" value="155" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -511,7 +513,14 @@
       <option name="presentableId" value="LOCAL−00036" />
       <updated>1779258862103</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL−00037" summary="added sounds for explosions and stars">
+      <option name="closed" value="true" />
+      <created>1779267248998</created>
+      <option name="number" value="LOCAL−00037" />
+      <option name="presentableId" value="LOCAL−00037" />
+      <updated>1779267248998</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -530,7 +539,8 @@
     <MESSAGE value="Totally broken down.. time to rebuild" />
     <MESSAGE value="time flows backwards" />
     <MESSAGE value="some progress" />
-    <option name="LAST_COMMIT_MESSAGE" value="some progress" />
+    <MESSAGE value="added sounds for explosions and stars" />
+    <option name="LAST_COMMIT_MESSAGE" value="added sounds for explosions and stars" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

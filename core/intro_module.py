@@ -8,7 +8,7 @@ fonts = ['prceltic']
 x_res = 1920
 y_res = 1080
 screen = pygame.display.set_mode([x_res, y_res], pygame.SHOWN)
-HOME_DIR = HOME = os.path.expanduser('~') + '/PycharmProjects/DarkVoid2'
+HOME_DIR = os.path.expanduser('~') + '/PycharmProjects/DarkVoid2'
 pygame.event.clear()
 
 font_size = 200
@@ -29,7 +29,6 @@ screen = pygame.display.set_mode([x_res, y_res], pygame.SHOWN)
 pygame.display.set_caption("Dark Void 2 - The Voidling")
 INITEVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(INITEVENT, 5000, 20000)
-
 screen.blit(rotozoom(textfont.render("DARK VOID 2", True, (255, 255, 255)), 3.0, 1.3), (100, 300), (0, 0, x_res, y_res))
 pygame.display.flip()
 timer.tick(159)
