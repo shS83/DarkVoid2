@@ -30,7 +30,11 @@ class Enemy(pg.sprite.Sprite):
 	def update(self, dt):
 		self.pos.y += self.speed * dt
 		self.rect.center = self.pos
-
+		if self.flash_timer > 0:
+			self.flash_timer -= dt
+			self.image = self.flash_image
+		else:
+			self.image = self.base_image
 		if self.rect.top > c.HEIGHT:
 			self.kill()
 
