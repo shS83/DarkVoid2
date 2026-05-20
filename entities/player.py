@@ -20,13 +20,13 @@ class Player(pg.sprite.Sprite):
 		self.alive = True
 		self.hitbox_radius = 6
 		self.fire_timer = 0
-		self.fire_cooldown = 0.12
+		self.fire_cooldown = 0.10
 		self.fire_cooldown2 = 0.08
 		self.game = game
 		self.image3 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/purplealus.png").convert_alpha(), 0, 0.3)
-		self.image8 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/turqoiseship.png").convert_alpha(), 0, 0.3)
+		# self.image8 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/turqoiseship.png").convert_alpha(), 0, 0.3)
 		self.image1 = pg.image.load(f"{c.HOME_DIR}/assets/Proper_warship.png").convert_alpha()
-		self.images = [self.image1, self.image3, self.image8]
+		self.images = [self.image1, self.image3]
 		self.image = random.choice(self.images)
 		self.image = pg.transform.scale(self.image, (160, 160))
 		self.rect = self.image.get_rect(center=pos)
@@ -59,7 +59,7 @@ class Player(pg.sprite.Sprite):
 
 	def shoot_spread(self):
 		self.image = pg.Surface((6, 20), pg.SRCALPHA)
-		pg.draw.rect(self.image, (255, 100, 255), (0, 0, 5, 25))
+		pg.draw.rect(self.image, (255, 0, 0), (0, 0, 5, 25))
 		bullet_data = [
 			((self.rect.centerx, self.rect.top), (0, -850)),
 			((self.rect.centerx - 10, self.rect.top + 8), (-180, -760)),
@@ -112,10 +112,10 @@ class Player(pg.sprite.Sprite):
 			self.power_timer = 12.0
 		if kind == "laser":
 			self.timer -= 1
-			self.fire_cooldown2 = 0.02
+			self.fire_cooldown2 = 0.01
 			self.power_timer = 12.0
 		if kind == "health":
-			self.lives += 5
+			self.lives += 3
 
 	def update(self, dt):
 		keys = pg.key.get_pressed()
@@ -130,16 +130,19 @@ class Player(pg.sprite.Sprite):
 			direction.y -= 1
 		if keys[pg.K_DOWN] or keys[pg.K_s]:
 			direction.y += 1
-		if keys[pg.K_SPACE]:
-			self.shoot_normal()
-		if mouse[0] == 1 or keys[pg.K_LCTRL]:
+		if keys[pg.K_SPACE] or mouse[0] == 1:
+			if self.shoot_mode == "spread":
+				self.shoot_spread()
+			else:
+				self.shoot_normal()
+		if keys[pg.K_LCTRL]:
 			self.shoot_spread()
 
 		if keys[pg.K_ESCAPE]:
 			pg.quit()
 		# For debugging
 		if keys[pg.K_F9]:
-			powerup = PowerUp(self.game, self.rect.center, kind="health")
+			powerup = PowerUp(self.game, (self.rect.x, 0), kind=random.choice(["health", "speed", "spread", "laser"]))
 			self.game.powerups.add(powerup)
 			self.game.all_sprites.add(powerup)
 		if keys[pg.K_F11]:

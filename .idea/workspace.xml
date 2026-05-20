@@ -4,15 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment=" Powerups not appearing">
-      <change afterPath="$PROJECT_DIR$/entities/glitter.py" afterDir="false" />
+    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment=" Powerups not appearing properly">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/spritegroups.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/spritegroups.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/enemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/enemy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/player.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/powerup.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/powerup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -555,7 +551,14 @@
       <option name="presentableId" value="LOCAL−00042" />
       <updated>1779316601930</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL−00043" summary=" Powerups not appearing properly">
+      <option name="closed" value="true" />
+      <created>1779319156930</created>
+      <option name="number" value="LOCAL−00043" />
+      <option name="presentableId" value="LOCAL−00043" />
+      <updated>1779319156930</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -579,7 +582,8 @@
     <MESSAGE value="Added some variation to ships and a boss" />
     <MESSAGE value="Now everything works till boss 1 who still doesn't do anything" />
     <MESSAGE value=" Powerups not appearing" />
-    <option name="LAST_COMMIT_MESSAGE" value=" Powerups not appearing" />
+    <MESSAGE value=" Powerups not appearing properly" />
+    <option name="LAST_COMMIT_MESSAGE" value=" Powerups not appearing properly" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

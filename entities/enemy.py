@@ -24,7 +24,7 @@ class Enemy(pg.sprite.Sprite):
 			self.boss_time = False
 		if self.boss_time:
 			self.boss = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/alus2.png").convert_alpha(), 180, 1)
-		self.boss_hp = 100
+		self.boss_hp = 150
 		self.image = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/purplealus.png").convert_alpha(), 180, 0.3)
 		self.image2 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/redhawk.png").convert_alpha(), 180, 0.3)
 		self.image4 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/redalus.png").convert_alpha(), 180, 0.3)
@@ -116,7 +116,7 @@ class Enemy(pg.sprite.Sprite):
 		self.hp -= amount
 		self.flash_timer = 0.005
 		pg.mixer.Sound(f'{c.HOME_DIR}/assets/clink.wav').play()
-		COLORS = [(255, 0, 0), (255, 120, 40), (255, 255, 0), (0, 255, 0), (0, 0, 255), (255, 0, 255),
+		COLORS = [(255, 0, 0), (255, 120, 40), (255, 255, 0), (255, 0, 255),
 		          (0, 255, 255), (255, 255, 255)]
 		colors = random.choice(COLORS)
 		for _ in range(50):
@@ -142,7 +142,7 @@ class Enemy(pg.sprite.Sprite):
 		self.game.score += 100
 		if random.random() < 0.9:
 			self.px, self.py = get_random_position(c.screen)
-			powerup = PowerUp(self, (self.px, self.py), random.choice(["health", "speed", "spread"]))
+			powerup = PowerUp(self.game, (random.randint(0, c.WIDTH), 0), random.choice(["health", "speed", "spread"]))
 			self.game.powerups.add(powerup)
 			self.game.all_sprites.add(powerup)
 		self.kill()
