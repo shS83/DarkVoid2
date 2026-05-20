@@ -14,7 +14,12 @@ class Game:
 		self.screen = pg.display.set_mode((c.WIDTH, c.HEIGHT))
 		self.clock = pg.time.Clock()
 		self.running = True
-
+		self.effects = pg.sprite.Group()
+		self.explosion_frames = []
+		for i in range(1, 32):
+			img = pg.image.load(f"assets/exp_{i}.png").convert_alpha()
+			img = pg.transform.scale(img, (160, 160))
+			self.explosion_frames.append(img)
 		self.background = pg.image.load("assets/space_background_2.jpg").convert()
 		self.background = pg.transform.scale(self.background, (c.WIDTH, c.HEIGHT))
 		self.enemies = pg.sprite.Group()
