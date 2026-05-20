@@ -1,3 +1,5 @@
+import os
+
 import pygame as pg
 import config as c
 from entities.bullet import PlayerBullet
@@ -9,7 +11,7 @@ class Player(pg.sprite.Sprite):
 		self.fire_timer = 0
 		self.fire_cooldown = 0.12
 		self.game = game
-		self.image = pg.image.load("assets/Proper_warship.png").convert_alpha()
+		self.image = pg.image.load(f"{os.getcwd()}/assets/Proper_warship.png").convert_alpha()
 		self.image = pg.transform.scale(self.image, (96, 96))
 		self.rect = self.image.get_rect(center=pos)
 		self.pos = pg.Vector2(self.rect.center)
@@ -18,12 +20,12 @@ class Player(pg.sprite.Sprite):
 	def shoot(self):
 		if self.fire_timer > 0:
 			return
-
+		pg.mixer.Sound(f'{os.getcwd()}/assets/lasersound2.wav').play()
 		self.fire_timer = self.fire_cooldown
 		bullet = PlayerBullet(self.game, self.rect.midtop)
 		self.game.player_bullets.add(bullet)
 		self.game.all_sprites.add(bullet)
-		
+
 	def update(self, dt):
 		keys = pg.key.get_pressed()
 		mouse = pg.mouse.get_pressed()
@@ -39,6 +41,8 @@ class Player(pg.sprite.Sprite):
 			direction.y += 1
 		if keys[pg.K_SPACE] or mouse[0]:
 			self.shoot()
+		if keys[pg.K_ESCAPE]:
+			pg.quit()
 		if direction.length_squared() > 0:
 			direction = direction.normalize()
 

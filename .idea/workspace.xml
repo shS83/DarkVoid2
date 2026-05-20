@@ -5,7 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="some progress">
+      <change afterPath="$PROJECT_DIR$/entities/star.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/enemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/enemy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/player.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/stars.py" beforeDir="false" afterPath="$PROJECT_DIR$/trash/stars.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trash/old_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/trash/old_main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +58,7 @@
     </selectedModels>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="145" />
+    <option name="cachedIndexableFilesCount" value="148" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -497,7 +504,14 @@
       <option name="presentableId" value="LOCAL−00035" />
       <updated>1779258732177</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL−00036" summary="some progress">
+      <option name="closed" value="true" />
+      <created>1779258862103</created>
+      <option name="number" value="LOCAL−00036" />
+      <option name="presentableId" value="LOCAL−00036" />
+      <updated>1779258862103</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

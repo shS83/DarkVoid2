@@ -2,13 +2,11 @@ from core import commons as c
 import pygame as pg
 import sys
 import entities.ship as enterprise
-from entities.stars import Star
-from entities.asteroids import Asteroid
+from trash.stars import Star
 from core.spritegroups import asteroid_group, all_sprites
 from core.sprite_anim import draw_left, draw_right
-from entities import level, states
+from entities import level
 import random
-from core import gameobject
 
 clock = pg.time.Clock()
 running = True

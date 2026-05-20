@@ -1,6 +1,8 @@
 import pygame as pg
 import config as c
 from pygame.transform import rotozoom
+import os
+import random
 from magic.pox_module import add_charge
 from magic.anim_module import new_explosion
 from entities.explosion import Explosion
@@ -23,8 +25,15 @@ class Enemy(pg.sprite.Sprite):
 		self.speed = 80
 
 	def make_flash_image(self, image):
-		flash = image.copy()
-		flash.fill((255, 255, 255, 180), special_flags=pg.BLEND_RGBA_ADD)
+		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
+
+		# Copy only the alpha channel shape from original image
+		alpha_mask = image.copy()
+		alpha_mask.fill((255, 255, 255, 255), special_flags=pg.BLEND_RGBA_MULT)
+
+		flash.blit(alpha_mask, (0, 0))
+		flash.fill((255, 255, 255, 255), special_flags=pg.BLEND_RGB_MAX)
+
 		return flash
 
 	def update(self, dt):
@@ -40,12 +49,16 @@ class Enemy(pg.sprite.Sprite):
 
 	def damage(self, amount):
 		self.hp -= amount
-		self.flash_timer = 0.1
+		self.flash_timer = 0.005
 
 		if self.hp <= 0:
 			self.destroy()
 
 	def destroy(self):
+		if r := random.random() < 0.5:
+			pg.mixer.Sound(f'{os.getcwd()}/assets/explosion2.wav').play()
+		else:
+			pg.mixer.Sound(f'{os.getcwd()}/assets/explosion3.wav').play()
 		explosion = Explosion(self.game, self.rect.center)
 		self.game.effects.add(explosion)
 		self.game.all_sprites.add(explosion)
