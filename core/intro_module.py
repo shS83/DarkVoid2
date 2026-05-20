@@ -10,7 +10,7 @@ timer = pg.time.Clock()
 
 x_res = 1920
 y_res = 1080
-screen = pg.display.set_mode([x_res, y_res], pg.SHOWN)
+screen = pg.display.set_mode((x_res, y_res), pg.SRCALPHA, 32)
 HOME = "/home/shs/PycharmProjects/DarkVoid2"
 HOME_DIR = HOME
 pg.event.clear()
@@ -34,7 +34,6 @@ switch = True
 i = 0
 last = 0
 logointerval = 200
-screen = pg.display.set_mode([x_res, y_res], pg.SHOWN)
 pg.display.set_caption("Dark Void 2 - The Voidling")
 INITEVENT = pg.USEREVENT + 1
 pg.time.set_timer(INITEVENT, 5000, 20000)
@@ -64,7 +63,8 @@ while running:
 			running = True
 
 		if event.type == pg.KEYDOWN:
-
+			if event.key == pg.K_ESCAPE:
+				running = False
 			if in_logo and event.key == pg.K_SPACE:
 				print("space pressed")
 
@@ -96,21 +96,21 @@ while running:
 			if in_logo:
 				now = pg.time.get_ticks()
 
-				if now - last >= logointerval:
-					last = now
-					switch = True
-					screen.fill((0, 0, 0))
-					screen.blit(fontti.render("ヾ", True, (255, 255, 255)),
-					            (screen.get_width() // 2, screen.get_height() // 2))
-					if switch:
-						screen.blit(pg.image.load(f'{HOME_DIR}/assets/stimu_wallpaper.png'), (0, 0))
-						screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
-						            (x_res / 2 - xd2 / 2, y_res / 2 - yd2 / 2))
-						screen.blit(font2.render("press space to continue", True, (255, 0, 0)),
-						            (x_res / 2 - xd2 / 2, y_res - yd2 * 2))
-					else:
-						screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
-						            (x_res / 2 - xd2 / 2, y_res / 2 - yd2 / 2))
+				# if now - last >= logointerval:
+				# 	last = now
+				#	switch = True
+				screen.fill((0, 0, 0))
+				# screen.blit(fontti.render("ヾ", True, (255, 255, 255)),
+				#           (screen.get_width() // 2, screen.get_height() // 2))
+				# if switch:
+				screen.blit(pg.image.load(f'{HOME_DIR}/assets/stimu_wallpaper.png'), (0, 0))
+				# screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
+				# 	            (x_res / 2 - xd2 / 2, y_res / 2 - yd2 / 2))
+				# 	screen.blit(font2.render("press space to continue", True, (255, 0, 0)),
+				# 	            (x_res / 2 - xd2 / 2, y_res - yd2 * 2))
+				# else:
+				# 	screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
+				# 	            (x_res / 2 - xd2 / 2, y_res / 2 - yd2 / 2))
 				pg.event.post(pg.event.Event(LOGOEVENT))
 
 		if event.type == FADEOUTEVENT:

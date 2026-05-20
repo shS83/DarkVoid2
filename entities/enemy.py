@@ -1,29 +1,52 @@
 import pygame as pg
 import config as c
 from pygame.transform import rotozoom
-import os
 import random
 from entities.explosion import Explosion
 from entities.particle import Particle
 from entities.bullet import EnemyBullet
+from entities.thruster_particle import ThrusterParticle
+from entities.boss import Boss
 
 
 class Enemy(pg.sprite.Sprite):
-	def __init__(self, game, pos):
+	def __init__(self, game, pos, boss=False):
 		super().__init__()
-
 		self.game = game
+		self.thruster_timer = 0
 		self.shoot_timer = 1.0
 		self.shoot_delay = 1.4
-		self.image = rotozoom(pg.image.load("assets/alus2.png").convert_alpha(), 180, 0.3)
-		self.base_image = self.image.copy()
+		if c.BOSS_TIME:
+			self.boss_time = True
+		else:
+			self.boss_time = False
+		if self.boss_time:
+			self.boss = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/alus2.png").convert_alpha(), 180, 1)
+		self.boss_hp = 100
+		self.image = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/purplealus.png").convert_alpha(), 180, 0.3)
+		self.image2 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/redhawk.png").convert_alpha(), 180, 0.3)
+		self.image4 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/redalus.png").convert_alpha(), 180, 0.3)
+		self.image5 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/grayship.png").convert_alpha(), 180, 0.3)
+		self.image6 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/bluehawk.png").convert_alpha(), 180, 0.3)
+		self.image7 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/blackhawk.png").convert_alpha(), 180, 0.3)
+		self.images = [self.image2, self.image4, self.image5, self.image6, self.image7]
+		if self.boss_time:
+			self.image = self.boss
+			self.base_image = self.boss.copy()
+		else:
+			self.image = random.choice(self.images)
+			self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_timer = 0
 		self.rect = self.image.get_rect(center=pos)
+		self.hitbox = self.rect.inflate(-56, -56)
 		self.pos = pg.Vector2(self.rect.center)
-
-		self.hp = 5
 		self.speed = 80
+		self.hp = 5
+
+		if c.BOSS_TIME:
+			self.hp = self.boss_hp
+			self.speed = 40
 
 	def make_flash_image(self, image):
 		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
@@ -40,7 +63,24 @@ class Enemy(pg.sprite.Sprite):
 	def update(self, dt):
 		self.pos.y += self.speed * dt
 		self.rect.center = self.pos
+		self.hitbox.center = self.rect.center
 		self.shoot_timer -= dt
+
+		self.thruster_timer -= dt
+
+		if self.thruster_timer <= 0:
+			self.thruster_timer = 0.04
+
+			particle = ThrusterParticle(
+				self.game,
+				self.rect.midtop,
+				direction=(0, -1),
+				color=(255, 120, 40)
+			)
+
+			self.game.effects.add(particle)
+			self.game.all_sprites.add(particle)
+
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
 			self.shoot()
@@ -89,5 +129,5 @@ class Enemy(pg.sprite.Sprite):
 			particle = Particle(self.game, self.rect.center)
 			self.game.effects.add(particle)
 			self.game.all_sprites.add(particle)
-
+		self.game.score += 100
 		self.kill()

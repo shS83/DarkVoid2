@@ -16,7 +16,7 @@ enterprise = Player(dt, (1920 // 2, 1080 // 2 - 200))
 
 while running:
 	enterprise.update(dt)
-	
-	screen.blit(pg.image.load(f'{os.getcwd()}/assets/space_background_2.jpg').convert_alpha(), (0, 0))
+
+	screen.blit(pg.image.load(f'{c.HOME_DIR}/assets/space_background_2.jpg').convert_alpha(), (0, 0))
 
 	pg.display.flip()

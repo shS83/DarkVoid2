@@ -4,18 +4,32 @@ import config as c
 from entities.player import Player
 from entities.enemy import Enemy
 from entities.star import Star
+from entities.boss import Boss
 import random
 from ui.hud import HUD
+from entities.powerup import PowerUp
+
+
+def mixer_init():
+	pg.mixer.init()
+	pg.mixer.music.load(f"{c.HOME_DIR}/assets/Jahzzar - Forest Pan.mp3")
+	pg.mixer.music.play(-1)
+	pg.mixer.init(48000, -16, 2, 4096)
+	pg.mixer.music.set_volume(0.2)
+	pg.mixer.set_num_channels(32)
 
 
 class Game:
 	def __init__(self):
 		pg.init()
-		pg.mixer.init()
-		pg.mixer.set_num_channels(32)
+		mixer_init()
+		self.boss = None
+		self.boss_time = False
+		self.boss_timer = 2000
+		self.boss_max_y = c.HEIGHT // 2 - 100
 		self.score = 0
 		self.hud = HUD(self)
-		self.screen = pg.display.set_mode((c.WIDTH, c.HEIGHT))
+		self.screen = pg.display.set_mode((c.WIDTH, c.HEIGHT), pg.SRCALPHA, 32)
 		self.clock = pg.time.Clock()
 		self.running = True
 		self.effects = pg.sprite.Group()
@@ -26,11 +40,15 @@ class Game:
 			img = pg.image.load(f"{c.HOME_DIR}/assets/exp_{i}.png").convert_alpha()
 			img = pg.transform.scale(img, (320, 320))
 			self.explosion_frames.append(img)
-		self.background = pg.image.load(f"{c.HOME_DIR}/assets/space_background.jpg").convert()
+		self.background = pg.image.load(f"{c.HOME_DIR}/assets/space_background.png").convert()
 		self.background = pg.transform.scale(self.background, (c.WIDTH, c.HEIGHT))
 		self.enemies = pg.sprite.Group()
 		self.enemy_bullets = pg.sprite.Group()
 		self.texts = pg.sprite.Group()
+		self.powerups = pg.sprite.Group()
+		self.direction = 1
+		self.px = c.WIDTH // 2
+		self.py = c.HEIGHT // 2
 		self.all_sprites = pg.sprite.Group()
 		self.game_over = False
 		self.game_over_angle = 0
@@ -75,22 +93,55 @@ class Game:
 				self.all_sprites.add(enemy)
 				return
 
+	def boss_spawn(self):
+		c.BOSS_TIME = True
+		x = c.WIDTH // 2
+		y = -300
+
+		self.boss = Boss(self, (x, y), boss=True)
+		self.enemies.add(self.boss)
+		self.all_sprites.add(self.boss)
+
+		if self.player.rect.colliderect(self.boss.rect) and not self.player.invincible_timer > 0:
+			self.player.hit()
+
 	def update(self, dt):
+		if not c.BOSS_TIME:
+			self.boss_timer -= dt * 100
 		self.stars.update(dt)
 		self.all_sprites.update(dt)
-		self.enemy_spawn_timer += dt
+		if not c.BOSS_TIME:
+			self.enemy_spawn_timer += dt
 
-		if self.enemy_spawn_timer >= self.enemy_spawn_delay:
-			self.enemy_spawn_timer = 0
-			self.enemy_spawn_delay = random.uniform(0.4, 3)
-			self.spawn_enemy()
+		if not c.BOSS_TIME or self.boss_timer >= 500:
+			if self.enemy_spawn_timer >= self.enemy_spawn_delay or self.boss_timer <= 0:
+				self.enemy_spawn_timer = 0
+				self.enemy_spawn_delay = random.uniform(0.4, 3)
+				self.spawn_enemy()
 
-		hits = pg.sprite.groupcollide(
-			self.enemies,
-			self.player_bullets,
-			False,
-			True
-		)
+		for enemy in self.enemies:
+			for bullet in self.player_bullets:
+				if enemy.hitbox.colliderect(bullet.rect):
+					bullet.kill()
+					enemy.damage(1)
+					break
+
+		if self.boss_timer <= 1500 and len(self.powerups) < 1:
+			self.px, self.py = random.randint(0, c.WIDTH), random.randint(0, c.HEIGHT)
+			powerup = PowerUp(self, (self.px, self.py), "spread")
+			self.powerups.add(powerup)
+			self.all_sprites.add(powerup)
+
+		self.px += self.direction * 1.5
+		self.py += self.direction * 1.5
+		if self.px >= c.WIDTH or self.px <= 0:
+			self.direction = -self.direction
+		if self.py >= c.HEIGHT or self.py <= 0:
+			self.direction = -self.direction
+
+		if self.boss_timer < 1 and self.boss == None:
+			self.boss_timer = 0
+			self.boss_spawn()
 
 		if self.player.alive and self.player.invincible_timer <= 0:
 			for bullet in self.enemy_bullets:
@@ -101,11 +152,20 @@ class Game:
 					self.player.hit()
 					break
 
+		powerup_hits = pg.sprite.spritecollide(
+			self.player,
+			self.powerups,
+			True
+		)
+
+		for powerup in powerup_hits:
+			self.player.apply_powerup(powerup.kind)
+
 		if not self.player.alive:
 			self.game_over = True
 
-		for enemy, bullets in hits.items():
-			enemy.damage(len(bullets))
+		# for enemy, bullets in hits.items():
+		# 	enemy.damage(len(bullets))
 
 		if self.game_over:
 			self.game_over_scale += self.game_over_scale_dir * 0.2 * dt
@@ -122,6 +182,8 @@ class Game:
 		self.screen.blit(self.background, (0, 0))
 		self.all_sprites.draw(self.screen)
 		self.stars.draw(self.screen)
+		self.hud.draw(self.screen)
+
 		if self.game_over:
 			# Screen darkening
 			overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
@@ -166,7 +228,16 @@ class Game:
 			for event in pg.event.get():
 				if event.type == pg.QUIT:
 					self.running = False
+				if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+					self.running = False
 			self.update(dt)
 			self.draw()
 
 		pg.quit()
+		pg.mixer.music.stop()
+		pg.mixer.quit()
+
+
+if __name__ == "__main__":
+	game = Game()
+	game.run()

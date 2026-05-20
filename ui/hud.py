@@ -18,12 +18,21 @@ class HUD:
 			True,
 			(240, 240, 255)
 		)
+		first_text = f"BOSS ARRIVING in {self.game.boss_timer}"
+		if self.game.boss_timer <= 1:
+			first_text = f"BOSS HP LEFT: {self.game.boss.hp}"
+		text2 = self.small_font.render(
+			first_text,
+			True,
+			(255, 50, 50),
+		)
 
 		screen.blit(text, (16, 14))
+		screen.blit(text2, (16, 40))
 
 	def draw_lives(self, screen):
 		label = self.small_font.render("ENERGY", True, (220, 220, 255))
-		screen.blit(label, (16, 52))
+		screen.blit(label, (16, 60))
 
 		for i in range(self.game.player.lives):
 			x = 16 + i * 24

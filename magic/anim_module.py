@@ -2,7 +2,7 @@ import pygame, pygame.gfxdraw, os
 
 x_res = 1920
 y_res = 1080
-HOME_DIR = os.getcwd()
+HOME_DIR = "/home/shs/PycharmProjects/DarkVoid2"
 ASSET_DIR = f'{HOME_DIR}/assets'
 NOW_MS = 0
 timer = pygame.time.Clock()

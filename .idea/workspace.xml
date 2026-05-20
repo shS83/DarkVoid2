@@ -5,17 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="added gameover still needs fixing">
+      <change afterPath="$PROJECT_DIR$/entities/powerup.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/entities/thruster_particle.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dark_Void_2.py" beforeDir="false" afterPath="$PROJECT_DIR$/Dark_Void_2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/gameover_text.py" beforeDir="false" afterPath="$PROJECT_DIR$/trash/gameover_text.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/intro_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/intro_module.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/asteroids.py" beforeDir="false" afterPath="$PROJECT_DIR$/trash/asteroids.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/boss.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/boss.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/bullet.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/bullet.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/enemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/enemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/particle.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/particle.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/explosion.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/explosion.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/player.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/magic/anim_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/magic/anim_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/systems/collisiions.py" beforeDir="false" afterPath="$PROJECT_DIR$/systems/collisions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trash/lvl1.py" beforeDir="false" afterPath="$PROJECT_DIR$/trash/lvl1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui/hud.py" beforeDir="false" afterPath="$PROJECT_DIR$/ui/hud.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -62,7 +67,7 @@
     </selectedModels>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="155" />
+    <option name="cachedIndexableFilesCount" value="171" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -118,6 +123,7 @@
     "Python.darkvoid2.executor": "Run",
     "Python.darkvoid21.executor": "Run",
     "Python.darkvoid_03.executor": "Run",
+    "Python.enemy.executor": "Run",
     "Python.game.executor": "Run",
     "Python.intro_module.executor": "Run",
     "Python.lvl1.executor": "Run",
@@ -163,8 +169,8 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
-    <configuration name="darkvoid2" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.game">
+    <configuration name="game" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="darkvoid2" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -180,7 +186,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="DEBUG_JUST_MY_CODE" value="false" />
       <option name="RUN_TOOL" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/trash/darkvoid2.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/game.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -238,7 +244,7 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.darkvoid2" />
+      <item itemvalue="Python.game" />
       <item itemvalue="Python.main" />
       <item itemvalue="Python.intro_module" />
     </list>
@@ -530,7 +536,14 @@
       <option name="presentableId" value="LOCAL−00038" />
       <updated>1779271912108</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL−00039" summary="added gameover still needs fixing">
+      <option name="closed" value="true" />
+      <created>1779277383475</created>
+      <option name="number" value="LOCAL−00039" />
+      <option name="presentableId" value="LOCAL−00039" />
+      <updated>1779277383475</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
