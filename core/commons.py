@@ -15,13 +15,6 @@ pygame.display.set_caption("Dark Void 2")
 pygame.init()
 clock = pygame.time.Clock()
 running = True
-laserinterval = 3
-laserkey = 0
-keyinterval = 5
-keypress = 0
-message = ""
-blastinterval = 1000
-last = 0
 
 laserkey = 0
 SCORE = 0

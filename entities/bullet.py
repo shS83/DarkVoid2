@@ -18,7 +18,7 @@ class PlayerBullet(pg.sprite.Sprite):
 		self.pos += self.velocity * dt
 		self.rect.center = self.pos
 
-		if self.rect.bottom < 0:
+		if self.rect.bottom < 0 or self.rect.top > c.HEIGHT or self.rect.left < 0 or self.rect.right > c.WIDTH:
 			self.kill()
 
 
@@ -31,7 +31,7 @@ class EnemyBullet(pg.sprite.Sprite):
 		self.velocity = pg.Vector2(velocity)
 
 		self.image = pg.Surface((12, 12), pg.SRCALPHA)
-		pg.draw.circle(self.image, (255, 80, 120), (6, 6), 6)
+		pg.draw.circle(self.image, (255, 80, 120), (6, 6), 8)
 
 		self.rect = self.image.get_rect(center=self.pos)
 		self.radius = 6

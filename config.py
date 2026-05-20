@@ -3,7 +3,7 @@ import os
 
 pg.init()
 pg.mixer.init()
-pg.mixer.music.set_volume(0.1)
+pg.mixer.music.set_volume(0.2)
 
 x_res = 1920
 y_res = 1080

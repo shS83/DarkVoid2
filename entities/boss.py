@@ -14,23 +14,23 @@ class Boss(pg.sprite.Sprite):
 		self.game = game
 		self.thruster_timer = 0
 		self.shoot_timer = 0.05
-		self.shoot_delay = 1.4
+		self.shoot_delay = 0.2
 		self.pos = pg.Vector2(pos)
-		self.hp = 300
+		self.hp = 500
 		self.max_h = c.HEIGHT // 2
 		self.phase_index = 0
 		self.phase_timer = 1000
 		self.image = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/alus2.png").convert_alpha(), 180, 1)
-		self.rect = self.image.get_rect(center=pos).inflate(-152, -152)
+		self.hitbox = self.rect = self.image.get_rect(center=pos).inflate(-300, -300)
+		game.screen.blit(self.rect, (255, 0, 0))
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_timer = 0
 		self.rect = self.image.get_rect(center=pos)
-		self.hitbox = self.rect.inflate(-56, -56)
 		self.pos = pg.Vector2(self.rect.center)
-		self.shoot_timer = 1.0
+		self.shoot_timer = 0.05
 		self.thruster_timer = 0.04
-		self.speed = 40
+		self.speed = 30
 		self.phases = [
 			self.phase_intro,
 			self.phase_radial,
@@ -39,16 +39,6 @@ class Boss(pg.sprite.Sprite):
 		]
 
 	def update(self, dt):
-		# for bullets in bullet_group:
-		#	bullets.update(dt)
-		#		bullets.rect.clamp_ip(self.rect)
-
-		#		self.game(bullet_group.add(bullets, dt))
-		#		self.game(all_sprites.add(dt))
-		#		self.game(enemies_group.add(dt))
-		#		iang = self.pos.angle_to(bullets.pos)
-		#		if abs(iang) < 10:
-		#			self.damage(bullets.damage)
 		if self.pos.y <= self.max_h:
 			self.pos.y += self.speed * dt
 		self.rect.center = self.pos
@@ -126,10 +116,10 @@ class Boss(pg.sprite.Sprite):
 
 		# Copy only the alpha channel shape from original image
 		alpha_mask = image.copy()
-		alpha_mask.fill((255, 255, 255, 255), special_flags=pg.BLEND_RGBA_MULT)
+		alpha_mask.fill((255, 255, 255, 200), special_flags=pg.BLEND_RGBA_MULT)
 
 		flash.blit(alpha_mask, (0, 0))
-		flash.fill((255, 255, 255, 255), special_flags=pg.BLEND_RGB_MAX)
+		flash.fill((255, 255, 255, 200), special_flags=pg.BLEND_RGB_MAX)
 
 		return flash
 

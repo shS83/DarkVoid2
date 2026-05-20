@@ -3,6 +3,7 @@ import random
 import os
 from pygame.transform import rotozoom
 from game import Game
+from time import sleep
 
 pg.init()
 timer = pg.time.Clock()
@@ -12,7 +13,9 @@ x_res = 1920
 y_res = 1080
 screen = pg.display.set_mode((x_res, y_res), pg.SRCALPHA, 32)
 HOME = "/home/shs/PycharmProjects/DarkVoid2"
+
 HOME_DIR = HOME
+screen.blit(pg.image.load(f'{HOME_DIR}/assets/stimu_wallpaper.png'), (0, 0))
 pg.event.clear()
 pg.mixer.music.load(f'{HOME_DIR}/assets/Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3')
 pg.mixer.music.play(-1)
@@ -34,11 +37,12 @@ switch = True
 i = 0
 last = 0
 logointerval = 200
-pg.display.set_caption("Dark Void 2 - The Voidling")
+pg.display.set_caption("Dark Void 2 - The Devoiding")
 INITEVENT = pg.USEREVENT + 1
 pg.time.set_timer(INITEVENT, 5000, 20000)
-screen.blit(rotozoom(textfont.render("DARK VOID 2", True, (255, 255, 255)), 3.0, 1.3), (100, 300), (0, 0, x_res, y_res))
+screen.blit(rotozoom(textfont.render("DARK VOID 2", True, (255, 255, 255)), 3.0, 1.3), (100, 300), (0, 0, 1920, 1080))
 pg.display.flip()
+sleep(2)
 timer.tick(159)
 xd2, yd2 = font2.size("press space to continue")
 f = 0
@@ -58,7 +62,7 @@ pg.event.post(pg.event.Event(LOGOEVENT))
 while running:
 
 	for event in pg.event.get():
-
+		# print("in a loop")
 		if event.type == pg.QUIT:
 			running = True
 
@@ -67,13 +71,14 @@ while running:
 				running = False
 			if in_logo and event.key == pg.K_SPACE:
 				print("space pressed")
+				running = False
 
-				# pg.event.clear()
+				pg.event.clear()
 				in_logo = True
+				i = 100
+				pg.event.post(pg.event.Event(FADEOUTEVENT))
 
-				pg.event.post(pg.event.Event(INITGAME))
-
-		if event.type == INITEVENT and i < 255:
+		if event.type == LOGOEVENT and i < 255:
 			now = pg.time.get_ticks()
 			if now - last >= cooldown:
 				last = now
@@ -85,32 +90,16 @@ while running:
 			i += 1
 			if i > 254:
 				i = 255
-				# print("init anim finished")
 				pg.event.clear()
 				in_logo = True
 				last = 0
 
-			pg.event.post(pg.event.Event(INITEVENT))
+			pg.event.post(pg.event.Event(LOGOEVENT))
 
 		if event.type == LOGOEVENT:
 			if in_logo:
 				now = pg.time.get_ticks()
-
-				# if now - last >= logointerval:
-				# 	last = now
-				#	switch = True
 				screen.fill((0, 0, 0))
-				# screen.blit(fontti.render("ヾ", True, (255, 255, 255)),
-				#           (screen.get_width() // 2, screen.get_height() // 2))
-				# if switch:
-				screen.blit(pg.image.load(f'{HOME_DIR}/assets/stimu_wallpaper.png'), (0, 0))
-				# screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
-				# 	            (x_res / 2 - xd2 / 2, y_res / 2 - yd2 / 2))
-				# 	screen.blit(font2.render("press space to continue", True, (255, 0, 0)),
-				# 	            (x_res / 2 - xd2 / 2, y_res - yd2 * 2))
-				# else:
-				# 	screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
-				# 	            (x_res / 2 - xd2 / 2, y_res / 2 - yd2 / 2))
 				pg.event.post(pg.event.Event(LOGOEVENT))
 
 		if event.type == FADEOUTEVENT:
@@ -123,7 +112,6 @@ while running:
 					            (x_res / 2 - xd2 / 2, y_res / 2 - yd2 / 2))
 					i -= 2
 					if i < 2:
-						print("fadeout anim finished")
 						pg.event.clear()
 						pg.event.post(pg.event.Event(INITGAME))
 				pg.event.post(pg.event.Event(FADEOUTEVENT))
@@ -131,9 +119,9 @@ while running:
 		if event.type == INITGAME:
 			finished = True
 			running = False
-			print("game initialized")
-			Game().run()
+
 	# MAIN LOOP
 
 	pg.display.flip()
-	timer.tick(159)
+	timer.tick(60)
+Game().run()

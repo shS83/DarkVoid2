@@ -1,7 +1,7 @@
 from core import commons as c
 import pygame as pg
 import sys
-import entities.ship as enterprise
+import trash.ship as enterprise
 from trash.stars import Star
 from core.spritegroups import asteroid_group, all_sprites
 from core.sprite_anim import draw_left, draw_right

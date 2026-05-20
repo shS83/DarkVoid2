@@ -13,7 +13,12 @@ from entities.powerup import PowerUp
 
 def mixer_init():
 	pg.mixer.init()
-	pg.mixer.music.load(f"{c.HOME_DIR}/assets/Jahzzar - Forest Pan.mp3")
+	tunes = ["1000 Handz - Reps.mp3", "1000 Handz - Announcement.mp3", "1000 Handz - No Option.mp3",
+	         "Colorcast - Coffee Break.mp3", "Colorcast - Drown.mp3", "Colorcast - Need.mp3",
+	         "Jahzzar - Forest Pan.mp3", "Jahzzar - Pink Fluid.mp3", "Lightning Traveler - Celestial Drift.mp3",
+	         "Lightning Traveler - Eclipse Horizon.mp3", "Lightning Traveler - Event Horizon.mp3",
+	         "Lightning Traveler - Lunar Echo.mp3", "Ov Moi Omm - The Dictator's Transmission.mp3"]
+	pg.mixer.music.load(f"{c.HOME_DIR}/assets/{random.choice(tunes)}")
 	pg.mixer.music.play(-1)
 	pg.mixer.init(48000, -16, 2, 4096)
 	pg.mixer.music.set_volume(0.2)
@@ -51,11 +56,15 @@ class Game:
 		self.px = c.WIDTH // 2
 		self.py = c.HEIGHT // 2
 		self.all_sprites = pg.sprite.Group()
-		powerup = PowerUp(self, (self.px, self.py), "health")
+		powerup = PowerUp(pg.image.load(f"{c.HOME_DIR}/assets/powerup-health.png"), (self.px, self.py), "health")
 		self.powerups.add(powerup)
-		powerup = PowerUp(self, (self.px, self.py), "spread")
+		powerup = PowerUp(pg.image.load(f"{c.HOME_DIR}/assets/powerup-spread.png"), (self.px, self.py), "spread")
 		self.powerups.add(powerup)
-		powerup = PowerUp(self, (self.px, self.py), "speed")
+		powerup = PowerUp(pg.image.load(f"{c.HOME_DIR}/assets/powerup-speed.png"), (self.px, self.py), "speed")
+		self.powerups.add(powerup)
+		dt = self.clock.tick(c.FPS)
+		self.powerups.update(dt)
+		self.powerups.draw(self.screen)
 		self.game_over = False
 		self.game_over_angle = 0
 		self.game_over_scale = 0.5
@@ -131,19 +140,6 @@ class Game:
 					bullet.kill()
 					enemy.damage(1)
 					break
-
-		if self.boss_timer <= 1500 and len(self.powerups) < 1:
-			self.px, self.py = random.randint(0, c.WIDTH), random.randint(0, c.HEIGHT)
-			powerup = PowerUp(self, (self.px, self.py), "spread")
-			self.powerups.add(powerup)
-			self.all_sprites.add(powerup)
-
-		self.px += self.direction * 1.5
-		self.py += self.direction * 1.5
-		if self.px >= c.WIDTH or self.px <= 0:
-			self.direction = -self.direction
-		if self.py >= c.HEIGHT or self.py <= 0:
-			self.direction = -self.direction
 
 		if self.boss_timer < 1 and self.boss == None:
 			self.boss_timer = 0

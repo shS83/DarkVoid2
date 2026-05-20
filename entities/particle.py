@@ -5,7 +5,7 @@ import config as c
 
 
 class Particle(pg.sprite.Sprite):
-	def __init__(self, game, pos):
+	def __init__(self, game, pos, color=(255, 255, 255)):
 		super().__init__()
 
 		self.game = game
@@ -29,7 +29,7 @@ class Particle(pg.sprite.Sprite):
 		self.image = pg.Surface((self.size, self.size), pg.SRCALPHA)
 		pg.draw.circle(
 			self.image,
-			(255, random.randint(120, 220), 40),
+			color,
 			(self.size // 2, self.size // 2),
 			self.size // 2
 		)

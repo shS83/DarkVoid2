@@ -6,6 +6,8 @@ from entities.particle import Particle
 from entities.thruster_particle import ThrusterParticle
 import random
 from pygame.transform import rotozoom
+from entities.powerup import PowerUp
+from core.spritegroups import powerups_group, all_sprites
 
 
 class Player(pg.sprite.Sprite):
@@ -20,6 +22,7 @@ class Player(pg.sprite.Sprite):
 		self.hitbox_radius = 6
 		self.fire_timer = 0
 		self.fire_cooldown = 0.12
+		self.fire_cooldown2 = 0.08
 		self.game = game
 		self.image3 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/purplealus.png").convert_alpha(), 0, 0.3)
 		self.image8 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/turqoiseship.png").convert_alpha(), 0, 0.3)
@@ -51,13 +54,13 @@ class Player(pg.sprite.Sprite):
 		if self.fire_timer > 0:
 			return
 		pg.mixer.Sound(f'{c.HOME_DIR}/assets/lasersound2.wav').play()
-		self.fire_timer = self.fire_cooldown
+		self.fire_timer = self.fire_cooldown2
 		self.game.player_bullets.add(bullet)
 		self.game.all_sprites.add(bullet)
 
 	def shoot_spread(self):
 		self.image = pg.Surface((6, 20), pg.SRCALPHA)
-		pg.draw.rect(self.image, (100, 220, 255), (0, 0, 6, 20))
+		pg.draw.rect(self.image, (255, 100, 255), (0, 0, 5, 25))
 		bullet_data = [
 			((self.rect.centerx, self.rect.top), (0, -850)),
 			((self.rect.centerx - 10, self.rect.top + 8), (-180, -760)),
@@ -99,9 +102,21 @@ class Player(pg.sprite.Sprite):
 			self.kill()
 
 	def apply_powerup(self, kind):
+		self.timer = 300
 		if kind == "spread":
+			self.timer -= 1
 			self.shoot_mode = "spread"
 			self.power_timer = 12.0
+		if kind == "speed":
+			self.timer -= 1
+			self.speed = 700
+			self.power_timer = 12.0
+		if kind == "laser":
+			self.timer -= 1
+			self.fire_cooldown2 = 0.02
+			self.power_timer = 12.0
+		if kind == "health":
+			self.lives += 5
 
 	def update(self, dt):
 		keys = pg.key.get_pressed()
@@ -118,12 +133,15 @@ class Player(pg.sprite.Sprite):
 			direction.y += 1
 		if keys[pg.K_SPACE]:
 			self.shoot_normal()
-		if mouse[0] == 1:
+		if mouse[0] == 1 or keys[pg.K_LCTRL]:
 			self.shoot_spread()
 
 		if keys[pg.K_ESCAPE]:
 			pg.quit()
 		# For debugging
+		if keys[pg.K_F9]:
+			powerups_group.add(powerup := PowerUp(self.game, self.rect.center, kind="health"))
+			all_sprites.add(powerup)
 		if keys[pg.K_F11]:
 			self.alive = False
 		if keys[pg.K_F10]:
@@ -134,6 +152,7 @@ class Player(pg.sprite.Sprite):
 
 		if self.power_timer <= 0:
 			self.shoot_mode = "normal"
+			self.speed = 350
 
 		self.thruster_timer -= dt
 

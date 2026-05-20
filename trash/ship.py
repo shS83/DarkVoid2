@@ -77,18 +77,17 @@ class Ship(GameObject):
 		return rot_image, rot_image.get_rect(center=image.get_rect(topleft=(self.position.x, self.position.y)).center)
 
 	def shoot_guns(self, ship_x, ship_y):
-		c.STREAMS.append(pox_module.flash_screen(255, c.screen))
+		# c.STREAMS.append(pox_module.flash_screen(255, c.screen))
 		pg.mixer.Sound(f'{c.HOME_DIR}/assets/lasersound.wav').play()
 		bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
 		bullet = Bullet(self.position, bullet_velocity)
-		c.BULLETS.append(bullet)
-		c.STREAMS.append(pox_module.add_charge(ship_x + 300, ship_y + 300, int(random.randint(10, 30)), (255, 255, 0),
-		                                       gravity=False))
-		self.create_bullet_callback(bullet)
+# c.BULLETS.append(bullet)
+# c.STREAMS.append(pox_module.add_charge(ship_x + 300, ship_y + 300, int(random.randint(10, 30)), (255, 255, 0),
+#                                      gravity=False))
+# self.create_bullet_callback(bullet)
 
+# enterprise = Ship((1920 // 2, 800), pg.image.load(f'{c.HOME_DIR}/assets/ship_neutral.png').convert_alpha(),
+#         bullet_group)
 
-enterprise = Ship((1920 // 2, 800), pg.image.load(f'{c.HOME_DIR}/assets/ship_neutral.png').convert_alpha(),
-                  bullet_group)
-
-enterprise.rotate_image(c.SHIP, 0)
-enterprise.draw(c.screen)
+# enterprise.rotate_image(c.SHIP, 0)
+# enterprise.draw(c.screen)

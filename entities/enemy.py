@@ -6,10 +6,7 @@ from entities.explosion import Explosion
 from entities.particle import Particle
 from entities.bullet import EnemyBullet
 from entities.thruster_particle import ThrusterParticle
-from entities.boss import Boss
-
-if c.BOSS_TIME:
-	boss = Boss()
+from entities.powerup import PowerUp
 
 
 class Enemy(pg.sprite.Sprite):
@@ -116,6 +113,14 @@ class Enemy(pg.sprite.Sprite):
 	def damage(self, amount):
 		self.hp -= amount
 		self.flash_timer = 0.005
+		pg.mixer.Sound(f'{c.HOME_DIR}/assets/clink.wav').play()
+		COLORS = [(255, 0, 0), (255, 120, 40), (255, 255, 0), (0, 255, 0), (0, 0, 255), (255, 0, 255),
+		          (0, 255, 255), (255, 255, 255)]
+		colors = random.choice(COLORS)
+		for _ in range(50):
+			particle = Particle(self.game, self.rect.center, colors)
+			self.game.effects.add(particle)
+			self.game.all_sprites.add(particle)
 
 		if self.hp <= 0:
 			self.destroy()
@@ -133,4 +138,6 @@ class Enemy(pg.sprite.Sprite):
 			self.game.effects.add(particle)
 			self.game.all_sprites.add(particle)
 		self.game.score += 100
+		if random.random() < 0.3:
+			powerup = PowerUp(self.game, self.rect.center)
 		self.kill()
