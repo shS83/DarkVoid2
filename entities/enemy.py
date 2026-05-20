@@ -8,6 +8,9 @@ from entities.bullet import EnemyBullet
 from entities.thruster_particle import ThrusterParticle
 from entities.boss import Boss
 
+if c.BOSS_TIME:
+	boss = Boss()
+
 
 class Enemy(pg.sprite.Sprite):
 	def __init__(self, game, pos, boss=False):

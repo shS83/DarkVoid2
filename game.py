@@ -2,9 +2,10 @@ import pygame as pg
 import pygame.gfxdraw
 import config as c
 from entities.player import Player
+# from entities.boss import Boss
 from entities.enemy import Enemy
 from entities.star import Star
-from entities.boss import Boss
+
 import random
 from ui.hud import HUD
 from entities.powerup import PowerUp
@@ -50,6 +51,11 @@ class Game:
 		self.px = c.WIDTH // 2
 		self.py = c.HEIGHT // 2
 		self.all_sprites = pg.sprite.Group()
+		powerup = PowerUp(self, (self.px, self.py), "health")
+		self.powerups.add(powerup)
+		powerup = PowerUp(self, (self.px, self.py), "spread")
+		self.powerups.add(powerup)
+		powerup = PowerUp(self, (self.px, self.py), "speed")
 		self.game_over = False
 		self.game_over_angle = 0
 		self.game_over_scale = 0.5
@@ -98,7 +104,7 @@ class Game:
 		x = c.WIDTH // 2
 		y = -300
 
-		self.boss = Boss(self, (x, y), boss=True)
+		self.boss = Enemy(self, (x, y), boss=True)
 		self.enemies.add(self.boss)
 		self.all_sprites.add(self.boss)
 

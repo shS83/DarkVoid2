@@ -21,6 +21,7 @@ class Boss(pg.sprite.Sprite):
 		self.phase_index = 0
 		self.phase_timer = 1000
 		self.image = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/alus2.png").convert_alpha(), 180, 1)
+		self.rect = self.image.get_rect(center=pos).inflate(-152, -152)
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_timer = 0
@@ -38,13 +39,46 @@ class Boss(pg.sprite.Sprite):
 		]
 
 	def update(self, dt):
-		self.phase_timer += dt
-		self.phases[self.phase_index](dt)
-		if not self.max_h:
+		# for bullets in bullet_group:
+		#	bullets.update(dt)
+		#		bullets.rect.clamp_ip(self.rect)
+
+		#		self.game(bullet_group.add(bullets, dt))
+		#		self.game(all_sprites.add(dt))
+		#		self.game(enemies_group.add(dt))
+		#		iang = self.pos.angle_to(bullets.pos)
+		#		if abs(iang) < 10:
+		#			self.damage(bullets.damage)
+		if self.pos.y <= self.max_h:
 			self.pos.y += self.speed * dt
-			self.rect.center = self.pos
+		self.rect.center = self.pos
 		self.hitbox.center = self.rect.center
 		self.shoot_timer -= dt
+		if self.shoot_timer < 1:
+			self.shoot()
+
+		self.thruster_timer -= dt
+
+		if self.thruster_timer <= 0:
+			self.thruster_timer = 0.04
+
+			particle = ThrusterParticle(
+				self.game,
+				self.rect.midtop,
+				direction=(0, -1),
+				color=(255, 120, 40)
+			)
+
+			self.game.effects.add(particle)
+			self.game.all_sprites.add(particle)
+
+		if self.flash_timer > 0:
+			self.flash_timer -= dt
+			self.image = self.flash_image
+		else:
+			self.image = self.base_image
+		self.phase_timer += dt
+		self.phases[self.phase_index](dt)
 
 		self.thruster_timer -= dt
 
@@ -99,50 +133,20 @@ class Boss(pg.sprite.Sprite):
 
 		return flash
 
-	def update(self, dt):
-		self.pos.y += self.speed * dt
-		self.rect.center = self.pos
-		self.hitbox.center = self.rect.center
-		self.shoot_timer -= dt
-
-		self.thruster_timer -= dt
-
-		if self.thruster_timer <= 0:
-			self.thruster_timer = 0.04
-
-			particle = ThrusterParticle(
-				self.game,
-				self.rect.midtop,
-				direction=(0, -1),
-				color=(255, 120, 40)
-			)
-
-			self.game.effects.add(particle)
-			self.game.all_sprites.add(particle)
-
-		if self.flash_timer > 0:
-			self.flash_timer -= dt
-			self.image = self.flash_image
-		else:
-			self.image = self.base_image
-		if self.rect.top > c.HEIGHT:
-			self.kill()
-
 	def shoot(self):
-		if self.shoot_timer <= 0:
-			self.shoot_timer = self.shoot_delay
+		self.shoot_timer = self.shoot_delay
 
 		direction = self.game.player.pos - self.pos
 
 		if direction.length_squared() == 0:
-			direction = pg.Vector2(0, 1)
+			direction = self.game.player.pos - self.pos
 		else:
 			direction = direction.normalize()
 
 		bullet = EnemyBullet(
 			self.game,
 			self.rect.center,
-			direction * 260
+			direction
 		)
 
 		self.game.enemy_bullets.add(bullet)
@@ -150,14 +154,7 @@ class Boss(pg.sprite.Sprite):
 
 	def damage(self, amount):
 		self.hp -= amount
-		self.flash_timer = 0.005
-
-		if self.hp <= 0:
-			self.destroy()
-
-	def damage(self, amount):
-		self.hp -= amount
-		self.flash_timer = 0.005
+		self.flash_timer = 0.002
 
 		if self.hp <= 0:
 			self.destroy()
@@ -169,25 +166,30 @@ class Boss(pg.sprite.Sprite):
 		now = pg.time.get_ticks()
 		if dt + now > 1000:
 			pg.mixer.Sound(random.choice(explosion_sounds)).play()
-		if dt + now > 1500:
+		if dt + now > 15400:
 			pg.mixer.Sound(random.choice(explosion_sounds)).play()
 
 		explosion = Explosion(self.game, self.rect.center)
 		self.game.effects.add(explosion)
 		self.game.all_sprites.add(explosion)
 		now = pg.time.get_ticks()
-		if dt + now > 100:
+		if dt + now > 1400:
 			explosion = Explosion(self.game, self.rect.center)
 			self.game.effects.add(explosion)
 			self.game.all_sprites.add(explosion)
-		if dt + now > 300:
+		if dt + now > 3500:
 			explosion = Explosion(self.game, self.rect.center)
 			self.game.effects.add(explosion)
 			self.game.all_sprites.add(explosion)
 
-		for _ in range(10000):
+		for _ in range(20000):
 			particle = Particle(self.game, self.rect.center)
 			self.game.effects.add(particle)
 			self.game.all_sprites.add(particle)
+		if dt + now > 4000:
+			for _ in range(10000):
+				particle = Particle(self.game, self.rect.center)
+				self.game.effects.add(particle)
+				self.game.all_sprites.add(particle)
 		self.game.score += 5000
 		self.kill()
