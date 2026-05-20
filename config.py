@@ -7,6 +7,7 @@ pg.mixer.music.set_volume(0.2)
 
 x_res = 1920
 y_res = 1080
+screen = pg.display.set_mode((x_res, y_res), pg.SRCALPHA)
 FPS = 60
 DEBUG = True
 PLAYER_SPEED = 420

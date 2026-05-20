@@ -7,7 +7,6 @@ from entities.thruster_particle import ThrusterParticle
 import random
 from pygame.transform import rotozoom
 from entities.powerup import PowerUp
-from core.spritegroups import powerups_group, all_sprites
 
 
 class Player(pg.sprite.Sprite):
@@ -140,8 +139,9 @@ class Player(pg.sprite.Sprite):
 			pg.quit()
 		# For debugging
 		if keys[pg.K_F9]:
-			powerups_group.add(powerup := PowerUp(self.game, self.rect.center, kind="health"))
-			all_sprites.add(powerup)
+			powerup = PowerUp(self.game, self.rect.center, kind="health")
+			self.game.powerups.add(powerup)
+			self.game.all_sprites.add(powerup)
 		if keys[pg.K_F11]:
 			self.alive = False
 		if keys[pg.K_F10]:

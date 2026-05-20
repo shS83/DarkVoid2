@@ -52,19 +52,11 @@ class Game:
 		self.enemy_bullets = pg.sprite.Group()
 		self.texts = pg.sprite.Group()
 		self.powerups = pg.sprite.Group()
+		self.effects = pg.sprite.Group()
 		self.direction = 1
 		self.px = c.WIDTH // 2
 		self.py = c.HEIGHT // 2
 		self.all_sprites = pg.sprite.Group()
-		powerup = PowerUp(pg.image.load(f"{c.HOME_DIR}/assets/powerup-health.png"), (self.px, self.py), "health")
-		self.powerups.add(powerup)
-		powerup = PowerUp(pg.image.load(f"{c.HOME_DIR}/assets/powerup-spread.png"), (self.px, self.py), "spread")
-		self.powerups.add(powerup)
-		powerup = PowerUp(pg.image.load(f"{c.HOME_DIR}/assets/powerup-speed.png"), (self.px, self.py), "speed")
-		self.powerups.add(powerup)
-		dt = self.clock.tick(c.FPS)
-		self.powerups.update(dt)
-		self.powerups.draw(self.screen)
 		self.game_over = False
 		self.game_over_angle = 0
 		self.game_over_scale = 0.5
@@ -182,9 +174,10 @@ class Game:
 
 	def draw(self):
 		self.screen.blit(self.background, (0, 0))
-		self.all_sprites.draw(self.screen)
+		self.powerups.draw(self.screen)
 		self.stars.draw(self.screen)
 		self.hud.draw(self.screen)
+		self.all_sprites.draw(self.screen)
 
 		if self.game_over:
 			# Screen darkening

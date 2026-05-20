@@ -4,20 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Now everything works till boss 1 who still doesn't do anything">
+    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment=" Powerups not appearing">
+      <change afterPath="$PROJECT_DIR$/entities/glitter.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/commons.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/commons.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/intro_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/intro_module.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/boss.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/boss.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/bullet.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/bullet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/spritegroups.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/spritegroups.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/enemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/enemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/particle.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/particle.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/player.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/powerup.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/powerup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/ship.py" beforeDir="false" afterPath="$PROJECT_DIR$/trash/ship.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trash/old_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/trash/old_main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -165,7 +160,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.intro_module">
+  <component name="RunManager" selected="Python.game">
     <configuration name="game" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="darkvoid2" />
       <option name="ENV_FILES" value="" />
@@ -553,7 +548,14 @@
       <option name="presentableId" value="LOCAL−00041" />
       <updated>1779298463836</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL−00042" summary=" Powerups not appearing">
+      <option name="closed" value="true" />
+      <created>1779316601930</created>
+      <option name="number" value="LOCAL−00042" />
+      <option name="presentableId" value="LOCAL−00042" />
+      <updated>1779316601930</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -576,7 +578,8 @@
     <MESSAGE value="added gameover still needs fixing" />
     <MESSAGE value="Added some variation to ships and a boss" />
     <MESSAGE value="Now everything works till boss 1 who still doesn't do anything" />
-    <option name="LAST_COMMIT_MESSAGE" value="Now everything works till boss 1 who still doesn't do anything" />
+    <MESSAGE value=" Powerups not appearing" />
+    <option name="LAST_COMMIT_MESSAGE" value=" Powerups not appearing" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

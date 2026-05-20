@@ -2,6 +2,8 @@ import pygame as pg
 import config as c
 from pygame.transform import rotozoom
 import random
+
+from core.utils import get_random_position, get_random_velocity
 from entities.explosion import Explosion
 from entities.particle import Particle
 from entities.bullet import EnemyBullet
@@ -138,6 +140,9 @@ class Enemy(pg.sprite.Sprite):
 			self.game.effects.add(particle)
 			self.game.all_sprites.add(particle)
 		self.game.score += 100
-		if random.random() < 0.3:
-			powerup = PowerUp(self.game, self.rect.center)
+		if random.random() < 0.9:
+			self.px, self.py = get_random_position(c.screen)
+			powerup = PowerUp(self, (self.px, self.py), random.choice(["health", "speed", "spread"]))
+			self.game.powerups.add(powerup)
+			self.game.all_sprites.add(powerup)
 		self.kill()
