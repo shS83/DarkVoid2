@@ -60,6 +60,8 @@ class Player(pg.sprite.Sprite):
 		bullet = PlayerBullet(self.game, self.rect.midtop, velocity=(0, -800))
 		if self.fire_timer > 0:
 			return
+		if self.rect.y + bullet.rect.y < 0:
+			self.kill()
 		pg.mixer.Sound(f'{c.HOME_DIR}/assets/lasersound2.wav').play()
 		self.fire_timer = self.fire_cooldown2
 		self.game.player_bullets.add(bullet)
@@ -78,6 +80,8 @@ class Player(pg.sprite.Sprite):
 		pg.mixer.Sound(f'{c.HOME_DIR}/assets/lasersound.wav').play()
 		self.fire_timer = self.fire_cooldown
 		for pos, velocity in bullet_data:
+			if self.pos.y + 20 < 0:
+				self.kill()
 			bullet = PlayerBullet(self.game, pos, velocity=velocity)
 			self.game.player_bullets.add(bullet)
 			self.game.all_sprites.add(bullet)

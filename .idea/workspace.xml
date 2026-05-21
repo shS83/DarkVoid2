@@ -4,25 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="Adding asteroids to the game">
-      <change afterPath="$PROJECT_DIR$/assets/rock_3_3.png" afterDir="false" />
+    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="a'steroids beem rollin'">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dark_Void_2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/rock_3.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/rock_3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/rock_3_2.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/rock_2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/rock_3_2_hit.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/rock_4_2.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/rock_1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/rock_5_2.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/rock_5.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/rock_6_2.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/rock_6.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/commons.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/commons.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/hs_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/hs_module.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/asteroid.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/asteroid.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/boss.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/boss.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/enemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/enemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/level.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/level.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/player.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trash/lvl1.py" beforeDir="false" afterPath="$PROJECT_DIR$/trash/lvl1.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,7 +55,7 @@
     </selectedModels>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="194" />
+    <option name="cachedIndexableFilesCount" value="202" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -171,7 +158,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.game">
+  <component name="RunManager" selected="Python.main">
     <configuration name="game" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="darkvoid2" />
       <option name="ENV_FILES" value="" />
@@ -587,7 +574,14 @@
       <option name="presentableId" value="LOCAL−00045" />
       <updated>1779324255601</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL−00046" summary="a'steroids beem rollin'">
+      <option name="closed" value="true" />
+      <created>1779335791938</created>
+      <option name="number" value="LOCAL−00046" />
+      <option name="presentableId" value="LOCAL−00046" />
+      <updated>1779335791938</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -613,7 +607,8 @@
     <MESSAGE value=" Powerups not appearing" />
     <MESSAGE value=" Powerups not appearing properly" />
     <MESSAGE value="Adding asteroids to the game" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding asteroids to the game" />
+    <MESSAGE value="a'steroids beem rollin'" />
+    <option name="LAST_COMMIT_MESSAGE" value="a'steroids beem rollin'" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

@@ -176,7 +176,7 @@ class Game:
 
 		if self.asteroid_spawn_timer >= self.asteroid_spawn_delay:
 			self.asteroid_spawn_timer = 0
-			self.asteroid_spawn_delay = random.uniform(0.18, 0.65)
+			self.asteroid_spawn_delay = random.uniform(0.40, 1.2)
 			self.spawn_asteroid()
 
 		for enemy in self.enemies:
@@ -222,9 +222,6 @@ class Game:
 
 		if not self.player.alive:
 			self.game_over = True
-
-		# for enemy, bullets in hits.items():
-		# 	enemy.damage(len(bullets))
 
 		if self.game_over:
 			self.game_over_scale += self.game_over_scale_dir * 0.2 * dt
@@ -290,10 +287,10 @@ class Game:
 				if event.type == pg.QUIT:
 					self.running = False
 				if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
-					print("here")
+					print("Escape from the game?!")
 					self.running = False
 				if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-					print("space pressed")
+					print("Have some space.")
 			self.update(dt)
 			self.draw()
 

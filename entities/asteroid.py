@@ -26,8 +26,8 @@ class Meteor(pg.sprite.Sprite):
 		self.rect = self.image.get_rect(center=self.pos)
 
 		self.velocity = pg.Vector2(
-			random.uniform(-60, 60),
-			random.uniform(90, 210)
+			random.uniform(-30, 30),
+			random.uniform(60, 180)
 		)
 
 		self.rotation = random.uniform(0, 360)
