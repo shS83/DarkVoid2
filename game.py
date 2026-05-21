@@ -149,7 +149,8 @@ class Game:
 		x = c.WIDTH // 2
 		y = -300
 
-		self.boss = Boss(self, (x, y), boss=True)
+		self.boss = Boss(self, (x, y))
+
 		self.enemies.add(self.boss)
 		self.all_sprites.add(self.boss)
 

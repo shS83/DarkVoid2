@@ -24,7 +24,7 @@ class Boss(pg.sprite.Sprite):
 		self.phase_index = 0
 		self.phase_timer = 0
 		self.image = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/alus2.png").convert_alpha(), 180, 1)
-		self.max_h = c.HEIGHT // 2 - self.image.get_height()
+		self.max_h = 160
 		self.hitbox = self.rect = self.image.get_rect(center=pos).inflate(-300, -300)
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
@@ -41,12 +41,17 @@ class Boss(pg.sprite.Sprite):
 		]
 
 	def update(self, dt):
-		if self.pos.y < self.max_h - self.image.get_height():
+		if self.pos.y < self.max_h:
 			self.entering = True
 			self.pos.y += self.speed * dt
 		else:
 			self.entering = False
-			self.pos.y = self.max_h - self.image.get_height()
+			self.pos.y = self.max_h
+
+		if self.pos.y < self.max_h:
+			self.pos.y += self.speed * dt
+			if self.pos.y > self.max_h:
+				self.pos.y = self.max_h
 
 		self.rect.center = self.pos
 		self.hitbox.center = self.rect.center
