@@ -5,10 +5,12 @@ from entities.player import Player
 # from entities.boss import Boss
 from entities.enemy import Enemy
 from entities.star import Star
-
 import random
 from ui.hud import HUD
 from entities.powerup import PowerUp
+from entities.asteroid import Meteor
+from entities.level import *
+from core.hs_module import HighScore
 
 
 def mixer_init():
@@ -42,6 +44,15 @@ class Game:
 		self.explosion_frames = []
 		self.enemy_spawn_timer = 0
 		self.enemy_spawn_delay = random.uniform(1.5, 5.0)
+		self.asteroids = pg.sprite.Group()
+		self.asteroid_spawn_timer = 0
+		self.asteroid_spawn_delay = 0.45
+
+		self.rock_images = []
+
+		for i in range(1, 5):
+			img = pg.image.load(f"{c.HOME_DIR}/assets/rock_{i}.png").convert_alpha()
+			self.rock_images.append(img)
 		for i in range(1, 32):
 			img = pg.image.load(f"{c.HOME_DIR}/assets/exp_{i}.png").convert_alpha()
 			img = pg.transform.scale(img, (320, 320))
@@ -53,10 +64,11 @@ class Game:
 		self.texts = pg.sprite.Group()
 		self.powerups = pg.sprite.Group()
 		self.effects = pg.sprite.Group()
+		self.asteroids = pg.sprite.Group()
 		self.direction = 1
 		self.px = c.WIDTH // 2
 		self.py = c.HEIGHT // 2
-		self.all_sprites = pg.sprite.Group()
+		self.all_sprites = pg.sprite.LayeredUpdates()
 		self.game_over = False
 		self.game_over_angle = 0
 		self.game_over_scale = 0.5
@@ -76,6 +88,39 @@ class Game:
 
 		for _ in range(200):
 			self.stars.add(Star())
+
+	def spawn_asteroid(self):
+		x = random.randint(40, c.WIDTH - 40)
+		y = random.randint(-160, -40)
+
+		asteroid = Meteor(self, (x, y))
+
+		self.asteroids.add(asteroid)
+		self.all_sprites.add(asteroid)
+
+	def spawn_rocks(self):
+		for _ in range(8):
+			asteroid = Meteor(self, (random.randint(0, c.WIDTH), random.randint(0, c.HEIGHT)))
+			x = random.randint(50, c.WIDTH - 50)
+			y = -60
+
+			test_rect = pg.Rect(0, 0, 64, 64)
+			test_rect.center = (x, y)
+
+			overlap = False
+
+			for asteroid in self.asteroids:
+				if test_rect.colliderect(asteroid.rect.inflate(20, 20)):
+					overlap = True
+				if self.player.rect.colliderect(asteroid.rect) and not self.player.invincible_timer > 0:
+					self.player.hit()
+					break
+
+			if not overlap:
+				asteroid = Meteor(self, (x, y))
+				self.asteroids.add(asteroid)
+				self.all_sprites.add(asteroid)
+				return
 
 	def spawn_enemy(self):
 		for _ in range(20):  # try 20 times
@@ -116,6 +161,7 @@ class Game:
 		if not c.BOSS_TIME:
 			self.boss_timer -= dt * 100
 		self.stars.update(dt)
+		self.asteroids.update(dt)
 		self.all_sprites.update(dt)
 		if not c.BOSS_TIME:
 			self.enemy_spawn_timer += dt
@@ -126,12 +172,31 @@ class Game:
 				self.enemy_spawn_delay = random.uniform(0.4, 3)
 				self.spawn_enemy()
 
+		self.asteroid_spawn_timer += dt
+
+		if self.asteroid_spawn_timer >= self.asteroid_spawn_delay:
+			self.asteroid_spawn_timer = 0
+			self.asteroid_spawn_delay = random.uniform(0.18, 0.65)
+			self.spawn_asteroid()
+
 		for enemy in self.enemies:
 			for bullet in self.player_bullets:
 				if enemy.hitbox.colliderect(bullet.rect):
 					bullet.kill()
 					enemy.damage(1)
 					break
+
+		for asteroid in self.asteroids:
+			for bullet in self.player_bullets:
+				if asteroid.hitbox.colliderect(bullet.rect):
+					bullet.kill()
+					asteroid.damage(1)
+					break
+
+		for asteroid in self.asteroids:
+			if asteroid.hitbox.colliderect(self.player.rect) and not self.player.invincible_timer > 0:
+				self.player.hit()
+				break
 
 		if self.boss_timer < 1 and self.boss == None:
 			self.boss_timer = 0
@@ -177,6 +242,7 @@ class Game:
 		self.powerups.draw(self.screen)
 		self.stars.draw(self.screen)
 		self.hud.draw(self.screen)
+		self.asteroids.draw(self.screen)
 		self.all_sprites.draw(self.screen)
 
 		if self.game_over:
@@ -224,10 +290,16 @@ class Game:
 				if event.type == pg.QUIT:
 					self.running = False
 				if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+					print("here")
 					self.running = False
+				if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+					print("space pressed")
 			self.update(dt)
 			self.draw()
 
+		scores = HighScore("John", self.score)
+		scores.load_scores()
+		scores.check_score(self.score)
 		pg.quit()
 		pg.mixer.music.stop()
 		pg.mixer.quit()

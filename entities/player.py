@@ -9,10 +9,9 @@ from entities.thruster_particle import ThrusterParticle
 import random
 from pygame.transform import rotozoom
 from entities.powerup import PowerUp
-from entities.asteroid import Meteor
 
-Asteroid = Meteor(random.choice(ROCK_IMAGES), get_random_position(c.screen),
-                  get_random_velocity(2, 10), get_random_velocity(1, 5))
+
+# from entities.asteroid import Meteor
 
 
 class Player(pg.sprite.Sprite):
@@ -41,6 +40,9 @@ class Player(pg.sprite.Sprite):
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_toggle_timer = 0
 		self.speed = 350
+
+	# self.asteroid_group = pg.sprite.Group()
+	# self.all_sprites = pg.sprite.LayeredUpdates()
 
 	def make_flash_image(self, image):
 		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
@@ -144,7 +146,9 @@ class Player(pg.sprite.Sprite):
 			pg.quit()
 		# For debugging
 		if keys[pg.K_F8]:
-			Asteroid.spawn_meteor(get_random_position(self.game.screen), get_random_velocity(10, 100))
+			Asteroid = Meteor(self.game, (c.WIDTH // 2, c.HEIGHT // 2))
+			self.asteroid_group.add(Asteroid)
+			self.all_sprites.add(Asteroid)
 
 		if keys[pg.K_F9]:
 			powerup = PowerUp(self.game, (self.rect.x, 0), kind=random.choice(["health", "speed", "spread", "laser"]))

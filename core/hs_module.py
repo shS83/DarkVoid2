@@ -1,89 +1,116 @@
-import pygame, pygame.gfxdraw, random, math
+import pygame as pg
+import pygame.gfxdraw
+import os
+import config as c
 
-xRES = 1024
-yRES = 768
-NOW_MS = 0
-timer = pygame.time.Clock()
-pygame.init()
-#screen = pygame.display.set_mode([xRES, yRES], pygame.SHOWN)
-startTime = pygame.time.get_ticks()
-running = True
-font = pygame.font.SysFont('msgothic', 18)
-HOMEDIR = '/Users/Paja/Documents/shS/darkvoid'
-FADE = pygame.USEREVENT + 5
 
-def load_scores():
-    scores = []
-    handle = open(f'{HOMEDIR}/darkvoid_highscores.txt', 'r')
-    for line in handle:
-        scores.append(line.rstrip())
-    return scores
+class HighScore:
+	def __init__(self, name: str = "John", score: int = 10):
+		self.name = name
+		self.score = score
+		self.ASSET_DIR = f'{c.HOME_DIR}/assets'
+		self.empty = pg.image.load(f'{self.ASSET_DIR}/tyhja.png')
+		self.new_hs_text = pg.image.load(f'{self.ASSET_DIR}/highscore_text.png')
+		self.tausta = pg.image.load(f'{self.ASSET_DIR}/pelitausta_2.png')
 
-def check_score(highscore):
-    scores = load_scores()
-    for e in range(0, len(scores)-1):
-        user, score = scores[e].split(' ')
-        if highscore >= int(score):
-            print(f"suurempi, kuin {user} {score}")
-            return e
-    return 'NO'
+		self.font = pg.font.Font(f'{self.ASSET_DIR}/JetBrainsMonoNerdFont-SemiBold.ttf', 18)
+		self.die_font = pg.font.Font(f'{self.ASSET_DIR}/JetBrainsMonoNerdFont-SemiBold.ttf', 100)
+		self.hs_font = self.font
 
-def fix_scores(index, user, highscore):
-    scores = load_scores()
-    for e in range(0, len(scores)-1):
-        if e == index:
-            scores.insert(index, f'{user} {highscore}')
-            scores.pop()
-    return scores
+		self.x_res = c.WIDTH
+		self.y_res = c.HEIGHT
+		self.timer = pygame.time.Clock()
+		self.font = self.hs_font
+		HOME_DIR = c.HOME_DIR
 
-def save_scores(scores):
-    try:
-        handle = open(f'{HOMEDIR}/darkvoid_highscores.txt', 'w')
-        for score in scores:
-            handle.write(score + '\n')
-        return True
-    except:
-        return False
+		self.high_scores = []
+		self.new_score = None
+		self.input_text = ""
+		self.finished_typing = False
+		self.typing_name = False
 
-    
-def blend_fill(screen, fade_to):
-    
-    c = fade_to
-    screen.fill((c, c, c), None, special_flags=pygame.BLEND_RGBA_SUB)
-   
-def scores(screen, scores, fontname, fsize):
+		def load_scores(self):
+			if len(self.high_scores) < 1:
+				handle = open(f"{HOME_DIR}/gemfall_highscores.txt", "r")
+				for line in handle:
+					self.high_scores.append(line.rstrip())
+				return True
+			return False
 
-    hs_font = pygame.font.SysFont(fontname, int(round(fsize*1.2)))
-    score_font = pygame.font.SysFont(fontname, fsize)
-    blend_fill(screen, 30)
-    hstext = 'HALL OF FAME'
-    hsblit = hs_font.render(hstext, True, (255, 255, 255))
-    hsize = hs_font.size(hstext)
-    screen.blit(hsblit, (xRES/2-hsize[0]/2, 100))
-    maxlen = len(scores)
-    if maxlen > 10:
-        maxlen = 10
-    for i in range(0, maxlen):
-        user, score = scores[i].split(' ')
-        usize = score_font.size(user)
-        ssize = score_font.size(score)
-        userblit = score_font.render(user, True, (255, 255, 255))
-        scoreblit = score_font.render(score, True, (255, 255, 255))     
-        #screen.blit(userblit, (xRES/2-100, 150+(usize[1]+30*i)))
-        screen.blit(scoreblit, (xRES/2+(75-ssize[0]/2), 150+(ssize[1]+30*i)))
-                    
+		def check_score(self, highscore):
+			new_score = "NO"
 
-    #for s in range(0, len(scores)-1):
-    #    to_blit = font.render(scores[s], True, (255, 255, 255))
-    #    screen.blit(to_blit, (100, 100+s*50))
+			for e in range(0, len(self.high_scores) - 1):
+				user, scoreamount = self.high_scores[e].split(" ")
+				if self.highscore >= int(scoreamount):
+					self.finished_typing = False
+					self.new_score = e
+					return True
+			return False
 
-#while running:
+		def fix_scores(self, index, user, highscore):
 
-#    for event in pygame.event.get():    
-#        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-#                running = False
-#        if event.type == pygame.QUIT:
-#            running = False
-        
-    
-    
+			for e in range(0, len(self.high_scores) - 1):
+				if e == self.index:
+					self.high_scores.insert(index, f"{self.user} {self.highscore}")
+					self.high_scores.pop()
+					return True
+			return False
+
+		def save_scores(self):
+			try:
+				handle = open(f"{HOME_DIR}/gemfall_highscores.txt", "w")
+				for scr in self.high_scores:
+					handle.write(scr + "\n")
+				return True
+			except OSError:
+				print("Could not open/read highscore file")
+				return False
+
+		def blend_fill(self, screen, fade_to):
+			color = fade_to
+			screen.fill((color, color, color), None, special_flags=pygame.BLEND_RGBA_SUB)
+
+		def draw_input(self, color):
+			size_surf = self.font.render("MMMMMMMMMM", True, (0, 0, 0))
+			font_w = size_surf.get_width()
+			font_h = size_surf.get_height()
+			rect_w = font_w + 20
+			rect_h = font_h + 20
+			self.text_surface = self.font.render(self.input_text, True, (255, 255, 255))
+			self.alpha_surface = pg.Surface((rect_w, rect_h))
+			outer_rect = pg.Rect(0, 0, rect_w, rect_h)
+			input_rect = pg.Rect(5, 5, rect_w - 10, rect_h - 10)
+			pg.draw.rect(self.alpha_surface, (255, 255, 255), outer_rect)
+			pg.draw.rect(self.alpha_surface, color, input_rect)
+			self.alpha_surface.set_alpha(160)
+			input_x = c.WIDTH / 2 - self.text_surface.get_width() / 2
+			blit_x = c.WIDTH / 2 - self.alpha_surface.get_width() / 2
+			blit_y = c.HEIGHT - self.alpha_surface.get_height() / 2 - 200
+			self.font_surface = self.font.render("Please enter your name:", True, (255, 255, 255))
+			text_blit_x = c.WIDTH / 2 - self.font_surface.get_width() / 2
+			c.screen.blit(self.font_surface, (text_blit_x, blit_y - 50))
+			c.screen.blit(self.alpha_surface, (blit_x, blit_y))
+			c.screen.blit(self.text_surface, (input_x, blit_y + 8))
+
+		def scores(self, fontname, fsize):
+			self.hs_font = pygame.font.Font(f"{HOME_DIR}/assets/{fontname}", int(round(fsize * 1.2)))
+			self.score_font = pygame.font.Font(f"{HOME_DIR}/assets/{fontname}", fsize)
+			self.hstext = "HALL OF FAME"
+			self.hsblit = self.hs_font.render(self.hstext, True, (255, 255, 255))
+			self.hsize = self.hs_font.size(self.hstext)
+			c.screen.blit(self.hsblit, (c.WIDTH / 2 - self.hsize[0] / 2, c.HEIGHT / 10))
+			self.maxlen = len(self.high_scores)
+
+			if self.maxlen > 10:
+				self.maxlen = 10
+
+			for i in range(0, self.maxlen):
+				self.user, self.score = self.high_scores[i].split(" ")
+				usize = self.score_font.size(self.user)
+				ssize = self.score_font.size(self.score)
+				self.userblit = self.score_font.render(self.user, True, (255, 255, 255))
+				self.scoreblit = self.score_font.render(self.score, True, (255, 255, 255))
+				c.screen.blit(self.userblit, (c.WIDTH / 2 - 175, c.HEIGHT / 10 + 50 + (usize[1] + 30 * i)))
+				c.screen.blit(self.scoreblit,
+				              (c.WIDTH / 2 + (175 - ssize[0]), c.HEIGHT / 10 + 50 + (ssize[1] + 30 * i)))

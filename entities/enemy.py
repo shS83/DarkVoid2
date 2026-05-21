@@ -140,9 +140,10 @@ class Enemy(pg.sprite.Sprite):
 			self.game.effects.add(particle)
 			self.game.all_sprites.add(particle)
 		self.game.score += 100
-		if random.random() < 0.9:
+		if random.random() < 0.3:
 			self.px, self.py = get_random_position(c.screen)
-			powerup = PowerUp(self.game, (random.randint(0, c.WIDTH), 0), random.choice(["health", "speed", "spread"]))
+			powerup = PowerUp(self.game, (random.randint(0, c.WIDTH), 0),
+			                  random.choice(["health", "speed", "spread", "laser"]))
 			self.game.powerups.add(powerup)
 			self.game.all_sprites.add(powerup)
 		self.kill()

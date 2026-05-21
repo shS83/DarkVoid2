@@ -6,6 +6,7 @@ from entities.explosion import Explosion
 from entities.bullet import EnemyBullet, PlayerBullet
 import config as c
 from pygame.transform import rotozoom
+from entities.level import *
 
 
 class Boss(pg.sprite.Sprite):
@@ -150,12 +151,14 @@ class Boss(pg.sprite.Sprite):
 			self.destroy()
 
 	def destroy(self, dt=pg.time.Clock().tick(60) / 1000):
+		interval = 400
 		explosion_sounds = [f'{c.HOME_DIR}/assets/explosion2.wav', f'{c.HOME_DIR}/assets/explosion1-long.wav',
 		                    f'{c.HOME_DIR}/assets/explosion3.wav']
 		pg.mixer.Sound(random.choice(explosion_sounds)).play()
 		now = pg.time.get_ticks()
 		if dt + now > 1000:
 			pg.mixer.Sound(random.choice(explosion_sounds)).play()
+		now = pg.time.get_ticks()
 		if dt + now > 15400:
 			pg.mixer.Sound(random.choice(explosion_sounds)).play()
 
@@ -163,23 +166,30 @@ class Boss(pg.sprite.Sprite):
 		self.game.effects.add(explosion)
 		self.game.all_sprites.add(explosion)
 		now = pg.time.get_ticks()
-		if dt + now > 1400:
-			explosion = Explosion(self.game, self.rect.center)
+		if dt + now > 1400 + interval:
+			explosion = Explosion(self.game, self.rect.topleft)
 			self.game.effects.add(explosion)
 			self.game.all_sprites.add(explosion)
-		if dt + now > 3500:
-			explosion = Explosion(self.game, self.rect.center)
+		now = pg.time.get_ticks()
+		if dt + now > 3500 + interval:
+			explosion = Explosion(self.game, self.rect.bottom)
 			self.game.effects.add(explosion)
 			self.game.all_sprites.add(explosion)
 
-		for _ in range(20000):
-			particle = Particle(self.game, self.rect.center)
-			self.game.effects.add(particle)
-			self.game.all_sprites.add(particle)
-		if dt + now > 4000:
-			for _ in range(10000):
+		now = pg.time.get_ticks()
+		if dt + now > 4000 + interval:
+			for _ in range(20000):
 				particle = Particle(self.game, self.rect.center)
+				self.game.effects.add(particle)
+				self.game.all_sprites.add(particle)
+		now = pg.time.get_ticks()
+		if dt + now > 4000 + interval:
+			for _ in range(10000):
+				particle = Particle(self.game, self.rect.top)
 				self.game.effects.add(particle)
 				self.game.all_sprites.add(particle)
 		self.game.score += 5000
 		self.kill()
+
+		# Man you got to level 2
+		level.stage += 1
