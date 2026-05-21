@@ -34,7 +34,7 @@ class Game:
 		self.boss = None
 		self.boss_time = False
 		self.boss_timer = 2000
-		self.boss_max_y = 160
+		self.boss_max_y = c.HEIGHT // 2 - 200
 		self.score = 0
 		self.hud = HUD(self)
 		self.screen = pg.display.set_mode((c.WIDTH, c.HEIGHT), pg.SRCALPHA, 32)
@@ -47,9 +47,7 @@ class Game:
 		self.asteroids = pg.sprite.Group()
 		self.asteroid_spawn_timer = 0
 		self.asteroid_spawn_delay = random.uniform(0.4, 3)
-
 		self.rock_images = []
-
 		for i in range(1, 5):
 			img = pg.image.load(f"{c.HOME_DIR}/assets/rock_{i}.png").convert_alpha()
 			self.rock_images.append(img)
@@ -67,7 +65,7 @@ class Game:
 		self.asteroids = pg.sprite.Group()
 		self.direction = 1
 		self.px = c.WIDTH // 2
-		self.py = c.HEIGHT // 2
+		self.py = -42
 		self.all_sprites = pg.sprite.LayeredUpdates()
 		self.game_over = False
 		self.game_over_angle = 0
@@ -99,29 +97,29 @@ class Game:
 		self.asteroids.add(asteroid)
 		self.all_sprites.add(asteroid)
 
-	# def spawn_rocks(self):
-	# 	for _ in range(8):
-	# 		asteroid = Meteor(self, (random.randint(0, c.WIDTH), random.randint(0, c.HEIGHT)))
-	# 		x = random.randint(50, c.WIDTH - 50)
-	# 		y = -100
-	#
-	# 		test_rect = pg.Rect(0, 0, 64, 64)
-	# 		test_rect.center = (x, y)
-	#
-	# 		overlap = False
-	#
-	# 		for asteroid in self.asteroids:
-	# 			if test_rect.colliderect(asteroid.rect.inflate(20, 20)):
-	# 				overlap = True
-	# 			if self.player.rect.colliderect(asteroid.rect) and not self.player.invincible_timer > 0:
-	# 				self.player.hit()
-	# 				break
-	#
-	# 		if not overlap:
-	# 			asteroid = Meteor(self, (x, y))
-	# 			self.asteroids.add(asteroid)
-	# 			self.all_sprites.add(asteroid)
-	# 			return
+	def spawn_rocks(self):
+		for _ in range(8):
+			asteroid = Meteor(self, (random.randint(0, c.WIDTH), random.randrange(-150, -50)))
+			x = random.randint(50, c.WIDTH - 50)
+			y = -100
+
+			test_rect = pg.Rect(0, 0, 64, 64)
+			test_rect.center = (x, y)
+
+			overlap = False
+
+			for asteroid in self.asteroids:
+				if test_rect.colliderect(asteroid.rect.inflate(20, 20)):
+					overlap = True
+				if self.player.rect.colliderect(asteroid.rect) and not self.player.invincible_timer > 0:
+					self.player.hit()
+					break
+
+			if not overlap:
+				asteroid = Meteor(self, (x, y))
+				self.asteroids.add(asteroid)
+				self.all_sprites.add(asteroid)
+				return
 
 	def spawn_enemy(self):
 		for _ in range(20):  # try 20 times
@@ -176,8 +174,8 @@ class Game:
 		self.asteroid_spawn_timer += dt
 
 		if self.asteroid_spawn_timer >= self.asteroid_spawn_delay:
-			self.asteroid_spawn_timer = 15
-			self.asteroid_spawn_delay = random.uniform(0.40, 1.2)
+			self.asteroid_spawn_timer = 0
+			self.asteroid_spawn_delay = random.uniform(0.40, 5.2)
 			self.spawn_asteroid()
 
 		for enemy in self.enemies:
@@ -201,7 +199,7 @@ class Game:
 		#	elif asteroid.hitbox.colliderect(asteroid.rect):
 		#		asteroid.damage(1)
 		#		break
-		if self.boss_timer < 1 and self.boss == None:
+		if self.boss_timer < 1:
 			self.boss_timer = 0
 			self.boss_spawn()
 

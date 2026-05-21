@@ -141,7 +141,8 @@ class Enemy(pg.sprite.Sprite):
 			self.game.all_sprites.add(particle)
 		self.game.score += 100
 		if random.random() < 0.15:
-			self.px, self.py = get_random_position(c.screen)
+			(self.px,
+			 self.py) = random.randrange(0, c.WIDTH), random.randrange(-150, -50)
 			powerup = PowerUp(self.game, (random.randint(0, c.WIDTH), 0),
 			                  random.choice(["health", "speed", "spread", "laser"]))
 			self.game.powerups.add(powerup)

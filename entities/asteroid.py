@@ -14,7 +14,7 @@ class Meteor(pg.sprite.Sprite):
 		self.game = game
 		self.pos = pg.Vector2(pos)
 		self.pos.y = -100
-		
+
 		self.image = random.choice(c.ROCK_IMAGES).copy()
 		scale = random.uniform(0.35, 1.05)
 
@@ -74,7 +74,7 @@ class Meteor(pg.sprite.Sprite):
 			self.game.all_sprites.add(particle)
 		self.game.score += 50
 		if random.random() < 0.15:
-			self.px, self.py = get_random_position(c.screen)
+			# self.px, self.py = get_random_position(self.game.screen)
 			# self.py = -15
 			powerup = PowerUp(self.game, (random.randint(0, c.WIDTH), 0),
 			                  random.choice(["health", "speed", "spread", "laser"]))

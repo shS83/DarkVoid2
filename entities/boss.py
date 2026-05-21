@@ -19,9 +19,10 @@ class Boss(pg.sprite.Sprite):
 		self.shoot_delay = 0.001
 		self.pos = pg.Vector2(pos)
 		self.pos.y -= 2000
+		self.entering = False
 		self.hp = 1000
 		self.phase_index = 0
-		self.phase_timer = 1000
+		self.phase_timer = 0
 		self.image = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/alus2.png").convert_alpha(), 180, 1)
 		self.max_h = c.HEIGHT // 2 - self.image.get_height()
 		self.hitbox = self.rect = self.image.get_rect(center=pos).inflate(-300, -300)
@@ -41,8 +42,10 @@ class Boss(pg.sprite.Sprite):
 
 	def update(self, dt):
 		if self.pos.y < self.max_h - self.image.get_height():
+			self.entering = True
 			self.pos.y += self.speed * dt
 		else:
+			self.entering = False
 			self.pos.y = self.max_h - self.image.get_height()
 
 		self.rect.center = self.pos
@@ -105,7 +108,7 @@ class Boss(pg.sprite.Sprite):
 			angle = start + step * i
 			self.fire_bullet(
 				self.rect.center,
-				direction.rotate(angle) * speed * 50
+				direction.rotate(angle) * speed
 			)
 
 	def radial_burst(self, count=32, speed=190, offset=0):
@@ -115,7 +118,7 @@ class Boss(pg.sprite.Sprite):
 
 			self.fire_bullet(
 				self.rect.center,
-				direction * speed * 50
+				direction * speed
 			)
 
 	def spiral_burst(self, arms=4, speed=220):
@@ -127,27 +130,27 @@ class Boss(pg.sprite.Sprite):
 
 			self.fire_bullet(
 				self.rect.center,
-				direction * speed * 50
+				direction * speed
 			)
 
 	def phase_intro(self, dt):
-		self.shoot_delay = 0.8
+		self.shoot_delay = 1.5
 
 		if self.phase_timer > 3:
 			self.next_phase()
 
 	def phase_radial(self, dt):
-		self.shoot_delay = 0.4
+		self.shoot_delay = 1.5
 
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
-			self.radial_burst(count=28, speed=180, offset=self.phase_timer * 40)
+			self.radial_burst(count=28, speed=180, offset=self.phase_timer)
 
 		if self.phase_timer > 10:
 			self.next_phase()
 
 	def phase_spiral(self, dt):
-		self.shoot_delay = 0.12
+		self.shoot_delay = 1.5
 
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
@@ -157,7 +160,7 @@ class Boss(pg.sprite.Sprite):
 			self.next_phase()
 
 	def phase_desperation(self, dt):
-		self.shoot_delay = 0.15
+		self.shoot_delay = 1.5
 
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
@@ -177,7 +180,7 @@ class Boss(pg.sprite.Sprite):
 		return flash
 
 	def shoot(self):
-		self.shoot_delay = 0.0001
+		self.shoot_delay = 1.5
 		self.shoot_timer = self.shoot_delay
 
 		direction = self.game.player.pos - self.pos
@@ -197,8 +200,11 @@ class Boss(pg.sprite.Sprite):
 		self.game.all_sprites.add(bullet)
 
 	def damage(self, amount):
+		if self.entering:
+			return
+
 		self.hp -= amount
-		self.flash_timer = 0.002
+		self.flash_timer = 0.02
 
 		if self.hp <= 0:
 			self.destroy()
@@ -209,10 +215,10 @@ class Boss(pg.sprite.Sprite):
 		                    f'{c.HOME_DIR}/assets/explosion3.wav']
 		pg.mixer.Sound(random.choice(explosion_sounds)).play()
 		now = pg.time.get_ticks()
-		if dt + now > 1000:
+		if dt + now > 1000 + interval:
 			pg.mixer.Sound(random.choice(explosion_sounds)).play()
 		now = pg.time.get_ticks()
-		if dt + now > 15400:
+		if dt + now > 15400 + interval:
 			pg.mixer.Sound(random.choice(explosion_sounds)).play()
 
 		explosion = Explosion(self.game, self.rect.center)
