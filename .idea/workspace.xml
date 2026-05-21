@@ -6,7 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="boss needs unnerfing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/asteroid.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/asteroid.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/boss.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/boss.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,6 +77,65 @@
     <commands />
     <urls />
   </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0000000000000002" />
+      <entry key="S2" value="1.000367553802588" />
+      <entry key="S5" value="1.12274454059046" />
+      <entry key="S10" value="1.8568290067485003" />
+      <entry key="S30" value="4.155292059745946" />
+      <entry key="S60" value="5.709617712474137" />
+      <entry key="M2" value="8.191605118830225" />
+      <entry key="M5" value="13.943035116894126" />
+      <entry key="M10" value="18.46250557827036" />
+      <entry key="M15" value="20.552393311329087" />
+      <entry key="M30" value="23.037352632541822" />
+      <entry key="H1" value="24.45313903076716" />
+      <entry key="H2" value="25.20939224167205" />
+      <entry key="H4" value="25.600298328377413" />
+      <entry key="D1" value="25.932763257155347" />
+      <entry key="W1" value="25.990379453592226" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.005048253244677701" />
+      <entry key="MS500" value="0.3472387839412778" />
+      <entry key="S2" value="0.7680053321207103" />
+      <entry key="S5" value="1.022204254705684" />
+      <entry key="S10" value="1.8047309100497557" />
+      <entry key="S30" value="4.136497903125718" />
+      <entry key="S60" value="5.695277482567872" />
+      <entry key="M2" value="8.17364092932382" />
+      <entry key="M5" value="13.922969899634468" />
+      <entry key="M10" value="18.447104608523873" />
+      <entry key="M15" value="20.540444973117232" />
+      <entry key="M30" value="23.030371684690945" />
+      <entry key="H1" value="24.449360279028102" />
+      <entry key="H2" value="25.20742568115703" />
+      <entry key="H4" value="25.599295075360057" />
+      <entry key="D1" value="25.932593215081404" />
+      <entry key="W1" value="25.9903550916969" />
+    </decayedShown>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0,
   &quot;fromUser&quot;: false
@@ -98,49 +159,49 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Python.Dark_Void_2.executor": "Run",
-    "Python.asteroids.executor": "Run",
-    "Python.commons.executor": "Run",
-    "Python.config.executor": "Run",
-    "Python.darkvoid2.executor": "Run",
-    "Python.darkvoid21.executor": "Run",
-    "Python.darkvoid_03.executor": "Run",
-    "Python.enemy.executor": "Run",
-    "Python.game.executor": "Run",
-    "Python.intro_module.executor": "Run",
-    "Python.lvl1.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.main2.executor": "Run",
-    "Python.old_main.executor": "Run",
-    "Python.pfx_module.executor": "Run",
-    "Python.player.executor": "Run",
-    "Python.pox_module.executor": "Run",
-    "Python.ship.executor": "Run",
-    "Python.spritegroups.executor": "Run",
-    "Python.stars.executor": "Run",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "root",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/home/shs/OneDrive/Documents/Code/gemfall/images.py",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "ml.llm.LLMThirdPartyAiProvidersConfigurable",
-    "to.speed.mode.migration.done": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.Dark_Void_2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.asteroids.executor&quot;: &quot;Run&quot;,
+    &quot;Python.commons.executor&quot;: &quot;Run&quot;,
+    &quot;Python.config.executor&quot;: &quot;Run&quot;,
+    &quot;Python.darkvoid2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.darkvoid21.executor&quot;: &quot;Run&quot;,
+    &quot;Python.darkvoid_03.executor&quot;: &quot;Run&quot;,
+    &quot;Python.enemy.executor&quot;: &quot;Run&quot;,
+    &quot;Python.game.executor&quot;: &quot;Run&quot;,
+    &quot;Python.intro_module.executor&quot;: &quot;Run&quot;,
+    &quot;Python.lvl1.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.old_main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.pfx_module.executor&quot;: &quot;Run&quot;,
+    &quot;Python.player.executor&quot;: &quot;Run&quot;,
+    &quot;Python.pox_module.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ship.executor&quot;: &quot;Run&quot;,
+    &quot;Python.spritegroups.executor&quot;: &quot;Run&quot;,
+    &quot;Python.stars.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;root&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/shs/OneDrive/Documents/Code/gemfall/images.py&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.LLMThirdPartyAiProvidersConfigurable&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/core" />
@@ -244,7 +305,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-024ed6589d45-c2ffad84badb-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.23567.174" />
+        <option value="bundled-python-sdk-c59985aa861c-c2ffad84badb-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.24374.152" />
       </set>
     </attachedChunks>
   </component>
@@ -592,7 +653,14 @@
       <option name="presentableId" value="LOCAL−00048" />
       <updated>1779362796796</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL−00049" summary="boss needs unnerfing">
+      <option name="closed" value="true" />
+      <created>1779364256614</created>
+      <option name="number" value="LOCAL−00049" />
+      <option name="presentableId" value="LOCAL−00049" />
+      <updated>1779364256614</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

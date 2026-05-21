@@ -1,7 +1,6 @@
 import random
 import pygame as pg
 import config as c
-from core import commons
 from entities.explosion import Explosion
 from entities.particle import Particle
 from entities.powerup import PowerUp
@@ -15,8 +14,8 @@ class Meteor(pg.sprite.Sprite):
 		self.game = game
 		self.pos = pg.Vector2(pos)
 
-		self.image = random.choice(commons.ROCK_IMAGES).copy()
-		scale = random.uniform(0.35, 0.9)
+		self.image = random.choice(c.ROCK_IMAGES).copy()
+		scale = random.uniform(0.35, 1.05)
 
 		w = int(self.image.get_width() * scale)
 		h = int(self.image.get_height() * scale)
@@ -27,7 +26,7 @@ class Meteor(pg.sprite.Sprite):
 
 		self.velocity = pg.Vector2(
 			random.uniform(-30, 30),
-			random.uniform(60, 120)
+			random.uniform(80, 130)
 		)
 
 		self.rotation = random.uniform(0, 360)
@@ -75,6 +74,7 @@ class Meteor(pg.sprite.Sprite):
 		self.game.score += 50
 		if random.random() < 0.15:
 			self.px, self.py = get_random_position(c.screen)
+			# self.py = -15
 			powerup = PowerUp(self.game, (random.randint(0, c.WIDTH), 0),
 			                  random.choice(["health", "speed", "spread", "laser"]))
 			self.game.powerups.add(powerup)

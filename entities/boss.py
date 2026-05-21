@@ -18,13 +18,13 @@ class Boss(pg.sprite.Sprite):
 		self.shoot_timer = 0.001
 		self.shoot_delay = 0.001
 		self.pos = pg.Vector2(pos)
+		self.pos.y -= 2000
 		self.hp = 1000
-		self.max_h = c.HEIGHT // 2
 		self.phase_index = 0
 		self.phase_timer = 1000
 		self.image = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/alus2.png").convert_alpha(), 180, 1)
+		self.max_h = c.HEIGHT // 2 - self.image.get_height()
 		self.hitbox = self.rect = self.image.get_rect(center=pos).inflate(-300, -300)
-		game.screen.blit(self.rect, (255, 0, 0))
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_timer = 0
