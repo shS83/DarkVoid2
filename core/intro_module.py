@@ -114,13 +114,11 @@ while running:
 					if i < 2:
 						pg.event.clear()
 						pg.event.post(pg.event.Event(INITGAME))
-						
+
 		if event.type == INITGAME:
 			finished = True
 			running = False
 
-	# MAIN LOOP
-
 	pg.display.flip()
-	timer.tick(60)
+	dt = timer.tick(60) / 1000
 Game().run()

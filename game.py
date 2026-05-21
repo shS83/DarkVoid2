@@ -1,13 +1,10 @@
 import pygame as pg
-import pygame.gfxdraw
 import config as c
 from entities.player import Player
 from entities.boss import Boss
 from entities.enemy import Enemy
 from entities.star import Star
-import random
 from ui.hud import HUD
-from entities.powerup import PowerUp
 from entities.asteroid import Meteor
 from entities.level import *
 from core.hs_module import HighScore
@@ -34,7 +31,7 @@ class Game:
 		self.boss = None
 		self.boss_time = False
 		self.boss_timer = 2000
-		self.boss_max_y = c.HEIGHT // 2 - 200
+		self.boss_max_y = 160
 		self.score = 0
 		self.hud = HUD(self)
 		self.screen = pg.display.set_mode((c.WIDTH, c.HEIGHT), pg.SRCALPHA, 32)
@@ -43,10 +40,10 @@ class Game:
 		self.effects = pg.sprite.Group()
 		self.explosion_frames = []
 		self.enemy_spawn_timer = 0
-		self.enemy_spawn_delay = random.uniform(1.5, 5.0)
+		self.enemy_spawn_delay = random.uniform(1.5, 10.0)
 		self.asteroids = pg.sprite.Group()
 		self.asteroid_spawn_timer = 0
-		self.asteroid_spawn_delay = random.uniform(0.4, 3)
+		self.asteroid_spawn_delay = random.uniform(5, 20)
 		self.rock_images = []
 		for i in range(1, 5):
 			img = pg.image.load(f"{c.HOME_DIR}/assets/rock_{i}.png").convert_alpha()
@@ -71,7 +68,7 @@ class Game:
 		self.game_over_angle = 0
 		self.game_over_scale = 0.1
 		self.game_over_scale_dir = 1
-		self.game_over_font = c.MSG_FONT
+		self.game_over_font = pg.font.SysFont(f'{c.HOME_DIR}/assets/GoMonoNerdFontPropo-Bold.ttf', 72)
 		self.game_over_backdrop_scale = 0.1
 		self.game_over_backdrop_alpha = 235
 		self.text_alpha = 255
@@ -79,9 +76,10 @@ class Game:
 		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 90))
 		self.all_sprites.add(self.player)
 		self.player_bullets = pg.sprite.Group()
-		boss = Boss(self, (c.WIDTH // 2, -80))
-		self.enemies.add(boss)
-		self.all_sprites.add(boss)
+		if self.boss_timer <= 0:
+			boss = Boss(self, (c.WIDTH // 2, -80))
+			self.enemies.add(boss)
+			self.all_sprites.add(boss)
 		self.stars = pg.sprite.Group()
 
 		for _ in range(200):
@@ -225,7 +223,7 @@ class Game:
 			self.game_over = True
 
 		if self.game_over:
-			self.game_over_scale += self.game_over_scale_dir * 0.2 * dt
+			self.game_over_scale += self.game_over_scale_dir * 0.4 * dt
 			self.text_alpha -= 0.3
 			self.game_over_backdrop_scale += 2.8 * dt
 			if self.game_over_backdrop_scale > 6:

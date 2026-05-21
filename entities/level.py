@@ -8,7 +8,7 @@ class Level:
 		self.enemy_spawn_delay = random.uniform(1.5, 5.0)
 		self.enemy_spawn_timer = 0
 		self.asteroid_spawn_timer = 0
-		self.asteroid_spawn_delay = 0.45
+		self.asteroid_spawn_delay = 15
 		self.max_asteroids = 3
 		self.asteroid_speed = 1
 		self.asteroid_hp = 1
