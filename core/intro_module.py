@@ -12,9 +12,8 @@ timer = pg.time.Clock()
 x_res = 1920
 y_res = 1080
 screen = pg.display.set_mode((x_res, y_res), pg.SRCALPHA, 32)
-HOME = "/home/shs/PycharmProjects/DarkVoid2"
-
-HOME_DIR = HOME
+HOME_DIR = os.path.dirname(__file__).replace('/core', '')
+print(HOME_DIR)
 screen.blit(pg.image.load(f'{HOME_DIR}/assets/stimu_wallpaper.png'), (0, 0))
 pg.event.clear()
 pg.mixer.music.load(f'{HOME_DIR}/assets/Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3')
@@ -27,7 +26,7 @@ fontti = pg.font.Font(f'{HOME_DIR}/assets/VL-Gothic-Regular.ttf', font_size)
 textfont = pg.font.Font(f'{HOME_DIR}/assets/GoMonoNerdFontPropo-Bold.ttf', 200)
 fonts = ['prceltic', fontti, textfont]
 pg.display.set_icon(fontti.render("シ", True, (0, 255, 0)))
-font = pg.font.SysFont(fonts[0], 72)
+font = pg.font.SysFont(fonts[0], 36)
 # font = pg.font.SysFont('msgothic', 72)
 font2 = pg.font.SysFont('msgothic', 48)
 screen.blit(fontti.render("シ", True, (255, 255, 255)), (screen.get_width() // 2, screen.get_height() // 2))
@@ -36,11 +35,14 @@ cooldown = 500
 switch = True
 i = 0
 last = 0
-logointerval = 200
-pg.display.set_caption("Dark Void 2 - The Devoiding")
+logointerval = 500
+pg.display.set_caption("Dark Void 2 - The Avoided")
 INITEVENT = pg.USEREVENT + 1
 pg.time.set_timer(INITEVENT, 5000, 20000)
-screen.blit(rotozoom(textfont.render("DARK VOID 2", True, (255, 255, 255)), 3.0, 1.3), (100, 300), (0, 0, 1920, 1080))
+surf = pg.surface.Surface((1920, 1080), pg.SRCALPHA, 32).convert_alpha()
+surf.fill(
+	(0, 0, 0, 255)
+)
 pg.display.flip()
 sleep(2)
 timer.tick(159)
@@ -62,7 +64,7 @@ pg.event.post(pg.event.Event(LOGOEVENT))
 while running:
 
 	for event in pg.event.get():
-		# print("in a loop")
+
 		if event.type == pg.QUIT:
 			running = True
 
@@ -76,9 +78,15 @@ while running:
 				pg.event.clear()
 				in_logo = True
 				i = 100
-				pg.event.post(pg.event.Event(FADEOUTEVENT))
+				pg.event.post(pg.event.Event(LOGOEVENT))
 
-		if event.type == LOGOEVENT and i < 255:
+		if event.type == LOGOEVENT:
+			direction = 1
+			i = 255
+			i += -direction
+			direction = 1
+			if i < 1:
+				direction = -direction
 			now = pg.time.get_ticks()
 			if now - last >= cooldown:
 				last = now
@@ -87,13 +95,8 @@ while running:
 			            (x_res / 2 / 2, y_res / 2 / 2))
 			screen.blit(fontti.render("ヾ", True, (255, 255, 255)),
 			            (screen.get_width() // 2, screen.get_height() // 2))
-			i += 1
-			if i > 254:
-				i = 255
-				pg.event.clear()
-				in_logo = True
-				last = 0
-
+			screen.blit(textfont.render("The AVOiDED", True, (255, 0, 0)), (x_res / 2 / 2, y_res / 2 + 120))
+			screen.blit(font.render("press ESC to avoid...", True, (255, 200, 255)), (x_res /2 / 2-100, y_res / 2 + 400))
 			pg.event.post(pg.event.Event(LOGOEVENT))
 
 		if event.type == LOGOEVENT:

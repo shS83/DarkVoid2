@@ -47,7 +47,7 @@ class Enemy(pg.sprite.Sprite):
 		self.hp = 5
 
 		if c.BOSS_TIME:
-			self.hp = self.boss_hp
+			self.hp = c.level.boss_hp
 			self.speed = 40
 
 	def make_flash_image(self, image):
@@ -106,7 +106,7 @@ class Enemy(pg.sprite.Sprite):
 		bullet = EnemyBullet(
 			self.game,
 			self.rect.center,
-			direction * 260
+			direction * c.ENEMY_BULLET_SPEED
 		)
 
 		self.game.enemy_bullets.add(bullet)
@@ -144,7 +144,7 @@ class Enemy(pg.sprite.Sprite):
 			(self.px,
 			 self.py) = random.randrange(0, c.WIDTH), random.randrange(-150, -50)
 			powerup = PowerUp(self.game, (random.randint(0, c.WIDTH), 0),
-			                  random.choice(["health", "speed", "spread", "laser"]))
+			                  random.choice(["health", "speed", "spread", "laser", "cannon"]))
 			self.game.powerups.add(powerup)
 			self.game.all_sprites.add(powerup)
 		self.kill()

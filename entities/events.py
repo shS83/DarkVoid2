@@ -11,4 +11,4 @@ class Event(Enum):
 	GAMEOVER = 6
 
 
-Eventing = Event.NOTHING
+Event = Event.NOTHING

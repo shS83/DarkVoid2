@@ -1,5 +1,6 @@
 import pygame as pg
 import config as c
+from entities.events import Event
 from entities.player import Player
 from entities.boss import Boss
 from entities.enemy import Enemy
@@ -8,7 +9,8 @@ from ui.hud import HUD
 from entities.asteroid import Meteor
 from entities.level import *
 from core.hs_module import HighScore
-
+from entities.level import Level
+c.Level = Level()
 
 def mixer_init():
 	pg.mixer.init()
@@ -29,8 +31,8 @@ class Game:
 		pg.init()
 		mixer_init()
 		self.boss = None
-		self.boss_time = False
-		self.boss_timer = 2000
+		self.boss_time = c.BOSS_TIME
+		self.boss_timer = c.level.boss_timer
 		self.boss_max_y = 160
 		self.score = 0
 		self.hud = HUD(self)
@@ -68,12 +70,24 @@ class Game:
 		self.direction = 1
 		self.px = c.WIDTH // 2
 		self.py = -42
+		self.dt = 0
 		self.all_sprites = pg.sprite.LayeredUpdates()
+		self.next_level_angle = 360
+		self.next_level_scale = 5
+		self.text_alpha = 255
+		self.banner = pg.Surface((400, 300), pg.SRCALPHA)
+		self.next_level_backdrop_alpha = 20
+		self.next_level_backdrop_scale = 0.1
+		self.overlay_timer = 500
+		self.game_over_font = pg.font.SysFont(f'{c.HOME_DIR}/assets/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
+		self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
+		self.next_level_text = self.game_over_font.render("Next Stage", True, (200, 200, 255))
+		self.next_level_backdrop_alpha = 235
+		self.next_level_backdrop_scale = 0.1
 		self.game_over = False
 		self.game_over_angle = 0
 		self.game_over_scale = 0.1
 		self.game_over_scale_dir = 1
-		self.game_over_font = pg.font.SysFont(f'{c.HOME_DIR}/assets/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
 		self.game_over_backdrop_scale = 0.1
 		self.game_over_backdrop_alpha = 235
 		self.text_alpha = 255
@@ -180,7 +194,8 @@ class Game:
 		if self.asteroid_spawn_timer >= self.asteroid_spawn_delay:
 			self.asteroid_spawn_timer = 0
 			self.asteroid_spawn_delay = random.uniform(0.40, 3.2)
-			self.spawn_asteroid()
+			if len(self.asteroids) < c.level.max_asteroids:
+				self.spawn_asteroid()
 
 		for enemy in self.enemies:
 			for bullet in self.player_bullets:
@@ -200,9 +215,9 @@ class Game:
 			if asteroid.hitbox.colliderect(self.player.rect) and not self.player.invincible_timer > 0:
 				self.player.hit()
 				break
-		#	elif asteroid.hitbox.colliderect(asteroid.rect):
-		#		asteroid.damage(1)
-		#		break
+			# elif asteroid.hitbox.colliderect(asteroid.rect):
+			# 	asteroid.damage(1)
+			# 	break
 		if self.boss_timer < 1:
 			self.boss_timer = 0
 			self.boss_spawn()
@@ -246,6 +261,55 @@ class Game:
 		self.hud.draw(self.screen)
 		self.asteroids.draw(self.screen)
 		self.all_sprites.draw(self.screen)
+
+		if c.Event == Event.NEXTLEVEL:
+			# Screen whitening
+			if self.overlay_timer > 0:
+				self.overlay_timer -= self.dt / 2
+			else:
+				self.overlay_timer = 0
+
+			if self.overlay_timer > 0:
+				self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
+				overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
+				overlay.fill((0, 0, 50, 25))
+				self.screen.blit(overlay, (0, 0))
+				rect_width = c.WIDTH
+				rect_height = 300
+				self.banner = pg.Surface((rect_width, rect_height), pg.SRCALPHA)
+				self.banner.fill((255, 255, 255, int(self.next_level_backdrop_alpha)-self.overlay_timer//2))
+			if self.text_alpha > 1:
+				self.next_level_backdrop_alpha += 0.01
+			elif self.text_alpha < 100:
+				self.next_level_backdrop_alpha -= 1
+
+			banner_rect = self.banner.get_rect(
+				center=(c.WIDTH // 2, c.HEIGHT // 2)
+			)
+			levelup_font = pg.font.SysFont(f'{c.HOME_DIR}/assets/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
+			self.banner.set_alpha(20)
+			self.screen.blit(self.banner, banner_rect)
+
+			self.rotated_text.blit(next_level_text := levelup_font.render("Next Stage", True, (0, 0, 255)), (c.WIDTH // 2, c.HEIGHT // 2))
+
+			clock = pg.time.Clock()
+			self.dt = clock.tick(60) / 1000
+			self.next_level_scale -= self.dt / 2.5
+
+			rect = self.rotated_text.get_rect(
+				center=(self.rotated_text.get_width() // 2, self.rotated_text.get_height() // 2)
+			)
+			pg.draw.rect(self.screen, self.rotated_text.get_bounding_rect(), (255, 0, 0, 255))
+			rotated_text = pg.transform.rotozoom(
+				self.next_level_text,
+				self.next_level_angle,
+				self.next_level_scale
+			)
+			self.text_alpha -= 0.05
+			self.rotated_text.set_alpha(self.text_alpha)
+			self.next_level_angle += 10 * self.dt
+			self.screen.blit(rotated_text, rect)
+		pg.display.flip()
 
 		if self.game_over:
 			# Screen darkening

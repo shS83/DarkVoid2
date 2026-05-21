@@ -1,8 +1,10 @@
 import pygame as pg
 import random
+
+from entities.events import Event
 from entities.particle import Particle
 from entities.thruster_particle import ThrusterParticle
-from entities.explosion import Explosion
+from entities.explosion import Explosion, Series_of_Explosions
 from entities.bullet import EnemyBullet, PlayerBullet
 import config as c
 from pygame.transform import rotozoom
@@ -18,11 +20,12 @@ class Boss(pg.sprite.Sprite):
 		self.shoot_timer = 0.001
 		self.shoot_delay = 0.001
 		self.pos = pg.Vector2(pos)
-		self.pos.y -= 2000
-		self.entering = False
-		self.hp = 500
+		self.pos.y = -c.level.boss_timer
+		self.entering = True
+		self.hp = 300
 		self.phase_index = 0
 		self.phase_timer = 0
+		self.boss_timer = c.level.boss_timer
 		self.image = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/alus2.png").convert_alpha(), 180, 1)
 		self.max_h = 160
 		self.hitbox = self.rect = self.image.get_rect(center=pos).inflate(-300, -300)
@@ -86,6 +89,7 @@ class Boss(pg.sprite.Sprite):
 	def fire_bullet(self, pos, velocity):
 		self.shoot_timer = 0
 		self.shoot_delay = 1.5
+		print("fire bullet phase")
 		if self.shoot_timer <= self.shoot_delay:
 			self.shoot_timer = self.shoot_delay
 			bullet = EnemyBullet(self.game, pos, velocity)
@@ -96,7 +100,7 @@ class Boss(pg.sprite.Sprite):
 		self.shoot_timer = 0
 		self.shoot_delay = 1.5
 		direction = self.game.player.pos - self.pos
-
+		print("aimed shot phase")
 		if direction.length_squared() == 0:
 			direction = pg.Vector2(0, 1)
 		else:
@@ -109,7 +113,7 @@ class Boss(pg.sprite.Sprite):
 		self.shoot_timer = 0
 		self.shoot_delay = 1.5
 		direction = self.game.player.pos - self.pos
-
+		print("aimed spread phase")
 		if direction.length_squared() == 0:
 			direction = pg.Vector2(0, 1)
 		else:
@@ -130,7 +134,7 @@ class Boss(pg.sprite.Sprite):
 	def radial_burst(self, count=32, speed=190, offset=0):
 		self.shoot_timer = 0
 		self.shoot_delay = 1.5
-
+		print("radial burst")
 		for i in range(count):
 			angle = offset + 360 * i / count
 			direction = pg.Vector2(1, 0).rotate(angle)
@@ -145,7 +149,7 @@ class Boss(pg.sprite.Sprite):
 	def spiral_burst(self, arms=4, speed=220):
 		self.shoot_timer = 0
 		self.shoot_delay = 1.5
-
+		print("spiral burst")
 		base_angle = self.phase_timer * 180
 
 		for i in range(arms):
@@ -160,13 +164,13 @@ class Boss(pg.sprite.Sprite):
 
 	def phase_intro(self, dt):
 		self.shoot_delay = 1.5
-
+		print("intro phase")
 		if self.phase_timer > 3:
 			self.next_phase()
 
 	def phase_radial(self, dt):
 		self.shoot_delay = 1.5
-
+		print("radial phase")
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
 			self.radial_burst(count=28, speed=180, offset=self.phase_timer)
@@ -176,7 +180,7 @@ class Boss(pg.sprite.Sprite):
 
 	def phase_spiral(self, dt):
 		self.shoot_delay = 1.5
-
+		print("spiral phase")
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
 			self.spiral_burst(arms=5, speed=230)
@@ -186,7 +190,7 @@ class Boss(pg.sprite.Sprite):
 
 	def phase_desperation(self, dt):
 		self.shoot_delay = 1.5
-
+		print("desperate phase")
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
 			self.aimed_spread(count=9, speed=300, spread=70)
@@ -249,15 +253,20 @@ class Boss(pg.sprite.Sprite):
 			self.game.effects.add(explosion)
 			self.game.all_sprites.add(explosion)
 
-		now = pg.time.get_ticks()
-		if dt + now > 4000 + interval:
-			for _ in range(10000):
-				particle = Particle(self.game, self.rect.center)
-				self.game.effects.add(particle)
-				self.game.all_sprites.add(particle)
+		for _ in range(5000):
+			particle = Particle(self.game, self.rect.center)
+			self.game.effects.add(particle)
+			self.game.all_sprites.add(particle)
 
 		self.game.score += 5000
 		self.kill()
-
+		self.game.boss_killed = True
+		self.game.boss = Boss(self.game, (0, 0), boss=False)
+		self.game.boss.image = pg.image.load(f"{c.HOME_DIR}/assets/foobarhead1.png").convert_alpha()
+		self.game.boss.rect = self.game.boss.image.get_rect(center=self.game.boss.rect.center)
+		self.game.boss.hitbox = self.rect.inflate(-100, -100)
+		self.enemy_group.empty()
+		self.game.player.hp = 5
 		# Man you got to level 2
+		c.event = Event.NEXTLEVEL
 		level.stage += 1

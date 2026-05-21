@@ -4,16 +4,16 @@ import config as c
 from entities.explosion import Explosion
 from entities.particle import Particle
 from entities.powerup import PowerUp
-from core.utils import get_random_position
-
+from entities.level import Level
 
 class Meteor(pg.sprite.Sprite):
 	def __init__(self, game, pos):
 		super().__init__()
-
+		self.level = c.level.stage
 		self.game = game
 		self.pos = pg.Vector2(pos)
 		self.pos.y = -100
+		self.max_asteroids = c.level.max_asteroids
 
 		self.image = random.choice(c.ROCK_IMAGES).copy()
 		scale = random.uniform(0.35, 1.05)
@@ -34,7 +34,7 @@ class Meteor(pg.sprite.Sprite):
 		self.rotation_speed = random.uniform(-75, 75)
 
 		self.hitbox = self.rect.inflate(-40, -40)
-		self.hp = 3
+		self.hp = c.level.asteroid_hp
 
 	def update(self, dt):
 		self.pos += self.velocity * dt
@@ -74,10 +74,8 @@ class Meteor(pg.sprite.Sprite):
 			self.game.all_sprites.add(particle)
 		self.game.score += 50
 		if random.random() < 0.15:
-			# self.px, self.py = get_random_position(self.game.screen)
-			# self.py = -15
 			powerup = PowerUp(self.game, (random.randint(0, c.WIDTH), 0),
-			                  random.choice(["health", "speed", "spread", "laser"]))
+			                  random.choice(["health", "speed", "spread", "laser", "cannon"]))
 			self.game.powerups.add(powerup)
 			self.game.all_sprites.add(powerup)
 		self.kill()

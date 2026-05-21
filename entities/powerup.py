@@ -9,7 +9,7 @@ class PowerUp(pg.sprite.Sprite):
 		super().__init__()
 
 		self.game = game
-		self.kind = kind or random.choice(["spread", "health", "speed", "laser"])
+		self.kind = kind or random.choice(["spread", "health", "speed", "laser", "cannon"])
 		self.pos = pg.Vector2(pos)
 
 		path = f"{c.HOME_DIR}/assets/powerup-{self.kind}.png"

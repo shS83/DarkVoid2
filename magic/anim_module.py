@@ -38,10 +38,10 @@ class Animation(pygame.sprite.Sprite):
 		self.opacity = opacity
 		self.image = pygame.transform.smoothscale(anim[0], (set_size, set_size))
 		self.image.set_alpha(self.opacity)
-		self.size = self.image.get_width()
+		self.size = (self.image.get_width(), self.image.get_height())
 		self.rect = self.image.get_rect()
-		self.rect.x = pos[0] - self.size / 2
-		self.rect.y = pos[1] - self.size / 2
+		self.rect.x = pos[0] - self.size[0] / 2
+		self.rect.y = pos[1] - self.size[1] / 2
 		self.interval = interval
 		self.repeat = repeat
 		self.curr_frame = 1
@@ -56,7 +56,7 @@ class Animation(pygame.sprite.Sprite):
 			self.curr_frame = 1
 		if NOW > self.last + self.interval:
 			self.last = NOW
-			self.image = pygame.transform.smoothscale(self.anim[self.curr_frame], (self.size, self.size))
+			self.image = pygame.transform.smoothscale(self.anim[self.curr_frame], self.size)
 			self.image.set_alpha(self.opacity)
 			self.curr_frame += 1
 

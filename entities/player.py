@@ -1,48 +1,47 @@
 import pygame as pg
+from pygame import rect
+
 import config as c
-from core.commons import ROCK_IMAGES
-from core.utils import get_random_velocity, get_random_position
 from entities.bullet import PlayerBullet
 from entities.explosion import Explosion
 from entities.particle import Particle
 from entities.thruster_particle import ThrusterParticle
 import random
-from pygame.transform import rotozoom
 from entities.powerup import PowerUp
-
-
-# from entities.asteroid import Meteor
-
 
 class Player(pg.sprite.Sprite):
 	def __init__(self, game, pos):
 		super().__init__()
+		self.bullet = PlayerBullet(game, pos, velocity=(0, -800))
 		self.shoot_mode = "normal"
 		self.power_timer = 0
-		self.lives = 3
+		self.lives = c.level.lives
 		self.invincible_timer = 0
 		self.thruster_timer = 0
 		self.alive = True
-		self.hitbox_radius = 6
 		self.fire_timer = 0
-		self.fire_cooldown = 0.10
+		self.fire_cooldown = 0.01
 		self.fire_cooldown2 = 0.08
+		self.fire_cooldown3 = 0.35
 		self.game = game
-		self.image3 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/purplealus.png").convert_alpha(), 0, 0.3)
-		# self.image8 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/turqoiseship.png").convert_alpha(), 0, 0.3)
+		self.image3 = pg.image.load(f"{c.HOME_DIR}/assets/purplealus.png").convert_alpha()
+		self.image8 = pg.image.load(f"{c.HOME_DIR}/assets/turqoiseship.png").convert_alpha()
 		self.image1 = pg.image.load(f"{c.HOME_DIR}/assets/Proper_warship.png").convert_alpha()
-		self.images = [self.image1, self.image3]
+		self.images = [self.image1,self.image8, self.image3]
 		self.image = random.choice(self.images)
-		self.image = pg.transform.scale(self.image, (160, 160))
-		self.rect = self.image.get_rect(center=pos)
-		self.pos = pg.Vector2(self.rect.center)
+		self.image = pg.transform.smoothscale(self.image, (200, 200))
+		self.rect = self.image.get_rect()
+		self.pos = pg.Vector2(0, -1)
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_toggle_timer = 0
-		self.speed = 350
-
-	# self.asteroid_group = pg.sprite.Group()
-	# self.all_sprites = pg.sprite.LayeredUpdates()
+		self.speed = c.PLAYER_SPEED
+		self.focus_speed = c.PLAYER_FOCUS_SPEED
+		self.fire_cooldown = c.PLAYER_FIRE_COOLDOWN
+		self.bullet_speed = c.PLAYER_BULLET_SPEED
+		self.hitbox_radius = c.PLAYER_HITBOX_RADIUS
+		self.particles = pg.sprite.Group()
+		self.all_sprites = pg.sprite.LayeredUpdates()
 
 	def make_flash_image(self, image):
 		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
@@ -56,12 +55,30 @@ class Player(pg.sprite.Sprite):
 
 		return flash
 
+	def shoot_railgun(self):
+		self.image = pg.transform.scale(pg.image.load(f"{c.HOME_DIR}/assets/laser_2.png"), (20, 100))
+		self.image2 = pg.transform.scale(pg.image.load(f"{c.HOME_DIR}/assets/laser_2.png"), (20, 100))
+		self.image2.map_rgb((255, 150, 150))
+		self.image2.blit(self.image, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
+		self.bullet = PlayerBullet(self.game, self.rect.midtop, self.image, velocity=(0, -2000))
+
+		if self.fire_timer > 0:
+			return
+		if self.rect.y - self.bullet.rect.y < 0:
+			self.bullet.kill()
+
+		pg.mixer.Sound(f'{c.HOME_DIR}/assets/laser-jatkuva.wav').play()
+		self.fire_timer = self.fire_cooldown
+
+		self.game.player_bullets.add(self.bullet)
+		self.game.all_sprites.add(self.bullet)
+
 	def shoot_normal(self):
 		bullet = PlayerBullet(self.game, self.rect.midtop, velocity=(0, -800))
 		if self.fire_timer > 0:
 			return
-		if self.rect.y + bullet.rect.y < 0:
-			self.kill()
+		if self.rect.y - bullet.rect.y < 0:
+			bullet.kill()
 		pg.mixer.Sound(f'{c.HOME_DIR}/assets/lasersound2.wav').play()
 		self.fire_timer = self.fire_cooldown2
 		self.game.player_bullets.add(bullet)
@@ -81,7 +98,7 @@ class Player(pg.sprite.Sprite):
 		self.fire_timer = self.fire_cooldown
 		for pos, velocity in bullet_data:
 			if self.pos.y + 20 < 0:
-				self.kill()
+				bullet.kill()
 			bullet = PlayerBullet(self.game, pos, velocity=velocity)
 			self.game.player_bullets.add(bullet)
 			self.game.all_sprites.add(bullet)
@@ -124,6 +141,10 @@ class Player(pg.sprite.Sprite):
 			self.power_timer = 12.0
 		if kind == "health":
 			self.lives += 3
+		if kind == "cannon":
+			self.power_timer = 12.0
+			self.fire_cooldown = 0.01
+
 
 	def update(self, dt):
 		keys = pg.key.get_pressed()
@@ -138,9 +159,13 @@ class Player(pg.sprite.Sprite):
 			direction.y -= 1
 		if keys[pg.K_DOWN] or keys[pg.K_s]:
 			direction.y += 1
+		if keys[pg.K_LSHIFT]:
+			self.shoot_railgun()
 		if keys[pg.K_SPACE] or mouse[0] == 1:
 			if self.shoot_mode == "spread":
 				self.shoot_spread()
+			elif self.shoot_mode == "cannon":
+				self.shoot_railgun()
 			else:
 				self.shoot_normal()
 		# if keys[pg.K_LCTRL]:
@@ -153,15 +178,16 @@ class Player(pg.sprite.Sprite):
 			Asteroid = Meteor(self.game, (c.WIDTH // 2, c.HEIGHT // 2))
 			self.asteroid_group.add(Asteroid)
 			self.all_sprites.add(Asteroid)
-
+		if keys[pg.K_F8]:
+			self.game.Level.up()
 		if keys[pg.K_F9]:
-			powerup = PowerUp(self.game, (self.rect.x, 0), kind=random.choice(["health", "speed", "spread", "laser"]))
+			powerup = PowerUp(self.game, (self.rect.x, 0), kind=random.choice(["health", "speed", "spread", "laser", "cannon"]))
 			self.game.powerups.add(powerup)
 			self.game.all_sprites.add(powerup)
 		if keys[pg.K_F11]:
 			self.alive = False
 		if keys[pg.K_F10]:
-			c.boss_time = True
+			c.BOSS_TIME = True
 
 		if self.power_timer > 0:
 			self.power_timer -= dt
@@ -179,7 +205,7 @@ class Player(pg.sprite.Sprite):
 			engine_right = (self.rect.centerx + 10, self.rect.centery + 42)
 			for engine_pos in [engine_left, engine_right]:
 				# hot core
-				for _ in range(1):
+				for _ in range(4):
 					particle = ThrusterParticle(
 						self.game,
 						engine_pos,
@@ -188,13 +214,13 @@ class Player(pg.sprite.Sprite):
 						speed_range=(280, 520),
 						size_range=(1, 5),
 						life_range=(0.12, 0.46),
-						spread=18
+						spread=12
 					)
 					self.game.effects.add(particle)
 					self.game.all_sprites.add(particle)
 
 				# purple/blue outer flame
-				for _ in range(2):
+				for _ in range(4):
 					particle = ThrusterParticle(
 						self.game,
 						engine_pos,
@@ -203,7 +229,7 @@ class Player(pg.sprite.Sprite):
 						speed_range=(180, 380),
 						size_range=(2, 6),
 						life_range=(0.18, 0.38),
-						spread=15
+						spread=10
 					)
 					self.game.effects.add(particle)
 					self.game.all_sprites.add(particle)

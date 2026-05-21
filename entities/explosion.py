@@ -8,16 +8,20 @@ class Series_of_Explosions(pg.sprite.Sprite):
 		self.game = game
 		self.frames = self.game.explosion_frames
 		self.index = 0
-		self.index2 = 0
+		self.index2 = 1
 		self.timer = 0
 		self.timer2 = 0
 		self.frame_time = 0.045
-		self.frame_time2 = 0.02
+		self.frame_time2 = 0.045
 
 		self.image = self.frames[self.index]
 		self.image2 = self.frames[self.index2]
 		self.rect = self.image.get_rect(center=pos)
+		self.rect.x += 20
+		self.rect.y += 20
 		self.rect2 = self.image.get_rect(center=pos)
+		self.rect2.x -= 20
+		self.rect2.y -= 20
 
 	def update(self, dt):
 		self.timer += dt
@@ -61,7 +65,7 @@ class Explosion(pg.sprite.Sprite):
 		if not boss:
 			self.frame_time = 0.045
 		else:
-			self.framw_time = 0.065
+			self.frame_time = 0.045
 
 		self.image = self.frames[self.index]
 		self.rect = self.image.get_rect(center=pos)
