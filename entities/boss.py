@@ -40,8 +40,10 @@ class Boss(pg.sprite.Sprite):
 		]
 
 	def update(self, dt):
-		if self.pos.y <= self.max_h - self.rect.height:
+		if self.pos.y < self.max_h - self.image.get_height():
 			self.pos.y += self.speed * dt
+		else:
+			self.pos.y = self.max_h - self.image.get_height()
 
 		self.rect.center = self.pos
 		self.hitbox.center = self.rect.center
@@ -86,7 +88,7 @@ class Boss(pg.sprite.Sprite):
 		else:
 			direction = direction.normalize()
 
-		self.fire_bullet(self.rect.center, direction * speed)
+		self.fire_bullet(self.rect.center, direction * speed * 50)
 
 	def aimed_spread(self, count=7, speed=260, spread=50):
 		direction = self.game.player.pos - self.pos
@@ -103,7 +105,7 @@ class Boss(pg.sprite.Sprite):
 			angle = start + step * i
 			self.fire_bullet(
 				self.rect.center,
-				direction.rotate(angle) * speed
+				direction.rotate(angle) * speed * 50
 			)
 
 	def radial_burst(self, count=32, speed=190, offset=0):
@@ -113,7 +115,7 @@ class Boss(pg.sprite.Sprite):
 
 			self.fire_bullet(
 				self.rect.center,
-				direction * speed
+				direction * speed * 50
 			)
 
 	def spiral_burst(self, arms=4, speed=220):
@@ -125,7 +127,7 @@ class Boss(pg.sprite.Sprite):
 
 			self.fire_bullet(
 				self.rect.center,
-				direction * speed
+				direction * speed * 50
 			)
 
 	def phase_intro(self, dt):

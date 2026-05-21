@@ -46,7 +46,7 @@ class Game:
 		self.enemy_spawn_delay = random.uniform(1.5, 5.0)
 		self.asteroids = pg.sprite.Group()
 		self.asteroid_spawn_timer = 0
-		self.asteroid_spawn_delay = 0.45
+		self.asteroid_spawn_delay = random.uniform(0.4, 3)
 
 		self.rock_images = []
 
@@ -91,37 +91,37 @@ class Game:
 			self.stars.add(Star())
 
 	def spawn_asteroid(self):
-		x = random.randint(40, c.WIDTH - 40)
-		y = random.randint(-160, -40)
+		x = random.randint(-40, c.WIDTH + 40)
+		y = random.randint(-40, c.HEIGHT + 40)
 
 		asteroid = Meteor(self, (x, y))
 
 		self.asteroids.add(asteroid)
 		self.all_sprites.add(asteroid)
 
-	def spawn_rocks(self):
-		for _ in range(8):
-			asteroid = Meteor(self, (random.randint(0, c.WIDTH), random.randint(0, c.HEIGHT)))
-			x = random.randint(50, c.WIDTH - 50)
-			y = -60
-
-			test_rect = pg.Rect(0, 0, 64, 64)
-			test_rect.center = (x, y)
-
-			overlap = False
-
-			for asteroid in self.asteroids:
-				if test_rect.colliderect(asteroid.rect.inflate(20, 20)):
-					overlap = True
-				if self.player.rect.colliderect(asteroid.rect) and not self.player.invincible_timer > 0:
-					self.player.hit()
-					break
-
-			if not overlap:
-				asteroid = Meteor(self, (x, y))
-				self.asteroids.add(asteroid)
-				self.all_sprites.add(asteroid)
-				return
+	# def spawn_rocks(self):
+	# 	for _ in range(8):
+	# 		asteroid = Meteor(self, (random.randint(0, c.WIDTH), random.randint(0, c.HEIGHT)))
+	# 		x = random.randint(50, c.WIDTH - 50)
+	# 		y = -100
+	#
+	# 		test_rect = pg.Rect(0, 0, 64, 64)
+	# 		test_rect.center = (x, y)
+	#
+	# 		overlap = False
+	#
+	# 		for asteroid in self.asteroids:
+	# 			if test_rect.colliderect(asteroid.rect.inflate(20, 20)):
+	# 				overlap = True
+	# 			if self.player.rect.colliderect(asteroid.rect) and not self.player.invincible_timer > 0:
+	# 				self.player.hit()
+	# 				break
+	#
+	# 		if not overlap:
+	# 			asteroid = Meteor(self, (x, y))
+	# 			self.asteroids.add(asteroid)
+	# 			self.all_sprites.add(asteroid)
+	# 			return
 
 	def spawn_enemy(self):
 		for _ in range(20):  # try 20 times
@@ -168,7 +168,7 @@ class Game:
 			self.enemy_spawn_timer += dt
 
 		if not c.BOSS_TIME or self.boss_timer >= 500:
-			if self.enemy_spawn_timer >= self.enemy_spawn_delay or self.boss_timer <= 0:
+			if self.enemy_spawn_timer >= self.enemy_spawn_delay:
 				self.enemy_spawn_timer = 0
 				self.enemy_spawn_delay = random.uniform(0.4, 3)
 				self.spawn_enemy()
@@ -176,7 +176,7 @@ class Game:
 		self.asteroid_spawn_timer += dt
 
 		if self.asteroid_spawn_timer >= self.asteroid_spawn_delay:
-			self.asteroid_spawn_timer = 0
+			self.asteroid_spawn_timer = 15
 			self.asteroid_spawn_delay = random.uniform(0.40, 1.2)
 			self.spawn_asteroid()
 
@@ -198,9 +198,9 @@ class Game:
 			if asteroid.hitbox.colliderect(self.player.rect) and not self.player.invincible_timer > 0:
 				self.player.hit()
 				break
-			elif asteroid.hitbox.colliderect(asteroid.rect):
-				asteroid.damage(1)
-				break
+		#	elif asteroid.hitbox.colliderect(asteroid.rect):
+		#		asteroid.damage(1)
+		#		break
 		if self.boss_timer < 1 and self.boss == None:
 			self.boss_timer = 0
 			self.boss_spawn()
@@ -228,7 +228,7 @@ class Game:
 
 		if self.game_over:
 			self.game_over_scale += self.game_over_scale_dir * 0.2 * dt
-			self.text_alpha -= 0.5
+			self.text_alpha -= 0.3
 			self.game_over_backdrop_scale += 2.8 * dt
 			if self.game_over_backdrop_scale > 6:
 				self.game_over_backdrop_scale = 6
@@ -290,20 +290,20 @@ class Game:
 				if event.type == pg.QUIT:
 					self.running = False
 				if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
-					print("Escape from the game?!")
 					self.running = False
 				if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-					print("Have some space.")
+					...
 			self.update(dt)
 			self.draw()
 
 		scores = HighScore("John", self.score)
 		scores.load_scores()
 		scores.check_score(self.score)
-		pg.quit()
-		pg.mixer.music.stop()
-		pg.mixer.quit()
 
+
+pg.quit()
+# pg.mixer.music.stop()
+pg.mixer.quit()
 
 if __name__ == "__main__":
 	game = Game()

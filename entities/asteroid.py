@@ -13,7 +13,8 @@ class Meteor(pg.sprite.Sprite):
 
 		self.game = game
 		self.pos = pg.Vector2(pos)
-
+		self.pos.y = -100
+		
 		self.image = random.choice(c.ROCK_IMAGES).copy()
 		scale = random.uniform(0.35, 1.05)
 
