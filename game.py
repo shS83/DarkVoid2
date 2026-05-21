@@ -39,6 +39,7 @@ class Game:
 		self.running = True
 		self.effects = pg.sprite.Group()
 		self.explosion_frames = []
+		self.boss_explosion_frames = []
 		self.enemy_spawn_timer = 0
 		self.enemy_spawn_delay = random.uniform(1.5, 10.0)
 		self.asteroids = pg.sprite.Group()
@@ -52,6 +53,10 @@ class Game:
 			img = pg.image.load(f"{c.HOME_DIR}/assets/exp_{i}.png").convert_alpha()
 			img = pg.transform.scale(img, (320, 320))
 			self.explosion_frames.append(img)
+		for i in range(1, 32):
+			img = pg.image.load(f"{c.HOME_DIR}/assets/exp_{i}.png").convert_alpha()
+			img = pg.transform.scale(img, (640, 640))
+			self.boss_explosion_frames.append(img)
 		self.background = pg.image.load(f"{c.HOME_DIR}/assets/space_background.png").convert()
 		self.background = pg.transform.scale(self.background, (c.WIDTH, c.HEIGHT))
 		self.enemies = pg.sprite.Group()
@@ -68,7 +73,7 @@ class Game:
 		self.game_over_angle = 0
 		self.game_over_scale = 0.1
 		self.game_over_scale_dir = 1
-		self.game_over_font = pg.font.SysFont(f'{c.HOME_DIR}/assets/GoMonoNerdFontPropo-Bold.ttf', 72)
+		self.game_over_font = pg.font.SysFont(f'{c.HOME_DIR}/assets/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
 		self.game_over_backdrop_scale = 0.1
 		self.game_over_backdrop_alpha = 235
 		self.text_alpha = 255
@@ -76,10 +81,10 @@ class Game:
 		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 90))
 		self.all_sprites.add(self.player)
 		self.player_bullets = pg.sprite.Group()
-		if self.boss_timer <= 0:
-			boss = Boss(self, (c.WIDTH // 2, -80))
-			self.enemies.add(boss)
-			self.all_sprites.add(boss)
+		if self.boss_timer <= 0 and not self.boss:
+			self.boss = Boss(self, (c.WIDTH // 2, -80))
+			self.enemies.add(self.boss)
+			self.all_sprites.add(self.boss)
 		self.stars = pg.sprite.Group()
 
 		for _ in range(200):
@@ -157,7 +162,7 @@ class Game:
 
 	def update(self, dt):
 		if not c.BOSS_TIME:
-			self.boss_timer -= dt * 100
+			self.boss_timer -= dt * 75
 		self.stars.update(dt)
 		self.asteroids.update(dt)
 		self.all_sprites.update(dt)

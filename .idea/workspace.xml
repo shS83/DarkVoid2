@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="try finger but hole">
+    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="treat ritual materials with care">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/boss.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/boss.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/explosion.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/explosion.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -78,61 +79,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000000433317577" />
-      <entry key="MS500" value="1.0337843870276568" />
-      <entry key="S2" value="1.5486263614737044" />
-      <entry key="S5" value="2.317533909144932" />
-      <entry key="S10" value="3.011700188732893" />
-      <entry key="S30" value="9.368856063710316" />
-      <entry key="S60" value="21.184802698821667" />
-      <entry key="M2" value="34.35801293696643" />
-      <entry key="M5" value="49.48741820979919" />
-      <entry key="M10" value="64.45156450059018" />
-      <entry key="M15" value="76.62553937427883" />
-      <entry key="M30" value="104.07379971765552" />
-      <entry key="H1" value="135.61833967673152" />
-      <entry key="H2" value="162.4810659497829" />
-      <entry key="H4" value="180.5876549160742" />
-      <entry key="D1" value="198.91721068015664" />
-      <entry key="W1" value="202.4075180580628" />
+      <entry key="MS100" value="1.0000003128719326" />
+      <entry key="MS500" value="1.063512166427771" />
+      <entry key="S2" value="1.9090365625821573" />
+      <entry key="S5" value="3.1629637754472943" />
+      <entry key="S10" value="4.400583573452183" />
+      <entry key="S30" value="6.262542054509183" />
+      <entry key="S60" value="7.574409335639278" />
+      <entry key="M2" value="11.685559534378516" />
+      <entry key="M5" value="26.989075071047743" />
+      <entry key="M10" value="51.31005857247081" />
+      <entry key="M15" value="71.94777766373264" />
+      <entry key="M30" value="116.55781813568517" />
+      <entry key="H1" value="165.97064926992124" />
+      <entry key="H2" value="208.3212250075001" />
+      <entry key="H4" value="237.36572893084872" />
+      <entry key="D1" value="267.26755088692926" />
+      <entry key="W1" value="273.0213559618248" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="4.591248702324952E-238" />
-      <entry key="MS500" value="3.407110067028433E-48" />
-      <entry key="S2" value="1.358615424680775E-12" />
-      <entry key="S5" value="1.7915899449917254E-5" />
-      <entry key="S10" value="0.004232717738039859" />
-      <entry key="S30" value="0.1617607317047656" />
-      <entry key="S60" value="0.4021952486745807" />
-      <entry key="M2" value="0.6348104476593098" />
-      <entry key="M5" value="0.8994257074491601" />
-      <entry key="M10" value="1.262996374885715" />
-      <entry key="M15" value="1.575802487714772" />
-      <entry key="M30" value="2.210124472061284" />
-      <entry key="H1" value="2.8375025998342576" />
-      <entry key="H2" value="3.321718622174417" />
-      <entry key="H4" value="3.6311117924012004" />
-      <entry key="D1" value="3.933806853044379" />
-      <entry key="W1" value="3.9904199532059703" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="1.5831720128031066E-232" />
+      <entry key="S5" value="1.9046327229009846E-93" />
+      <entry key="S10" value="4.364209805796441E-47" />
+      <entry key="S30" value="3.520750153753679E-16" />
+      <entry key="S60" value="1.8763678707136382E-8" />
+      <entry key="M2" value="1.371148812189358E-4" />
+      <entry key="M5" value="0.03074266459178283" />
+      <entry key="M10" value="0.2335017873456056" />
+      <entry key="M15" value="0.5113997584619054" />
+      <entry key="M30" value="1.2590590580545806" />
+      <entry key="H1" value="2.141662105339038" />
+      <entry key="H2" value="2.8858262753876525" />
+      <entry key="H4" value="3.384490434163568" />
+      <entry key="D1" value="3.887961697086883" />
+      <entry key="W1" value="3.983742967753956" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.08133386596512085" />
-      <entry key="MS500" value="0.605555094227947" />
-      <entry key="S2" value="1.0661967975622608" />
-      <entry key="S5" value="1.8847775008561698" />
-      <entry key="S10" value="2.7178456319480007" />
-      <entry key="S30" value="9.386439178898856" />
-      <entry key="S60" value="21.49274676732019" />
-      <entry key="M2" value="34.93336713073439" />
-      <entry key="M5" value="50.35230949614065" />
-      <entry key="M10" value="65.68735727600523" />
-      <entry key="M15" value="78.1765486330386" />
-      <entry key="M30" value="106.26279609910996" />
-      <entry key="H1" value="138.4397323314361" />
-      <entry key="H2" value="165.79227163873574" />
-      <entry key="H4" value="184.21266845816078" />
-      <entry key="D1" value="202.84985793047278" />
-      <entry key="W1" value="206.39776844206477" />
+      <entry key="MS100" value="0.10881882093406377" />
+      <entry key="MS500" value="0.6631496949218426" />
+      <entry key="S2" value="1.6044431916770152" />
+      <entry key="S5" value="2.9157780840423313" />
+      <entry key="S10" value="4.214789531793367" />
+      <entry key="S30" value="6.169084419186871" />
+      <entry key="S60" value="7.51691695313156" />
+      <entry key="M2" value="11.640746412634899" />
+      <entry key="M5" value="26.9792412725351" />
+      <entry key="M10" value="51.50868740637076" />
+      <entry key="M15" value="72.42782302981837" />
+      <entry key="M30" value="117.79104933916524" />
+      <entry key="H1" value="168.09262191262576" />
+      <entry key="H2" value="211.19397973748767" />
+      <entry key="H4" value="240.74252098570284" />
+      <entry key="D1" value="271.1540243209225" />
+      <entry key="W1" value="277.00488060163275" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -158,49 +159,50 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.Dark_Void_2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.asteroids.executor&quot;: &quot;Run&quot;,
-    &quot;Python.commons.executor&quot;: &quot;Run&quot;,
-    &quot;Python.config.executor&quot;: &quot;Run&quot;,
-    &quot;Python.darkvoid2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.darkvoid21.executor&quot;: &quot;Run&quot;,
-    &quot;Python.darkvoid_03.executor&quot;: &quot;Run&quot;,
-    &quot;Python.enemy.executor&quot;: &quot;Run&quot;,
-    &quot;Python.game.executor&quot;: &quot;Run&quot;,
-    &quot;Python.intro_module.executor&quot;: &quot;Run&quot;,
-    &quot;Python.lvl1.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.old_main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pfx_module.executor&quot;: &quot;Run&quot;,
-    &quot;Python.player.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pox_module.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ship.executor&quot;: &quot;Run&quot;,
-    &quot;Python.spritegroups.executor&quot;: &quot;Run&quot;,
-    &quot;Python.stars.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;root&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/shs/OneDrive/Documents/Code/gemfall/images.py&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.LLMThirdPartyAiProvidersConfigurable&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.Dark_Void_2.executor": "Run",
+    "Python.asteroids.executor": "Run",
+    "Python.boss.executor": "Run",
+    "Python.commons.executor": "Run",
+    "Python.config.executor": "Run",
+    "Python.darkvoid2.executor": "Run",
+    "Python.darkvoid21.executor": "Run",
+    "Python.darkvoid_03.executor": "Run",
+    "Python.enemy.executor": "Run",
+    "Python.game.executor": "Run",
+    "Python.intro_module.executor": "Run",
+    "Python.lvl1.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.main2.executor": "Run",
+    "Python.old_main.executor": "Run",
+    "Python.pfx_module.executor": "Run",
+    "Python.player.executor": "Run",
+    "Python.pox_module.executor": "Run",
+    "Python.ship.executor": "Run",
+    "Python.spritegroups.executor": "Run",
+    "Python.stars.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "root",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/shs/OneDrive/Documents/Code/gemfall/images.py",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "ml.llm.LLMThirdPartyAiProvidersConfigurable",
+    "to.speed.mode.migration.done": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/core" />
@@ -215,7 +217,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.main">
     <configuration name="game" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="darkvoid2" />
       <option name="ENV_FILES" value="" />
@@ -315,13 +317,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1778759820696</updated>
-    </task>
-    <task id="LOCAL−00007" summary="Added quite a bit of things">
-      <option name="closed" value="true" />
-      <created>1778797730960</created>
-      <option name="number" value="LOCAL−00007" />
-      <option name="presentableId" value="LOCAL−00007" />
-      <updated>1778797730960</updated>
     </task>
     <task id="LOCAL−00008" summary="Something starting to emerge from the depths of night">
       <option name="closed" value="true" />
@@ -659,14 +654,20 @@
       <option name="presentableId" value="LOCAL−00055" />
       <updated>1779371491792</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL−00056" summary="treat ritual materials with care">
+      <option name="closed" value="true" />
+      <created>1779371864849</created>
+      <option name="number" value="LOCAL−00056" />
+      <option name="presentableId" value="LOCAL−00056" />
+      <updated>1779371864849</updated>
+    </task>
+    <option name="localTasksCounter" value="57" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="First commit" />
     <MESSAGE value="First real commit" />
     <MESSAGE value="Added gitgnore" />
     <MESSAGE value="Added quite a bit of things" />
@@ -691,7 +692,8 @@
     <MESSAGE value="massive asteroid attack" />
     <MESSAGE value="boss playing hide and seek" />
     <MESSAGE value="try finger but hole" />
-    <option name="LAST_COMMIT_MESSAGE" value="try finger but hole" />
+    <MESSAGE value="treat ritual materials with care" />
+    <option name="LAST_COMMIT_MESSAGE" value="treat ritual materials with care" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

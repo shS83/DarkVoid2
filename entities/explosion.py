@@ -48,14 +48,20 @@ class Series_of_Explosions(pg.sprite.Sprite):
 
 
 class Explosion(pg.sprite.Sprite):
-	def __init__(self, game, pos):
+	def __init__(self, game, pos, boss=False):
 		super().__init__()
 
 		self.game = game
-		self.frames = self.game.explosion_frames
+		if not boss:
+			self.frames = self.game.explosion_frames
+		else:
+			self.frames = self.game.boss_explosion_frames
 		self.index = 0
 		self.timer = 0
-		self.frame_time = 0.045
+		if not boss:
+			self.frame_time = 0.045
+		else:
+			self.framw_time = 0.065
 
 		self.image = self.frames[self.index]
 		self.rect = self.image.get_rect(center=pos)

@@ -235,6 +235,7 @@ class Boss(pg.sprite.Sprite):
 			self.destroy()
 
 	def destroy(self, dt=pg.time.Clock().tick(60) / 1000):
+		explosion = None
 		interval = 400
 		explosion_sounds = [f'{c.HOME_DIR}/assets/explosion2.wav', f'{c.HOME_DIR}/assets/explosion1-long.wav',
 		                    f'{c.HOME_DIR}/assets/explosion3.wav']
@@ -242,36 +243,19 @@ class Boss(pg.sprite.Sprite):
 		now = pg.time.get_ticks()
 		if dt + now > 1000 + interval:
 			pg.mixer.Sound(random.choice(explosion_sounds)).play()
-		now = pg.time.get_ticks()
-		if dt + now > 15400 + interval:
-			pg.mixer.Sound(random.choice(explosion_sounds)).play()
 
-		explosion = Explosion(self.game, self.rect.center)
-		self.game.effects.add(explosion)
-		self.game.all_sprites.add(explosion)
-		now = pg.time.get_ticks()
-		if dt + now > 1400 + interval:
-			explosion = Explosion(self.game, self.rect.topleft)
-			self.game.effects.add(explosion)
-			self.game.all_sprites.add(explosion)
-		now = pg.time.get_ticks()
-		if dt + now > 3500 + interval:
-			explosion = Explosion(self.game, self.rect.bottom)
+		if not explosion:
+			explosion = Explosion(self.game, self.rect.center, boss=True)
 			self.game.effects.add(explosion)
 			self.game.all_sprites.add(explosion)
 
-		now = pg.time.get_ticks()
-		if dt + now > 4000 + interval:
-			for _ in range(20000):
-				particle = Particle(self.game, self.rect.center)
-				self.game.effects.add(particle)
-				self.game.all_sprites.add(particle)
 		now = pg.time.get_ticks()
 		if dt + now > 4000 + interval:
 			for _ in range(10000):
-				particle = Particle(self.game, self.rect.top)
+				particle = Particle(self.game, self.rect.center)
 				self.game.effects.add(particle)
 				self.game.all_sprites.add(particle)
+
 		self.game.score += 5000
 		self.kill()
 
