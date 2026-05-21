@@ -2,7 +2,7 @@ import pygame as pg
 import pygame.gfxdraw
 import config as c
 from entities.player import Player
-# from entities.boss import Boss
+from entities.boss import Boss
 from entities.enemy import Enemy
 from entities.star import Star
 import random
@@ -34,7 +34,7 @@ class Game:
 		self.boss = None
 		self.boss_time = False
 		self.boss_timer = 2000
-		self.boss_max_y = c.HEIGHT // 2 - 100
+		self.boss_max_y = 160
 		self.score = 0
 		self.hud = HUD(self)
 		self.screen = pg.display.set_mode((c.WIDTH, c.HEIGHT), pg.SRCALPHA, 32)
@@ -71,19 +71,20 @@ class Game:
 		self.all_sprites = pg.sprite.LayeredUpdates()
 		self.game_over = False
 		self.game_over_angle = 0
-		self.game_over_scale = 0.5
+		self.game_over_scale = 0.1
 		self.game_over_scale_dir = 1
 		self.game_over_font = c.MSG_FONT
 		self.game_over_backdrop_scale = 0.1
-		self.game_over_backdrop_alpha = 220
+		self.game_over_backdrop_alpha = 235
 		self.text_alpha = 255
-		self.game_over_text = self.game_over_font.render("GAME OVER", True, (255, 40, 40))
+		self.gothic_font = pygame.font.Font(f'{c.HOME_DIR}/assets/msgothic.ttc', 18)
+		self.game_over_text = self.gothic_font.render("GAME OVER", True, (255, 40, 40))
 		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 90))
 		self.all_sprites.add(self.player)
 		self.player_bullets = pg.sprite.Group()
-		enemy = Enemy(self, (c.WIDTH // 2, -80))
-		self.enemies.add(enemy)
-		self.all_sprites.add(enemy)
+		boss = Boss(self, (c.WIDTH // 2, -80))
+		self.enemies.add(boss)
+		self.all_sprites.add(boss)
 		self.stars = pg.sprite.Group()
 
 		for _ in range(200):
@@ -150,7 +151,7 @@ class Game:
 		x = c.WIDTH // 2
 		y = -300
 
-		self.boss = Enemy(self, (x, y), boss=True)
+		self.boss = Boss(self, (x, y), boss=True)
 		self.enemies.add(self.boss)
 		self.all_sprites.add(self.boss)
 
@@ -197,7 +198,9 @@ class Game:
 			if asteroid.hitbox.colliderect(self.player.rect) and not self.player.invincible_timer > 0:
 				self.player.hit()
 				break
-
+			elif asteroid.hitbox.colliderect(asteroid.rect):
+				asteroid.damage(1)
+				break
 		if self.boss_timer < 1 and self.boss == None:
 			self.boss_timer = 0
 			self.boss_spawn()
