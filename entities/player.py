@@ -1,5 +1,7 @@
 import pygame as pg
 import config as c
+from core.commons import ROCK_IMAGES
+from core.utils import get_random_velocity, get_random_position
 from entities.bullet import PlayerBullet
 from entities.explosion import Explosion
 from entities.particle import Particle
@@ -7,6 +9,10 @@ from entities.thruster_particle import ThrusterParticle
 import random
 from pygame.transform import rotozoom
 from entities.powerup import PowerUp
+from entities.asteroid import Meteor
+
+Asteroid = Meteor(random.choice(ROCK_IMAGES), get_random_position(c.screen),
+                  get_random_velocity(2, 10), get_random_velocity(1, 5))
 
 
 class Player(pg.sprite.Sprite):
@@ -101,17 +107,13 @@ class Player(pg.sprite.Sprite):
 			self.kill()
 
 	def apply_powerup(self, kind):
-		self.timer = 300
 		if kind == "spread":
-			self.timer -= 1
 			self.shoot_mode = "spread"
 			self.power_timer = 12.0
 		if kind == "speed":
-			self.timer -= 1
 			self.speed = 700
 			self.power_timer = 12.0
 		if kind == "laser":
-			self.timer -= 1
 			self.fire_cooldown2 = 0.01
 			self.power_timer = 12.0
 		if kind == "health":
@@ -135,12 +137,15 @@ class Player(pg.sprite.Sprite):
 				self.shoot_spread()
 			else:
 				self.shoot_normal()
-		if keys[pg.K_LCTRL]:
-			self.shoot_spread()
+		# if keys[pg.K_LCTRL]:
+		#	self.shoot_spread()
 
 		if keys[pg.K_ESCAPE]:
 			pg.quit()
 		# For debugging
+		if keys[pg.K_F8]:
+			Asteroid.spawn_meteor(get_random_position(self.game.screen), get_random_velocity(10, 100))
+
 		if keys[pg.K_F9]:
 			powerup = PowerUp(self.game, (self.rect.x, 0), kind=random.choice(["health", "speed", "spread", "laser"]))
 			self.game.powerups.add(powerup)
@@ -156,7 +161,7 @@ class Player(pg.sprite.Sprite):
 		if self.power_timer <= 0:
 			self.shoot_mode = "normal"
 			self.speed = 350
-
+			self.fire_cooldown2 = 0.08
 		self.thruster_timer -= dt
 
 		if self.thruster_timer <= 0:

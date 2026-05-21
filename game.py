@@ -17,7 +17,7 @@ def mixer_init():
 	         "Colorcast - Coffee Break.mp3", "Colorcast - Drown.mp3", "Colorcast - Need.mp3",
 	         "Jahzzar - Forest Pan.mp3", "Jahzzar - Pink Fluid.mp3", "Lightning Traveler - Celestial Drift.mp3",
 	         "Lightning Traveler - Eclipse Horizon.mp3", "Lightning Traveler - Event Horizon.mp3",
-	         "Lightning Traveler - Lunar Echo.mp3", "Ov Moi Omm - The Dictator's Transmission.mp3"]
+	         "Lightning Traveler - Lunar Echo.mp3", "Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3"]
 	pg.mixer.music.load(f"{c.HOME_DIR}/assets/{random.choice(tunes)}")
 	pg.mixer.music.play(-1)
 	pg.mixer.init(48000, -16, 2, 4096)

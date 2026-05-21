@@ -5,10 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment=" Powerups not appearing properly">
+      <change afterPath="$PROJECT_DIR$/entities/asteroid.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/enemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/enemy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/commons.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/commons.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/player.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/powerup.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/powerup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +55,7 @@
     </selectedModels>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="190" />
+    <option name="cachedIndexableFilesCount" value="194" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -558,7 +559,14 @@
       <option name="presentableId" value="LOCAL−00043" />
       <updated>1779319156930</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL−00044" summary=" Powerups not appearing properly">
+      <option name="closed" value="true" />
+      <created>1779320511992</created>
+      <option name="number" value="LOCAL−00044" />
+      <option name="presentableId" value="LOCAL−00044" />
+      <updated>1779320511992</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
