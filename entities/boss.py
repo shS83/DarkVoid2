@@ -84,21 +84,30 @@ class Boss(pg.sprite.Sprite):
 		self.phase_timer = 1
 
 	def fire_bullet(self, pos, velocity):
-		bullet = EnemyBullet(self.game, pos, velocity)
+		self.shoot_timer = 0
+		self.shoot_delay = 1.5
+		if self.shoot_timer <= self.shoot_delay:
+			self.shoot_timer = self.shoot_delay
+			bullet = EnemyBullet(self.game, pos, velocity)
 		self.game.enemy_bullets.add(bullet)
 		self.game.all_sprites.add(bullet)
 
 	def aimed_shot(self, speed=260):
+		self.shoot_timer = 0
+		self.shoot_delay = 1.5
 		direction = self.game.player.pos - self.pos
 
 		if direction.length_squared() == 0:
 			direction = pg.Vector2(0, 1)
 		else:
 			direction = direction.normalize()
-
-		self.fire_bullet(self.rect.center, direction * speed * 50)
+		if self.shoot_timer <= self.shoot_delay:
+			self.shoot_timer = self.shoot_delay
+			self.fire_bullet(self.rect.center, direction * speed * 50)
 
 	def aimed_spread(self, count=7, speed=260, spread=50):
+		self.shoot_timer = 0
+		self.shoot_delay = 1.5
 		direction = self.game.player.pos - self.pos
 
 		if direction.length_squared() == 0:
@@ -109,30 +118,41 @@ class Boss(pg.sprite.Sprite):
 		start = -spread / 2
 		step = spread / max(1, count - 1)
 
-		for i in range(count):
-			angle = start + step * i
-			self.fire_bullet(
-				self.rect.center,
-				direction.rotate(angle) * speed
-			)
+		if self.shoot_timer <= self.shoot_delay:
+			self.shoot_timer = self.shoot_delay
+			for i in range(count):
+				angle = start + step * i
+				self.fire_bullet(
+					self.rect.center,
+					direction.rotate(angle) * speed
+				)
 
 	def radial_burst(self, count=32, speed=190, offset=0):
+		self.shoot_timer = 0
+		self.shoot_delay = 1.5
+
 		for i in range(count):
 			angle = offset + 360 * i / count
 			direction = pg.Vector2(1, 0).rotate(angle)
 
-			self.fire_bullet(
-				self.rect.center,
-				direction * speed
-			)
+			if self.shoot_timer <= self.shoot_delay:
+				self.shoot_timer = self.shoot_delay
+				self.fire_bullet(
+					self.rect.center,
+					direction * speed
+				)
 
 	def spiral_burst(self, arms=4, speed=220):
+		self.shoot_timer = 0
+		self.shoot_delay = 1.5
+
 		base_angle = self.phase_timer * 180
 
 		for i in range(arms):
 			angle = base_angle + i * (360 / arms)
 			direction = pg.Vector2(1, 0).rotate(angle)
-
+		if self.shoot_timer <= self.shoot_delay:
+			self.shoot_timer = self.shoot_delay
 			self.fire_bullet(
 				self.rect.center,
 				direction * speed

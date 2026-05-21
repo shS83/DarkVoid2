@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="boss playing hide and seek">
+    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="try finger but hole">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/boss.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/boss.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
@@ -78,61 +78,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0439219159184956" />
-      <entry key="MS500" value="1.7677956935030092" />
-      <entry key="S2" value="3.8845394796491455" />
-      <entry key="S5" value="5.37184234199302" />
-      <entry key="S10" value="6.107476289126063" />
-      <entry key="S30" value="7.154324966158845" />
-      <entry key="S60" value="8.226842471599939" />
-      <entry key="M2" value="9.535132701489525" />
-      <entry key="M5" value="12.84475906948107" />
-      <entry key="M10" value="19.516447240460916" />
-      <entry key="M15" value="26.457853633924078" />
-      <entry key="M30" value="42.25179577246714" />
-      <entry key="H1" value="57.64233301125675" />
-      <entry key="H2" value="68.7080890114269" />
-      <entry key="H4" value="75.39224312165827" />
-      <entry key="D1" value="81.66219650326578" />
-      <entry key="W1" value="82.80709478036614" />
+      <entry key="MS100" value="1.0131390783600864" />
+      <entry key="MS500" value="1.4577141098871893" />
+      <entry key="S2" value="2.244623914164558" />
+      <entry key="S5" value="2.647160386707597" />
+      <entry key="S10" value="2.9094451022071293" />
+      <entry key="S30" value="3.5035931889478746" />
+      <entry key="S60" value="4.042587359362596" />
+      <entry key="M2" value="5.662433747507715" />
+      <entry key="M5" value="13.245833387244886" />
+      <entry key="M10" value="23.42109189498954" />
+      <entry key="M15" value="31.753498018540363" />
+      <entry key="M30" value="51.497079703252055" />
+      <entry key="H1" value="74.06392695213427" />
+      <entry key="H2" value="92.51023180533905" />
+      <entry key="H4" value="104.53268742066294" />
+      <entry key="D1" value="116.39646690743933" />
+      <entry key="W1" value="118.62303026239103" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="0.0" />
-      <entry key="S5" value="1.2648623847324025E-131" />
-      <entry key="S10" value="3.5564903834150933E-66" />
-      <entry key="S30" value="1.526419408862054E-22" />
-      <entry key="S60" value="1.2354834717073524E-11" />
-      <entry key="M2" value="3.514944482786823E-6" />
-      <entry key="M5" value="0.006582144131463697" />
-      <entry key="M10" value="0.08113041434298056" />
-      <entry key="M15" value="0.1874084329807597" />
-      <entry key="M30" value="0.43290695649384014" />
-      <entry key="H1" value="0.6579566524428797" />
-      <entry key="H2" value="0.8111452720954981" />
-      <entry key="H4" value="0.900636037528756" />
-      <entry key="D1" value="0.9827088942596451" />
-      <entry key="W1" value="0.9975113386058004" />
+      <entry key="MS500" value="4.9E-324" />
+      <entry key="S2" value="1.4188043767848534E-81" />
+      <entry key="S5" value="4.5789827538078216E-33" />
+      <entry key="S10" value="6.766818125092342E-17" />
+      <entry key="S30" value="4.075005206580946E-6" />
+      <entry key="S60" value="0.002018664213429501" />
+      <entry key="M2" value="0.0449295473903098" />
+      <entry key="M5" value="0.28920014100078095" />
+      <entry key="M10" value="0.5487768976917213" />
+      <entry key="M15" value="0.7110227993609025" />
+      <entry key="M30" value="1.0363404876705529" />
+      <entry key="H1" value="1.3741804651257414" />
+      <entry key="H2" value="1.6369416841774431" />
+      <entry key="H4" value="1.8035346471280915" />
+      <entry key="D1" value="1.9649390308183936" />
+      <entry key="W1" value="1.9949310940717957" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.0198384256007302" />
-      <entry key="MS500" value="1.753277127072304" />
-      <entry key="S2" value="3.876554011399498" />
-      <entry key="S5" value="5.367621612870421" />
-      <entry key="S10" value="6.104615005410646" />
-      <entry key="S30" value="7.141159771767978" />
-      <entry key="S60" value="8.208206020292788" />
-      <entry key="M2" value="9.516592467075478" />
-      <entry key="M5" value="12.831662406376383" />
-      <entry key="M10" value="19.577129983233256" />
-      <entry key="M15" value="26.6252245010003" />
-      <entry key="M30" value="42.667923653922266" />
-      <entry key="H1" value="58.28873762897236" />
-      <entry key="H2" value="69.51233982794865" />
-      <entry key="H4" value="76.28909655356637" />
-      <entry key="D1" value="82.64422274339059" />
-      <entry key="W1" value="83.80450723752514" />
+      <entry key="MS100" value="0.913174423961194" />
+      <entry key="MS500" value="1.4278835026592671" />
+      <entry key="S2" value="2.232047023165471" />
+      <entry key="S5" value="2.63837648376649" />
+      <entry key="S10" value="2.892135682546409" />
+      <entry key="S30" value="3.474238066662769" />
+      <entry key="S60" value="4.016963427538825" />
+      <entry key="M2" value="5.6797928562200175" />
+      <entry key="M5" value="13.50509652830771" />
+      <entry key="M10" value="23.943734996822666" />
+      <entry key="M15" value="32.44087085834328" />
+      <entry key="M30" value="52.513920815953746" />
+      <entry key="H1" value="75.42389964061604" />
+      <entry key="H2" value="94.13824320422941" />
+      <entry key="H4" value="106.33116185104329" />
+      <entry key="D1" value="118.36046474883969" />
+      <entry key="W1" value="120.61782427912189" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -215,7 +215,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Python.game">
     <configuration name="game" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="darkvoid2" />
       <option name="ENV_FILES" value="" />
@@ -315,13 +315,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1778759820696</updated>
-    </task>
-    <task id="LOCAL−00004" summary="Added gitgnore">
-      <option name="closed" value="true" />
-      <created>1778763981868</created>
-      <option name="number" value="LOCAL−00004" />
-      <option name="presentableId" value="LOCAL−00004" />
-      <updated>1778763981868</updated>
     </task>
     <task id="LOCAL−00005" summary="Added quite a bit of things">
       <option name="closed" value="true" />
@@ -659,7 +652,14 @@
       <option name="presentableId" value="LOCAL−00052" />
       <updated>1779368352717</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL−00053" summary="try finger but hole">
+      <option name="closed" value="true" />
+      <created>1779369338109</created>
+      <option name="number" value="LOCAL−00053" />
+      <option name="presentableId" value="LOCAL−00053" />
+      <updated>1779369338109</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -690,7 +690,8 @@
     <MESSAGE value="boss needs tweaking" />
     <MESSAGE value="massive asteroid attack" />
     <MESSAGE value="boss playing hide and seek" />
-    <option name="LAST_COMMIT_MESSAGE" value="boss playing hide and seek" />
+    <MESSAGE value="try finger but hole" />
+    <option name="LAST_COMMIT_MESSAGE" value="try finger but hole" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

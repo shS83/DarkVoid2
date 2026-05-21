@@ -75,8 +75,7 @@ class Game:
 		self.game_over_backdrop_scale = 0.1
 		self.game_over_backdrop_alpha = 235
 		self.text_alpha = 255
-		self.gothic_font = pygame.font.Font(f'{c.HOME_DIR}/assets/msgothic.ttc', 18)
-		self.game_over_text = self.gothic_font.render("GAME OVER", True, (255, 40, 40))
+		self.game_over_text = self.game_over_font.render("YOU FELLED", True, (255, 40, 40))
 		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 90))
 		self.all_sprites.add(self.player)
 		self.player_bullets = pg.sprite.Group()
