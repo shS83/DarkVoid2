@@ -114,8 +114,7 @@ while running:
 					if i < 2:
 						pg.event.clear()
 						pg.event.post(pg.event.Event(INITGAME))
-				pg.event.post(pg.event.Event(FADEOUTEVENT))
-
+						
 		if event.type == INITGAME:
 			finished = True
 			running = False

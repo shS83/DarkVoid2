@@ -16,7 +16,7 @@ class Meteor(pg.sprite.Sprite):
 		self.pos = pg.Vector2(pos)
 
 		self.image = random.choice(commons.ROCK_IMAGES).copy()
-		scale = random.uniform(0.35, 1.05)
+		scale = random.uniform(0.35, 0.9)
 
 		w = int(self.image.get_width() * scale)
 		h = int(self.image.get_height() * scale)
@@ -27,11 +27,11 @@ class Meteor(pg.sprite.Sprite):
 
 		self.velocity = pg.Vector2(
 			random.uniform(-30, 30),
-			random.uniform(60, 180)
+			random.uniform(60, 120)
 		)
 
 		self.rotation = random.uniform(0, 360)
-		self.rotation_speed = random.uniform(-100, 100)
+		self.rotation_speed = random.uniform(-75, 75)
 
 		self.hitbox = self.rect.inflate(-40, -40)
 		self.hp = 3
@@ -73,7 +73,7 @@ class Meteor(pg.sprite.Sprite):
 			self.game.effects.add(particle)
 			self.game.all_sprites.add(particle)
 		self.game.score += 50
-		if random.random() < 0.3:
+		if random.random() < 0.15:
 			self.px, self.py = get_random_position(c.screen)
 			powerup = PowerUp(self.game, (random.randint(0, c.WIDTH), 0),
 			                  random.choice(["health", "speed", "spread", "laser"]))

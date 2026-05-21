@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="a'steroids beem rollin'">
+    <list default="true" id="84a94e19-d226-41bd-9225-fe146a62f2ac" name="Changes" comment="boss needs unnerfing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/intro_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/intro_module.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/entities/asteroid.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/asteroid.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/enemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/enemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entities/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/player.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entities/boss.py" beforeDir="false" afterPath="$PROJECT_DIR$/entities/boss.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -581,7 +580,14 @@
       <option name="presentableId" value="LOCAL−00046" />
       <updated>1779335791938</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL−00047" summary="boss needs unnerfing">
+      <option name="closed" value="true" />
+      <created>1779361277064</created>
+      <option name="number" value="LOCAL−00047" />
+      <option name="presentableId" value="LOCAL−00047" />
+      <updated>1779361277064</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -608,7 +614,8 @@
     <MESSAGE value=" Powerups not appearing properly" />
     <MESSAGE value="Adding asteroids to the game" />
     <MESSAGE value="a'steroids beem rollin'" />
-    <option name="LAST_COMMIT_MESSAGE" value="a'steroids beem rollin'" />
+    <MESSAGE value="boss needs unnerfing" />
+    <option name="LAST_COMMIT_MESSAGE" value="boss needs unnerfing" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

@@ -7,6 +7,7 @@ from entities.bullet import EnemyBullet, PlayerBullet
 import config as c
 from pygame.transform import rotozoom
 from entities.level import *
+import math
 
 
 class Boss(pg.sprite.Sprite):
@@ -14,10 +15,10 @@ class Boss(pg.sprite.Sprite):
 		super().__init__()
 		self.game = game
 		self.thruster_timer = 0
-		self.shoot_timer = 0.05
-		self.shoot_delay = 0.2
+		self.shoot_timer = 0.001
+		self.shoot_delay = 0.001
 		self.pos = pg.Vector2(pos)
-		self.hp = 500
+		self.hp = 1000
 		self.max_h = c.HEIGHT // 2
 		self.phase_index = 0
 		self.phase_timer = 1000
@@ -29,7 +30,6 @@ class Boss(pg.sprite.Sprite):
 		self.flash_timer = 0
 		self.rect = self.image.get_rect(center=pos)
 		self.pos = pg.Vector2(self.rect.center)
-		self.shoot_timer = 0.05
 		self.thruster_timer = 0.04
 		self.speed = 30
 		self.phases = [
@@ -40,55 +40,28 @@ class Boss(pg.sprite.Sprite):
 		]
 
 	def update(self, dt):
-		if self.pos.y <= self.max_h:
+		if self.pos.y <= self.max_h - self.rect.height:
 			self.pos.y += self.speed * dt
+
 		self.rect.center = self.pos
 		self.hitbox.center = self.rect.center
+
 		self.shoot_timer -= dt
-		if self.shoot_timer < 1:
-			self.shoot()
-
-		self.thruster_timer -= dt
-
-		if self.thruster_timer <= 0:
-			self.thruster_timer = 0.04
-
-			particle = ThrusterParticle(
-				self.game,
-				self.rect.midtop,
-				direction=(0, -1),
-				color=(255, 120, 40)
-			)
-
-			self.game.effects.add(particle)
-			self.game.all_sprites.add(particle)
-
-		if self.flash_timer > 0:
-			self.flash_timer -= dt
-			self.image = self.flash_image
-		else:
-			self.image = self.base_image
 		self.phase_timer += dt
+
 		self.phases[self.phase_index](dt)
 
 		self.thruster_timer -= dt
-
 		if self.thruster_timer <= 0:
 			self.thruster_timer = 0.04
-
 			particle = ThrusterParticle(
 				self.game,
 				self.rect.midtop,
 				direction=(0, -1),
 				color=(255, 120, 40)
 			)
-
 			self.game.effects.add(particle)
 			self.game.all_sprites.add(particle)
-
-		if self.shoot_timer <= 0:
-			self.shoot_timer = self.shoot_delay
-			self.shoot()
 
 		if self.flash_timer > 0:
 			self.flash_timer -= dt
@@ -98,19 +71,96 @@ class Boss(pg.sprite.Sprite):
 
 	def next_phase(self):
 		self.phase_index += 1
-		self.phase_timer = 0
+		self.phase_timer = 1
+
+	def fire_bullet(self, pos, velocity):
+		bullet = EnemyBullet(self.game, pos, velocity)
+		self.game.enemy_bullets.add(bullet)
+		self.game.all_sprites.add(bullet)
+
+	def aimed_shot(self, speed=260):
+		direction = self.game.player.pos - self.pos
+
+		if direction.length_squared() == 0:
+			direction = pg.Vector2(0, 1)
+		else:
+			direction = direction.normalize()
+
+		self.fire_bullet(self.rect.center, direction * speed)
+
+	def aimed_spread(self, count=7, speed=260, spread=50):
+		direction = self.game.player.pos - self.pos
+
+		if direction.length_squared() == 0:
+			direction = pg.Vector2(0, 1)
+		else:
+			direction = direction.normalize()
+
+		start = -spread / 2
+		step = spread / max(1, count - 1)
+
+		for i in range(count):
+			angle = start + step * i
+			self.fire_bullet(
+				self.rect.center,
+				direction.rotate(angle) * speed
+			)
+
+	def radial_burst(self, count=32, speed=190, offset=0):
+		for i in range(count):
+			angle = offset + 360 * i / count
+			direction = pg.Vector2(1, 0).rotate(angle)
+
+			self.fire_bullet(
+				self.rect.center,
+				direction * speed
+			)
+
+	def spiral_burst(self, arms=4, speed=220):
+		base_angle = self.phase_timer * 180
+
+		for i in range(arms):
+			angle = base_angle + i * (360 / arms)
+			direction = pg.Vector2(1, 0).rotate(angle)
+
+			self.fire_bullet(
+				self.rect.center,
+				direction * speed
+			)
 
 	def phase_intro(self, dt):
-		pass
+		self.shoot_delay = 0.8
+
+		if self.phase_timer > 3:
+			self.next_phase()
 
 	def phase_radial(self, dt):
-		pass
+		self.shoot_delay = 0.4
+
+		if self.shoot_timer <= 0:
+			self.shoot_timer = self.shoot_delay
+			self.radial_burst(count=28, speed=180, offset=self.phase_timer * 40)
+
+		if self.phase_timer > 10:
+			self.next_phase()
 
 	def phase_spiral(self, dt):
-		pass
+		self.shoot_delay = 0.12
+
+		if self.shoot_timer <= 0:
+			self.shoot_timer = self.shoot_delay
+			self.spiral_burst(arms=5, speed=230)
+
+		if self.phase_timer > 10:
+			self.next_phase()
 
 	def phase_desperation(self, dt):
-		pass
+		self.shoot_delay = 0.15
+
+		if self.shoot_timer <= 0:
+			self.shoot_timer = self.shoot_delay
+			self.aimed_spread(count=9, speed=300, spread=70)
+			self.radial_burst(count=18, speed=210, offset=self.phase_timer * 90)
 
 	def make_flash_image(self, image):
 		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
@@ -125,6 +175,7 @@ class Boss(pg.sprite.Sprite):
 		return flash
 
 	def shoot(self):
+		self.shoot_delay = 0.0001
 		self.shoot_timer = self.shoot_delay
 
 		direction = self.game.player.pos - self.pos
