@@ -20,7 +20,7 @@ class Boss(pg.sprite.Sprite):
 		self.pos = pg.Vector2(pos)
 		self.pos.y -= 2000
 		self.entering = False
-		self.hp = 1000
+		self.hp = 500
 		self.phase_index = 0
 		self.phase_timer = 0
 		self.image = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/alus2.png").convert_alpha(), 180, 1)

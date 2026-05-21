@@ -146,10 +146,11 @@ class Game:
 		x = c.WIDTH // 2
 		y = -300
 
-		self.boss = Boss(self, (x, y))
+		if not self.boss:
+			self.boss = Boss(self, (x, y))
 
-		self.enemies.add(self.boss)
-		self.all_sprites.add(self.boss)
+			self.enemies.add(self.boss)
+			self.all_sprites.add(self.boss)
 
 		if self.player.rect.colliderect(self.boss.rect) and not self.player.invincible_timer > 0:
 			self.player.hit()
@@ -166,14 +167,14 @@ class Game:
 		if not c.BOSS_TIME or self.boss_timer >= 500:
 			if self.enemy_spawn_timer >= self.enemy_spawn_delay:
 				self.enemy_spawn_timer = 0
-				self.enemy_spawn_delay = random.uniform(0.4, 3)
+				self.enemy_spawn_delay = random.uniform(0.4, 3.6)
 				self.spawn_enemy()
 
 		self.asteroid_spawn_timer += dt
 
 		if self.asteroid_spawn_timer >= self.asteroid_spawn_delay:
 			self.asteroid_spawn_timer = 0
-			self.asteroid_spawn_delay = random.uniform(0.40, 5.2)
+			self.asteroid_spawn_delay = random.uniform(0.40, 3.2)
 			self.spawn_asteroid()
 
 		for enemy in self.enemies:
