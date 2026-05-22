@@ -46,6 +46,6 @@ SCALE = 0.4
 HOME_DIR = os.path.dirname(__file__)
 MSG_FONT = pg.font.SysFont(f'{HOME_DIR}/PycharmProjects/DarkVoid2/assets/GoMonoNerdFontPropo-Bold.ttf', 60)
 GOTHIC_FONT = pg.font.Font(f'{HOME_DIR}/assets/VL-Gothic-Regular.ttf', 36)
-Event = Event.INITIATION
+Event = Event.PLAYING
 level = Level()
 Level.stage = 1

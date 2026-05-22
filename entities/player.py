@@ -24,6 +24,7 @@ class Player(pg.sprite.Sprite):
 		self.fire_cooldown2 = 0.08
 		self.fire_cooldown3 = 0.35
 		self.game = game
+		self.pauseswitch = -1
 		self.image3 = pg.image.load(Path(c.HOME_DIR, "assets", "purplealus.png")).convert_alpha()
 		self.image8 = pg.image.load(Path(c.HOME_DIR, "assets", "turqoiseship.png")).convert_alpha()
 		self.image1 = pg.image.load(Path(c.HOME_DIR, "assets", "Proper_warship.png")).convert_alpha()
