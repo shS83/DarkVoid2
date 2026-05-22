@@ -1,3 +1,4 @@
+from pygame import mixer
 import pygame as pg
 import config as c
 from entities.events import Event
@@ -10,16 +11,17 @@ from entities.asteroid import Meteor
 from entities.level import *
 from core.hs_module import HighScore
 from entities.level import Level
+from pathlib import Path
 c.Level = Level()
 
-def mixer_init():
-	pg.mixer.init()
+def mixing():
+	mixer.init()
 	tunes = ["1000 Handz - Reps.mp3", "1000 Handz - Announcement.mp3", "1000 Handz - No Option.mp3",
 	         "Colorcast - Coffee Break.mp3", "Colorcast - Drown.mp3", "Colorcast - Need.mp3",
 	         "Jahzzar - Forest Pan.mp3", "Jahzzar - Pink Fluid.mp3", "Lightning Traveler - Celestial Drift.mp3",
 	         "Lightning Traveler - Eclipse Horizon.mp3", "Lightning Traveler - Event Horizon.mp3",
 	         "Lightning Traveler - Lunar Echo.mp3", "Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3"]
-	pg.mixer.music.load(f"{c.HOME_DIR}/assets/{random.choice(tunes)}")
+	pg.mixer.music.load(Path(c.HOME_DIR / "assets" / f"{random.choice(tunes)}"))
 	pg.mixer.music.play(-1)
 	pg.mixer.init(48000, -16, 2, 4096)
 	pg.mixer.music.set_volume(0.2)
@@ -29,10 +31,11 @@ def mixer_init():
 class Game:
 	def __init__(self):
 		pg.init()
-		mixer_init()
+		
+		mixing()
 		if c.Event == Event.NEXTLEVEL:
 			self.boss = Boss(self, (c.WIDTH // 2, -300))
-			self.boss.image = pg.transform.scale(pg.image.load(f"{c.HOME_DIR}/assets/foobarhead1.png"), (160, 160))
+			self.boss.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR / "assets" / "foobarhead1.png")), (160, 160))
 			self.boss_time = c.BOSS_TIME
 		else:
 			self.boss = None
@@ -56,17 +59,17 @@ class Game:
 		self.asteroid_spawn_delay = random.uniform(5, 20)
 		self.rock_images = []
 		for i in range(1, 5):
-			img = pg.image.load(f"{c.HOME_DIR}/assets/rock_{i}.png").convert_alpha()
+			img = pg.image.load(Path(c.HOME_DIR / "assets" / f"rock_{i}.png")).convert_alpha()
 			self.rock_images.append(img)
 		for i in range(1, 32):
-			img = pg.image.load(f"{c.HOME_DIR}/assets/exp_{i}.png").convert_alpha()
+			img = pg.image.load(Path(c.HOME_DIR / "assets" / f"exp_{i}.png")).convert_alpha()
 			img = pg.transform.scale(img, (320, 320))
 			self.explosion_frames.append(img)
 		for i in range(1, 32):
-			img = pg.image.load(f"{c.HOME_DIR}/assets/exp_{i}.png").convert_alpha()
+			img = pg.image.load(Path(c.HOME_DIR / "assets" / f"exp_{i}.png")).convert_alpha()
 			img = pg.transform.scale(img, (640, 640))
 			self.boss_explosion_frames.append(img)
-		self.background = pg.image.load(f"{c.HOME_DIR}/assets/space_background.png").convert()
+		self.background = pg.image.load(Path(c.HOME_DIR / "assets" / "space_background.png")).convert()
 		self.background = pg.transform.scale(self.background, (c.WIDTH, c.HEIGHT))
 		self.enemies = pg.sprite.Group()
 		self.enemy_bullets = pg.sprite.Group()

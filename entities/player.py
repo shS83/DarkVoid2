@@ -1,6 +1,6 @@
 import pygame as pg
-from pygame import rect
-
+from pathlib import Path
+from pathlib import Path
 import config as c
 from entities.bullet import PlayerBullet
 from entities.explosion import Explosion
@@ -24,9 +24,9 @@ class Player(pg.sprite.Sprite):
 		self.fire_cooldown2 = 0.08
 		self.fire_cooldown3 = 0.35
 		self.game = game
-		self.image3 = pg.image.load(f"{c.HOME_DIR}/assets/purplealus.png").convert_alpha()
-		self.image8 = pg.image.load(f"{c.HOME_DIR}/assets/turqoiseship.png").convert_alpha()
-		self.image1 = pg.image.load(f"{c.HOME_DIR}/assets/Proper_warship.png").convert_alpha()
+		self.image3 = pg.image.load(Path(c.HOME_DIR, "assets", "purplealus.png")).convert_alpha()
+		self.image8 = pg.image.load(Path(c.HOME_DIR, "assets", "turqoiseship.png")).convert_alpha()
+		self.image1 = pg.image.load(Path(c.HOME_DIR, "assets", "Proper_warship.png")).convert_alpha()
 		self.images = [self.image1,self.image8, self.image3]
 		self.image = random.choice(self.images)
 		self.image = pg.transform.smoothscale(self.image, (200, 200))
@@ -56,8 +56,8 @@ class Player(pg.sprite.Sprite):
 		return flash
 
 	def shoot_railgun(self):
-		self.image = pg.transform.scale(pg.image.load(f"{c.HOME_DIR}/assets/laser_2.png"), (20, 100))
-		self.image2 = pg.transform.scale(pg.image.load(f"{c.HOME_DIR}/assets/laser_2.png"), (20, 100))
+		self.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
+		self.image2 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
 		self.image2.map_rgb((255, 150, 150))
 		self.image2.blit(self.image, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
 		self.bullet = PlayerBullet(self.game, self.rect.midtop, self.image, velocity=(0, -2000))
@@ -175,7 +175,7 @@ class Player(pg.sprite.Sprite):
 			pg.quit()
 		# For debugging
 		if keys[pg.K_F8]:
-			Asteroid = Meteor(self.game, (c.WIDTH // 2, c.HEIGHT // 2))
+			Asteroid = Meteor(self.game, (c.WIDTH// 2, c.HEIGHT// 2))
 			self.asteroid_group.add(Asteroid)
 			self.all_sprites.add(Asteroid)
 		if keys[pg.K_F8]:

@@ -7,7 +7,7 @@ from entities.bullet import EnemyBullet
 import config as c
 from pygame.transform import rotozoom
 from entities.level import *
-
+from pathlib import Path
 
 class Boss(pg.sprite.Sprite):
 	def __init__(self, game, pos, boss=True):
@@ -23,7 +23,7 @@ class Boss(pg.sprite.Sprite):
 		self.phase_index = 0
 		self.phase_timer = 0
 		self.boss_timer = c.level.boss_timer
-		self.image = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/alus2.png").convert_alpha(), 180, 1)
+		self.image = rotozoom(pg.image.load(Path(c.HOME_DIR / "assets" / "alus2.png")).convert_alpha(), 180, 1)
 		self.max_h = 160
 		self.hitbox = self.rect = self.image.get_rect(center=pos).inflate(-300, -300)
 		self.base_image = self.image.copy()
@@ -259,7 +259,7 @@ class Boss(pg.sprite.Sprite):
 		self.kill()
 		self.game.boss_killed = True
 		self.game.boss = Boss(self.game, (0, 0), boss=False)
-		self.game.boss.image = pg.image.load(f"{c.HOME_DIR}/assets/foobarhead1.png").convert_alpha()
+		self.game.boss.image = pg.image.load(Path(c.HOME_DIR / "assets" / "foobarhead1.png")).convert_alpha()
 		self.game.boss.rect = self.game.boss.image.get_rect(center=self.game.boss.rect.center)
 		self.game.boss.hitbox = self.rect.inflate(-100, -100)
 		self.game.player.hp = 5
