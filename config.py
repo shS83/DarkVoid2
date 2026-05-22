@@ -26,11 +26,16 @@ ROCK3 = pg.image.load(f'{HOME_DIR}/assets/rock_3.png').convert_alpha()
 ROCK4 = pg.image.load(f'{HOME_DIR}/assets/rock_4.png').convert_alpha()
 ROCK5 = pg.image.load(f'{HOME_DIR}/assets/rock_5.png').convert_alpha()
 ROCK6 = pg.image.load(f'{HOME_DIR}/assets/rock_6.png').convert_alpha()
-
 BEACH1 = pg.image.load(f'{HOME_DIR}/assets/beach_1.jpg').convert()
 BEACH2 = pg.image.load(f'{HOME_DIR}/assets/beach_2.jpg').convert()
 BEACH3 = pg.image.load(f'{HOME_DIR}/assets/beach_3.jpg').convert()
 BEACH4 = pg.image.load(f'{HOME_DIR}/assets/beach_4.jpg').convert()
+PALLO1 = pg.transform.scale(pg.image.load(f"{HOME_DIR}/assets/metallipallo_1.png").convert_alpha(), (64, 64))
+PALLO2 = pg.transform.scale(pg.image.load(f"{HOME_DIR}/assets/metallipallo_2.png").convert_alpha(), (64, 64))
+PALLO3 = pg.transform.scale(pg.image.load(f"{HOME_DIR}/assets/metallipallo_3.png").convert_alpha(), (64, 64))
+PALLO4 = pg.transform.scale(pg.image.load(f"{HOME_DIR}/assets/metallipallo_4.png").convert_alpha(), (64, 64))
+PALLO5 = pg.transform.scale(pg.image.load(f"{HOME_DIR}/assets/metallipallo_5.png").convert_alpha(), (64, 64))
+PALLOt = [PALLO1, PALLO2, PALLO3, PALLO4, PALLO5]
 BEACHES=[BEACH1, BEACH2, BEACH3, BEACH4]
 BACKGROUND = BEACH3
 ROCK_IMAGES = [ROCK1, ROCK2, ROCK3, ROCK4, ROCK5, ROCK6]
