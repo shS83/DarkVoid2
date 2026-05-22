@@ -86,8 +86,8 @@ while running:
 			screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
 			            (x_res / 2 / 2, y_res / 2 / 2))
 			screen.blit(fontti.render("ヾ", True, (255, 255, 255)),
-			            (screen.get_width() // 2, screen.get_height() // 2))
-			screen.blit(textfont.render("The AVOiDED", True, (255, 0, 0)), (x_res / 2 / 2, y_res / 2 + 120))
+			            (screen.get_width() // 2, screen.get_height() // 2 - 20))
+			screen.blit(textfont.render("The AVOiDED", True, (255, 0, 0)), (x_res / 2 / 2, y_res / 2 + 140))
 			screen.blit(font.render("press space to avoid...", True, (255, 200, 255)), (x_res /2 / 2-100, y_res / 2 + 400))
 			pg.event.post(pg.event.Event(LOGOEVENT))
 

@@ -30,14 +30,21 @@ class Game:
 	def __init__(self):
 		pg.init()
 		mixer_init()
-		self.boss = None
-		self.boss_time = c.BOSS_TIME
+		if c.Event == Event.NEXTLEVEL:
+			self.boss = Boss(self, (c.WIDTH // 2, -300))
+			self.boss.image = pg.transform.scale(pg.image.load(f"{c.HOME_DIR}/assets/foobarhead1.png"), (160, 160))
+			self.boss_time = c.BOSS_TIME
+		else:
+			self.boss = None
+			self.boss_time = False
+			self.boss_image = None
 		self.boss_timer = c.level.boss_timer
 		self.boss_max_y = 160
 		self.score = 0
 		self.hud = HUD(self)
 		self.screen = pg.display.set_mode((c.WIDTH, c.HEIGHT), pg.SRCALPHA, 32)
 		self.clock = pg.time.Clock()
+		self.dt = self.clock.tick(60) / 1000
 		self.running = True
 		self.effects = pg.sprite.Group()
 		self.explosion_frames = []
