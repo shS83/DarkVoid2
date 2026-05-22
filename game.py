@@ -34,6 +34,8 @@ class Game:
 			self.boss = Boss(self, (c.WIDTH // 2, -300))
 			self.boss.image = pg.transform.scale(pg.image.load(f"{c.HOME_DIR}/assets/foobarhead1.png"), (160, 160))
 			self.boss_time = c.BOSS_TIME
+			self.enemies.add(self.boss)
+			self.all_sprites.add(self.boss)
 		else:
 			self.boss = None
 			self.boss_time = False
@@ -50,10 +52,10 @@ class Game:
 		self.explosion_frames = []
 		self.boss_explosion_frames = []
 		self.enemy_spawn_timer = 0
-		self.enemy_spawn_delay = random.uniform(1.5, 10.0)
+		self.enemy_spawn_delay = c.level.enemy_spawn_delay
 		self.asteroids = pg.sprite.Group()
 		self.asteroid_spawn_timer = 0
-		self.asteroid_spawn_delay = random.uniform(5, 20)
+		self.asteroid_spawn_delay = c.level.asteroid_spawn_delay
 		self.rock_images = []
 		for i in range(1, 5):
 			img = pg.image.load(f"{c.HOME_DIR}/assets/rock_{i}.png").convert_alpha()

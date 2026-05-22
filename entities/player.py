@@ -1,6 +1,5 @@
 import pygame as pg
-from pygame import rect
-
+from entities.asteroid import Meteor
 import config as c
 from entities.bullet import PlayerBullet
 from entities.explosion import Explosion
@@ -8,6 +7,7 @@ from entities.particle import Particle
 from entities.thruster_particle import ThrusterParticle
 import random
 from entities.powerup import PowerUp
+from core.spritegroups import asteroid_group
 
 class Player(pg.sprite.Sprite):
 	def __init__(self, game, pos):
@@ -174,12 +174,16 @@ class Player(pg.sprite.Sprite):
 		if keys[pg.K_ESCAPE]:
 			pg.quit()
 		# For debugging
+		if keys[pg.K_KP_PLUS]:
+			self.game.spawn_enemy()
+		if keys[pg.K_F7]:
+			c.level.stage =+ 1
 		if keys[pg.K_F8]:
 			Asteroid = Meteor(self.game, (c.WIDTH // 2, c.HEIGHT // 2))
-			self.asteroid_group.add(Asteroid)
+			asteroid_group.add(Asteroid)
 			self.all_sprites.add(Asteroid)
 		if keys[pg.K_F8]:
-			self.game.Level.up()
+			c.level.up()
 		if keys[pg.K_F9]:
 			powerup = PowerUp(self.game, (self.rect.x, 0), kind=random.choice(["health", "speed", "spread", "laser", "cannon"]))
 			self.game.powerups.add(powerup)

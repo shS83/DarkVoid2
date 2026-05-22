@@ -264,5 +264,6 @@ class Boss(pg.sprite.Sprite):
 		self.game.boss.hitbox = self.rect.inflate(-100, -100)
 		self.game.player.hp = 5
 		# Man you got to level 2
+		c.BOSS_TIME = False
 		c.event = Event.NEXTLEVEL
 		c.level.stage += 1
