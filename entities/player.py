@@ -30,8 +30,8 @@ class Player(pg.sprite.Sprite):
 		self.images = [self.image1,self.image8, self.image3]
 		self.image = random.choice(self.images)
 		self.image = pg.transform.smoothscale(self.image, (200, 200))
-		self.rect = self.image.get_rect()
-		self.pos = pg.Vector2(0, -1)
+		self.rect = self.image.get_rect(center=pos)
+		self.pos = c.WIDTH // 2, c.HEIGHT - 120
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_toggle_timer = 0

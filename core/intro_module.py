@@ -52,13 +52,8 @@ finished = True
 in_logo = False
 begin = False
 LOGOEVENT = pg.USEREVENT + 2
-pg.event.post(pg.event.Event(LOGOEVENT))
-
-pg.time.set_timer(LOGOEVENT, 1000, 2000)
 FADEOUTEVENT = pg.USEREVENT + 3
-pg.time.set_timer(FADEOUTEVENT, 1000, 2000)
 INITGAME = pg.USEREVENT + 4
-
 pg.event.post(pg.event.Event(LOGOEVENT))
 
 while running:
@@ -69,10 +64,7 @@ while running:
 			running = True
 
 		if event.type == pg.KEYDOWN:
-			if event.key == pg.K_ESCAPE:
-				running = False
-			if in_logo and event.key == pg.K_SPACE:
-				print("space pressed")
+			if event.key == pg.K_SPACE:
 				running = False
 
 				pg.event.clear()
@@ -96,7 +88,7 @@ while running:
 			screen.blit(fontti.render("ヾ", True, (255, 255, 255)),
 			            (screen.get_width() // 2, screen.get_height() // 2))
 			screen.blit(textfont.render("The AVOiDED", True, (255, 0, 0)), (x_res / 2 / 2, y_res / 2 + 120))
-			screen.blit(font.render("press ESC to avoid...", True, (255, 200, 255)), (x_res /2 / 2-100, y_res / 2 + 400))
+			screen.blit(font.render("press space to avoid...", True, (255, 200, 255)), (x_res /2 / 2-100, y_res / 2 + 400))
 			pg.event.post(pg.event.Event(LOGOEVENT))
 
 		if event.type == LOGOEVENT:

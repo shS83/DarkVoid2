@@ -14,8 +14,7 @@ class Meteor(pg.sprite.Sprite):
 		self.pos = pg.Vector2(pos)
 		self.pos.y = -100
 		self.max_asteroids = c.level.max_asteroids
-
-		self.image = random.choice(c.ROCK_IMAGES).copy()
+		self.image = random.choice(c.ROCK_IMAGES)
 		scale = random.uniform(0.35, 1.05)
 
 		w = int(self.image.get_width() * scale)

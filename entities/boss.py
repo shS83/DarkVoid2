@@ -1,15 +1,12 @@
 import pygame as pg
-import random
-
 from entities.events import Event
 from entities.particle import Particle
 from entities.thruster_particle import ThrusterParticle
-from entities.explosion import Explosion, Series_of_Explosions
-from entities.bullet import EnemyBullet, PlayerBullet
+from entities.explosion import Explosion
+from entities.bullet import EnemyBullet
 import config as c
 from pygame.transform import rotozoom
 from entities.level import *
-import math
 
 
 class Boss(pg.sprite.Sprite):
@@ -265,8 +262,7 @@ class Boss(pg.sprite.Sprite):
 		self.game.boss.image = pg.image.load(f"{c.HOME_DIR}/assets/foobarhead1.png").convert_alpha()
 		self.game.boss.rect = self.game.boss.image.get_rect(center=self.game.boss.rect.center)
 		self.game.boss.hitbox = self.rect.inflate(-100, -100)
-		self.enemy_group.empty()
 		self.game.player.hp = 5
 		# Man you got to level 2
 		c.event = Event.NEXTLEVEL
-		level.stage += 1
+		c.level.stage += 1
