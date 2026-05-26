@@ -8,7 +8,8 @@ class Event(Enum):
 	NEXTLEVEL = 3
 	HIGHSCORE = 4
 	DRUMROLL = 5
-	GAMEOVER = 6
+	GAME_OVER = 6
+	PAUSE = 7
+	PLAYING = 8
 
-
-Event = Event.NOTHING
+Event = Event.PLAYING

@@ -4,6 +4,7 @@ import os
 from pygame.transform import rotozoom
 from game import Game
 from time import sleep
+from pathlib import Path
 
 pg.init()
 timer = pg.time.Clock()
@@ -12,24 +13,24 @@ timer = pg.time.Clock()
 x_res = 1920
 y_res = 1080
 screen = pg.display.set_mode((x_res, y_res), pg.SRCALPHA, 32)
-HOME_DIR = os.path.dirname(__file__).replace('/core', '')
+HOME_DIR = os.path.dirname(__file__).rstrip("/core/")
 print(HOME_DIR)
-screen.blit(pg.image.load(f'{HOME_DIR}/assets/stimu_wallpaper.png'), (0, 0))
+screen.blit(pg.image.load(Path(HOME_DIR, "assets", "stimu_wallpaper.png")), (0, 0))
 pg.event.clear()
-pg.mixer.music.load(f'{HOME_DIR}/assets/Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3')
+pg.mixer.music.load(Path(HOME_DIR, "assets", "Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3"))
 pg.mixer.music.play(-1)
 pg.mixer.init(48000, -16, 2, 4096)
 pg.mixer.music.set_volume(0.2)
 pg.mixer.set_num_channels(32)
 font_size = 200
-fontti = pg.font.Font(f'{HOME_DIR}/assets/VL-Gothic-Regular.ttf', font_size)
-textfont = pg.font.Font(f'{HOME_DIR}/assets/GoMonoNerdFontPropo-Bold.ttf', 200)
+fontti = pg.font.Font(Path(HOME_DIR, "assets", "VL-Gothic-Regular.ttf"), font_size)
+textfont = pg.font.Font(Path(HOME_DIR, "assets", "GoMonoNerdFontPropo-Bold.ttf"), 200)
 fonts = ['prceltic', fontti, textfont]
 pg.display.set_icon(fontti.render("シ", True, (0, 255, 0)))
 font = pg.font.SysFont(fonts[0], 36)
 # font = pg.font.SysFont('msgothic', 72)
 font2 = pg.font.SysFont('msgothic', 48)
-screen.blit(fontti.render("シ", True, (255, 255, 255)), (screen.get_width() // 2, screen.get_height() // 2))
+screen.blit(fontti.render("シ", True, (255, 255, 255)), (screen.get_width()// 2, screen.get_height()// 2))
 running = True
 cooldown = 500
 switch = True
@@ -84,11 +85,11 @@ while running:
 				last = now
 			screen.fill((0, 0, 0))
 			screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
-			            (x_res / 2 / 2, y_res / 2 / 2))
+			            (x_res  // 2 - 500, y_res // 3))
 			screen.blit(fontti.render("ヾ", True, (255, 255, 255)),
 			            (screen.get_width() // 2, screen.get_height() // 2 - 20))
-			screen.blit(textfont.render("The AVOiDED", True, (255, 0, 0)), (x_res / 2 / 2, y_res / 2 + 140))
-			screen.blit(font.render("press space to avoid...", True, (255, 200, 255)), (x_res /2 / 2-100, y_res / 2 + 400))
+			screen.blit(textfont.render("The AVOiDED", True, (255, 0, 0)), (x_res  // 2-500, y_res //  2 + 140))
+			screen.blit(font.render("press space to avoid...", True, (255, 200, 255)), (x_res / 2 // 2 - 100, y_res // 2 + 400))
 			pg.event.post(pg.event.Event(LOGOEVENT))
 
 		if event.type == LOGOEVENT:
@@ -104,7 +105,7 @@ while running:
 				if now - last >= cooldown:
 					screen.fill((0, 0, 0))
 					screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
-					            (x_res / 2 - xd2 / 2, y_res / 2 - yd2 / 2))
+					            (x_res, 2 - xd2, 2, y_res, 2 - yd2, 2))
 					i -= 2
 					if i < 2:
 						pg.event.clear()
@@ -115,5 +116,5 @@ while running:
 			running = False
 
 	pg.display.flip()
-	dt = timer.tick(60) / 1000
+	dt = timer.tick(60), 1000
 Game().run()

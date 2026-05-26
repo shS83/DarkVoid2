@@ -2,8 +2,7 @@ import pygame as pg
 import config as c
 from pygame.transform import rotozoom
 import random
-
-from core.utils import get_random_position, get_random_velocity
+from pathlib import Path
 from entities.explosion import Explosion
 from entities.particle import Particle
 from entities.bullet import EnemyBullet
@@ -23,14 +22,14 @@ class Enemy(pg.sprite.Sprite):
 		else:
 			self.boss_time = False
 		if self.boss_time:
-			self.boss = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/alus2.png").convert_alpha(), 180, 1)
+			self.boss = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "alus2.png")).convert_alpha(), 180, 1)
 		self.boss_hp = 150
-		self.image = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/purplealus.png").convert_alpha(), 180, 0.3)
-		self.image2 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/redhawk.png").convert_alpha(), 180, 0.3)
-		self.image4 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/redalus.png").convert_alpha(), 180, 0.3)
-		self.image5 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/grayship.png").convert_alpha(), 180, 0.3)
-		self.image6 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/bluehawk.png").convert_alpha(), 180, 0.3)
-		self.image7 = rotozoom(pg.image.load(f"{c.HOME_DIR}/assets/blackhawk.png").convert_alpha(), 180, 0.3)
+		self.image = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "purplealus.png")).convert_alpha(), 180, 0.3)
+		self.image2 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "redhawk.png")).convert_alpha(), 180, 0.3)
+		self.image4 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "redalus.png")).convert_alpha(), 180, 0.3)
+		self.image5 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "grayship.png")).convert_alpha(), 180, 0.3)
+		self.image6 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "bluehawk.png")).convert_alpha(), 180, 0.3)
+		self.image7 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "blackhawk.png")).convert_alpha(), 180, 0.3)
 		self.images = [self.image2, self.image4, self.image5, self.image6, self.image7]
 		if self.boss_time:
 			self.image = self.boss

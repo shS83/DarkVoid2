@@ -1,3 +1,4 @@
+from pygame import mixer
 import pygame as pg
 import config as c
 from entities.events import Event
@@ -10,32 +11,39 @@ from entities.asteroid import Meteor
 from entities.level import *
 from core.hs_module import HighScore
 from entities.level import Level
+from pathlib import Path
 c.Level = Level()
 
-def mixer_init():
-	pg.mixer.init()
+def mixing():
+	mixer.init()
 	tunes = ["1000 Handz - Reps.mp3", "1000 Handz - Announcement.mp3", "1000 Handz - No Option.mp3",
 	         "Colorcast - Coffee Break.mp3", "Colorcast - Drown.mp3", "Colorcast - Need.mp3",
 	         "Jahzzar - Forest Pan.mp3", "Jahzzar - Pink Fluid.mp3", "Lightning Traveler - Celestial Drift.mp3",
 	         "Lightning Traveler - Eclipse Horizon.mp3", "Lightning Traveler - Event Horizon.mp3",
 	         "Lightning Traveler - Lunar Echo.mp3", "Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3"]
-	pg.mixer.music.load(f"{c.HOME_DIR}/assets/{random.choice(tunes)}")
-	pg.mixer.music.play(-1)
-	pg.mixer.init(48000, -16, 2, 4096)
-	pg.mixer.music.set_volume(0.2)
-	pg.mixer.set_num_channels(32)
+	mixer.music.load(Path(c.HOME_DIR, "assets", f"{random.choice(tunes)}"))
+	mixer.music.play(-1)
+	mixer.init(48000, -16, 2, 4096)
+	mixer.music.set_volume(0.2)
+	mixer.set_num_channels(32)
 
 
 class Game:
 	def __init__(self):
 		pg.init()
-		mixer_init()
-		if c.Event == Event.NEXTLEVEL:
+		mixing()
+		self.enemies = pg.sprite.Group()
+		self.boss_group = pg.sprite.Group()
+		self.enemy_bullets = pg.sprite.Group()
+		self.texts = pg.sprite.Group()
+		self.powerups = pg.sprite.Group()
+		self.effects = pg.sprite.Group()
+		self.asteroids = pg.sprite.Group()
+		if c.Event == c.Event.NEXTLEVEL:
 			self.boss = Boss(self, (c.WIDTH // 2, -300))
-			self.boss.image = pg.transform.scale(pg.image.load(f"{c.HOME_DIR}/assets/foobarhead1.png"), (160, 160))
+			self.boss.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")), (160, 160))
 			self.boss_time = c.BOSS_TIME
-			self.enemies.add(self.boss)
-			self.all_sprites.add(self.boss)
+			self.boss_group.add(self.boss)
 		else:
 			self.boss = None
 			self.boss_time = False
@@ -52,30 +60,24 @@ class Game:
 		self.explosion_frames = []
 		self.boss_explosion_frames = []
 		self.enemy_spawn_timer = 0
-		self.enemy_spawn_delay = c.level.enemy_spawn_delay
+		self.enemy_spawn_delay = random.uniform(1.5, 10.0)
 		self.asteroids = pg.sprite.Group()
 		self.asteroid_spawn_timer = 0
-		self.asteroid_spawn_delay = c.level.asteroid_spawn_delay
+		self.asteroid_spawn_delay = random.uniform(5, 20)
 		self.rock_images = []
 		for i in range(1, 5):
-			img = pg.image.load(f"{c.HOME_DIR}/assets/rock_{i}.png").convert_alpha()
+			img = pg.image.load(Path(c.HOME_DIR, "assets", f"rock_{i}.png")).convert_alpha()
 			self.rock_images.append(img)
 		for i in range(1, 32):
-			img = pg.image.load(f"{c.HOME_DIR}/assets/exp_{i}.png").convert_alpha()
+			img = pg.image.load(Path(c.HOME_DIR, "assets", f"exp_{i}.png")).convert_alpha()
 			img = pg.transform.scale(img, (320, 320))
 			self.explosion_frames.append(img)
 		for i in range(1, 32):
-			img = pg.image.load(f"{c.HOME_DIR}/assets/exp_{i}.png").convert_alpha()
+			img = pg.image.load(Path(c.HOME_DIR, "assets", f"exp_{i}.png")).convert_alpha()
 			img = pg.transform.scale(img, (640, 640))
 			self.boss_explosion_frames.append(img)
-		self.background = pg.image.load(f"{c.HOME_DIR}/assets/space_background.png").convert()
+		self.background = pg.image.load(Path(c.HOME_DIR, "assets", "space_background.png")).convert()
 		self.background = pg.transform.scale(self.background, (c.WIDTH, c.HEIGHT))
-		self.enemies = pg.sprite.Group()
-		self.enemy_bullets = pg.sprite.Group()
-		self.texts = pg.sprite.Group()
-		self.powerups = pg.sprite.Group()
-		self.effects = pg.sprite.Group()
-		self.asteroids = pg.sprite.Group()
 		self.direction = 1
 		self.px = c.WIDTH // 2
 		self.py = -42
@@ -271,7 +273,19 @@ class Game:
 		self.asteroids.draw(self.screen)
 		self.all_sprites.draw(self.screen)
 
-		if c.Event == Event.NEXTLEVEL:
+		if c.Event == c.Event.PAUSE:
+			pausesurface = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
+			pausesurface.fill((0, 0, 0, 120))
+
+			pausetext = self.game_over_font.render("| |", True, (255, 255, 255))
+			pause_rect = pausetext.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2))
+
+			pausesurface.blit(pausetext, pause_rect)
+			self.screen.blit(pausesurface, (0, 0))
+
+		pg.display.flip()
+
+		if c.Event == c.Event.NEXTLEVEL:
 			# Screen whitening
 			if self.overlay_timer > 0:
 				self.overlay_timer -= self.dt / 2
@@ -366,10 +380,17 @@ class Game:
 					self.running = False
 				if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
 					self.running = False
-				if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-					...
-			self.update(dt)
+				if event.type == pg.KEYDOWN and event.key == pg.K_PAUSE:
+					if c.Event == c.Event.PAUSE:
+						c.Event = c.Event.DRUMROLL
+						c.Event = c.Event.PLAYING
+					elif c.Event != c.Event.PAUSE:
+						c.Event = c.Event.PAUSE
+
+			if c.Event != c.Event.PAUSE:
+				self.update(dt)
 			self.draw()
+
 
 		scores = HighScore("John", self.score)
 		scores.load_scores()
@@ -377,8 +398,7 @@ class Game:
 
 
 pg.quit()
-# pg.mixer.music.stop()
-pg.mixer.quit()
+mixer.quit()
 
 if __name__ == "__main__":
 	game = Game()

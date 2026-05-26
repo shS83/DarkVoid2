@@ -2,7 +2,7 @@ import random
 import pygame as pg
 import config as c
 from entities.glitter import Glitter
-
+from pathlib import Path
 
 class PowerUp(pg.sprite.Sprite):
 	def __init__(self, game, pos, kind=None):
@@ -12,7 +12,7 @@ class PowerUp(pg.sprite.Sprite):
 		self.kind = kind or random.choice(["spread", "health", "speed", "laser", "cannon"])
 		self.pos = pg.Vector2(pos)
 
-		path = f"{c.HOME_DIR}/assets/powerup-{self.kind}.png"
+		path = Path(c.HOME_DIR, "assets", f"powerup-{self.kind}.png")
 		self.image = pg.image.load(path).convert_alpha()
 		self.image = pg.transform.scale(self.image, (46, 46))
 		self.size = random.randint(4, 8)

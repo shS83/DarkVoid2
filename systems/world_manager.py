@@ -11,13 +11,13 @@ class MapManager:
 
         self.ocean_images = [
             self.scale_to_screen_width(
-                pg.image.load(f"{c.HOME_DIR}/assets/backgrounds/ocean/sea_chunk_1.png").convert()
+                pg.image.load(Path(c.HOME_DIR / "assets" / "backgrounds/ocean/sea_chunk_1.png")).convert()
             ),
             self.scale_to_screen_width(
-                pg.image.load(f"{c.HOME_DIR}/assets/backgrounds/ocean/sea_chunk_2.png").convert()
+                pg.image.load(Path(c.HOME_DIR / "assets" / "backgrounds/ocean/sea_chunk_2.png")).convert()
             ),
             self.scale_to_screen_width(
-                pg.image.load(f"{c.HOME_DIR}/assets/backgrounds/ocean/sea_chunk_3.png").convert()
+                pg.image.load(Path(c.HOME_DIR / "assets" / "backgrounds/ocean/sea_chunk_3.png")).convert()
             ),
         ]
 

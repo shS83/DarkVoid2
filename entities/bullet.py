@@ -1,9 +1,9 @@
 import pygame as pg
 import config as c
-
+from pathlib import Path
 
 class PlayerBullet(pg.sprite.Sprite):
-	def __init__(self, game, pos, image=pg.image.load(f"{c.HOME_DIR}/assets/laser.png").convert_alpha(), velocity=(0, -800)):
+	def __init__(self, game, pos, image=pg.image.load(Path(c.HOME_DIR, "assets", "laser.png")).convert_alpha(), velocity=(0, -800)):
 		super().__init__()
 
 		self.game = game
