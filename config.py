@@ -49,11 +49,14 @@ DING = pg.mixer.Sound(f'{HOME_DIR}/assets/ding.mp3')
 BEACHES=[BEACH1, BEACH2, BEACH3, BEACH4]
 BACKGROUND = BEACH3
 ROCK_IMAGES = [ROCK1, ROCK2, ROCK3, ROCK4, ROCK5, ROCK6]
+BOSS = [{"name": "Dark Crusader", "lvl": 1, "boss_hp": 300, "boss_time": 3000, "boss_image": BOSS1},
+		{"name": "Illithid", "lvl": 2, "boss_hp": 400, "boss_time": 4000, "boss_image": BOSS2},
+		{"name":"Fubar", "lvl": 3, "boss_hp": 500, "boss_time": 5000, "boss_image": BOSS3}]
 SHIELD = False
 WIDTH = 1920
 HEIGHT = 1080
 BOSS_TIME = False
-SCALE = 0.4
+SCALE = 0.3
 HOME_DIR = os.path.dirname(__file__)
 MSG_FONT = pg.font.SysFont(f'{HOME_DIR}/assets/GoMonoNerdFontPropo-Bold.ttf', 60)
 GOTHIC_FONT = pg.font.Font(f'{HOME_DIR}/assets/VL-Gothic-Regular.ttf', 36)

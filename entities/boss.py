@@ -30,6 +30,7 @@ class Boss(pg.sprite.Sprite):
 		self.flash_timer = 0.2
 		self.rect = self.image.get_rect(center=pos)
 		self.pos = pg.Vector2(self.rect.center)
+		self.hitbox = self.rect.inflate(-56, -56)
 		self.pos.y = -160
 		self.pos.x = c.WIDTH // 2
 		self.thruster_timer = 0.04
@@ -187,7 +188,7 @@ class Boss(pg.sprite.Sprite):
 			self.next_phase()
 
 	def phase_desperation(self, dt):
-		self.shoot_delay = self.test_delay + 0.05
+		self.shoot_delay = self.test_delay + 0.1
 		print("desperate phase")
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay

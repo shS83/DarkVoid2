@@ -175,12 +175,17 @@ class Game:
 				self.all_sprites.add(enemy)
 				return
 
-	def boss_spawn(self):
+	def boss_spawn(self, name: str = "Werner", lvl: int = 1, image: pg.image or None = c.BOSS2, hp: int = 3000):
+		print(f"{len(self.enemies)} enemies + 1 boss = {len(self.enemies)+1}")
 		if self.boss is not None:
 			return
-
+		self.boss.name = name
+		self.boss.lvl = lvl
+		self.boss.image = image
+		self.boss.hp = hp
+		self.hitbox = pg.rect.inflate(self.boss.image.get_rect(), -10)
 		c.BOSS_TIME = True
-		print(f"lisättiin tason {c.level.stage} bossi")
+		print(f"lisättiin tason {c.level.stage} bossi {name} {lvl} {image.path}")
 
 		if self.boss is not None:
 			print("boss already exists")
@@ -215,10 +220,7 @@ class Game:
 		# self.all_sprites.add(self.boss)
 		print("boss created:", self.boss.pos)
 		print("boss added to groups")
-		#
-		# self.boss = Boss(self, (c.WIDTH // 2, -300))
-		# self.enemies.add(self.boss)
-		# self.all_sprites.add(self.boss)
+
 
 		if self.player.rect.colliderect(self.boss.rect) and not self.player.invincible_timer > 0:
 			if not self.player.shield_active:
@@ -293,10 +295,11 @@ class Game:
 				and self.boss is None
 		):
 			print("bossi spawnautumassa")
-
+			self.boss=Boss(self, (c.WIDTH // 2, -160))
 			self.boss_timer = 0
 			self.boss_spawned_this_level = True
-			self.boss_spawn()
+			print(f"you're fighting {c.BOSS[0].get("name")}")
+			self.boss_spawn(name=c.BOSS[0].get("name"), lvl=c.BOSS[0].get("lvl"), image=c.BOSS[0].get("boss_image"), hp=c.BOSS[0].get("boss_hp"))
 
 		if not self.player.alive:
 			self.game_over = True

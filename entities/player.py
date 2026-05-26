@@ -197,7 +197,10 @@ class Player(pg.sprite.Sprite):
 			self.shield = True
 		if keys[pg.K_F8]:
 			from entities.boss import Boss
-			self.game.boss = Boss(self.game, (random.randrange(0, 1920), -100))
+			#self.game.boss = Boss(self.game, (random.randrange(0, 1920), -100))
+			c.BOSS_TIME = True
+			c.BOSS_SPAWN_DELAY = 0
+			self.game.spawn_boss()
 		if keys[pg.K_F9]:
 			powerup = PowerUp(self.game, (random.randrange(0, 1920), 0), kind=random.choice(["health", "speed", "spread", "laser", "cannon", "shield"]))
 			self.game.powerups.add(powerup)
