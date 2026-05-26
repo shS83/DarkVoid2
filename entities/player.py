@@ -184,7 +184,8 @@ class Player(pg.sprite.Sprite):
 		if not keys[pg.K_LSHIFT]:
 			self.speed = c.PLAYER_SPEED
 		if keys[pg.K_LALT]:
-			self.shield_active = True
+			if self.shield:
+				self.shield_active = True
 		# if not keys[pg.K_LALT]:
 		#	self.shield_active = False
 
@@ -197,7 +198,8 @@ class Player(pg.sprite.Sprite):
 		if keys[pg.K_F7]:
 			self.shield = True
 		if keys[pg.K_F8]:
-			self.game.boss_spawn()
+			from entities.boss import Boss
+			self.game.boss = Boss(self.game, (random.randrange(0, 1920), -100))
 		if keys[pg.K_F9]:
 			powerup = PowerUp(self.game, (random.randrange(0, 1920), 0), kind=random.choice(["health", "speed", "spread", "laser", "cannon", "shield"]))
 			self.game.powerups.add(powerup)

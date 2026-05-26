@@ -23,13 +23,13 @@ class Shield(pg.sprite.Sprite):
 
     def update(self, dt):
         if self.glitter_timer <= 0:
-            self.glitter_timer = 0.025
+            self.glitter_timer = 0.005
         self.life -= dt
         self.glitter_timer -= dt
-        for _ in range(8):
+        for _ in range(16):
             glitter_pos = (
-                self.rect.centerx + random.randint(-160, 160),
-                self.rect.centery + random.randint(-160, 160),
+                self.rect.centerx + random.randint(-100, 100),
+                self.rect.centery + random.randint(-100, 100),
             )
 
             glitter = Glitter(self.game, glitter_pos)

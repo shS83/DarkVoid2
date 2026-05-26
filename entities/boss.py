@@ -10,7 +10,7 @@ from entities.level import *
 from pathlib import Path
 
 class Boss(pg.sprite.Sprite):
-	def __init__(self, game, pos, boss=True):
+	def __init__(self, game, pos, boss=False):
 		super().__init__()
 		self.game = game
 		self.test_delay = 0.25 # Tight knit
@@ -18,15 +18,16 @@ class Boss(pg.sprite.Sprite):
 		self.shoot_timer = 0.001
 		self.shoot_delay = 0.001
 		self.pos = pg.Vector2(pos)
-		self.pos.y = -c.level.boss_timer
 		self.entering = False
 		self.hp = 300
 		self.phase_index = 0
 		self.phase_timer = 0
 		self.boss_timer = c.level.boss_timer
+		if c.level.stage == 3:
+			self.image = pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")).convert_alpha()
+			self.hitbox = self.rect.inflate(-100, -100)
 		if c.level.stage == 2:
 			self.image = pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")).convert_alpha()
-			self.rect = self.image.get_rect(center=pos)
 			self.hitbox = self.rect.inflate(-100, -100)
 		if c.level.stage == 1:
 			self.image = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "alus2.png")).convert_alpha(), 180, 1)
@@ -37,6 +38,8 @@ class Boss(pg.sprite.Sprite):
 		self.flash_timer = 0
 		self.rect = self.image.get_rect(center=pos)
 		self.pos = pg.Vector2(self.rect.center)
+		self.pos.y = -900
+		self.pos.x = c.WIDTH // 2
 		self.thruster_timer = 0.04
 		self.speed = 30
 		self.phases = [

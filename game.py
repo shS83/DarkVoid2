@@ -44,25 +44,8 @@ class Game:
 		self.powerups = pg.sprite.Group()
 		self.effects = pg.sprite.Group()
 		self.asteroids = pg.sprite.Group()
-		if c.level.stage == 3:
-			print("nextlevel shite")
-			self.boss = Boss(self, (c.WIDTH // 2, -300))
-			self.boss.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")), (160, 160))
-			self.boss_time = c.BOSS_TIME
-			self.boss_group.add(self.boss)
-		elif c.level.stage == 2:
-			self.boss = Boss(self, (c.WIDTH // 2, -300))
-			self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")), 0.5)
-			self.boss_time = c.BOSS_TIME
-			self.boss_group.add(self.boss)
-		elif c.level.stage == 1:
-			self.boss = Boss(self, (c.WIDTH // 2, -300))
-			self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "alus2.png"))
-			self.boss_group.add(self.boss)
-		else:
-			self.boss = None
-			self.boss_time = False
-			self.boss.image = None
+		self.boss = None
+		self.boss_time = False
 		self.boss_timer = c.level.boss_timer
 		self.level_timer = 0
 		self.boss_spawn_delay = c.BOSS_SPAWN_DELAY
@@ -120,11 +103,6 @@ class Game:
 		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 90))
 		self.all_sprites.add(self.player)
 		self.player_bullets = pg.sprite.Group()
-		if self.boss_timer <= 0 and self.level_timer >= self.boss_spawn_delay and not self.boss:
-			print("lisättiin bossi")
-			self.boss = Boss(self, (c.WIDTH // 2, -300))
-			self.enemies.add(self.boss)
-			self.all_sprites.add(self.boss)
 		self.stars = pg.sprite.Group()
 
 		for _ in range(200):
@@ -198,14 +176,36 @@ class Game:
 				return
 
 	def boss_spawn(self):
-		if self.boss is not None or self.boss_timer > 0:
-			return
-		# IF RANDOMEVENT THEN SPAWN 8 ASTEROIDS
-
-		c.BOSS_TIME = True
-		self.boss = Boss(self, (c.WIDTH // 2, -300))
-		self.enemies.add(self.boss)
-		self.all_sprites.add(self.boss)
+# 		if self.boss is not None or self.boss_timer > 0 or not self.override:
+#			return
+		if self.boss_timer <= 0 and self.level_timer >= self.boss_spawn_delay and not self.boss:
+			c.BOSS_TIME = True
+			print("lisättiin bossi")
+			if c.level.stage == 3:
+				print("nextlevel shite")
+				self.boss = Boss(self, (c.WIDTH // 2, -300))
+				self.boss.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")),
+													 (160, 160))
+				self.boss_time = c.BOSS_TIME
+				self.boss_group.add(self.boss)
+			elif c.level.stage == 2:
+				print("kakkone on ykköne")
+				self.boss = Boss(self, (c.WIDTH // 2, -300))
+				self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")), 0.5)
+				self.boss_time = c.BOSS_TIME
+				self.boss_group.add(self.boss)
+			elif c.level.stage == 1:
+				print("el virgo")
+				self.boss = Boss(self, (c.WIDTH // 2, -300))
+				self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "alus2.png"))
+				self.boss_group.add(self.boss)
+			else:
+				print("what's up, man")
+				pg.quit()
+		#
+		# self.boss = Boss(self, (c.WIDTH // 2, -300))
+		# self.enemies.add(self.boss)
+		# self.all_sprites.add(self.boss)
 
 		if self.player.rect.colliderect(self.boss.rect) and not self.player.invincible_timer > 0:
 			if not self.player.shield_active:
@@ -255,7 +255,6 @@ class Game:
 				break
 		if (
 				self.level_timer >= self.boss_spawn_delay
-				and not self.boss_spawned_this_level
 				and self.boss is None
 		):
 			print(" bossi spawnautumassa")
