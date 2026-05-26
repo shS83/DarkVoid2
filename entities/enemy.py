@@ -22,7 +22,7 @@ class Enemy(pg.sprite.Sprite):
 		else:
 			self.boss_time = False
 		if self.boss_time:
-			self.boss = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "alus2.png")).convert_alpha(), 180, 1)
+			self.boss = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png")).convert_alpha(), 180, 1)
 		self.boss_hp = 150
 		self.image = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "purplealus.png")).convert_alpha(), 180, 0.3)
 		self.image2 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "redhawk.png")).convert_alpha(), 180, 0.3)

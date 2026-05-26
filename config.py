@@ -1,15 +1,13 @@
 import pygame as pg
 import os
-from entities.level import Level
+
 from entities.events import Event
 
 pg.init()
 pg.mixer.init()
 pg.mixer.music.set_volume(0.2)
+HOME_DIR = os.path.dirname(__file__)
 
-Event = Event.PLAYING
-level = Level()
-Level.stage = 1
 x_res = 1920
 y_res = 1080
 screen = pg.display.set_mode((x_res, y_res), pg.SRCALPHA, 32)
@@ -22,11 +20,10 @@ PLAYER_FOCUS_SPEED = 180
 PLAYER_FIRE_COOLDOWN = 0.08
 ENEMY_BULLET_SPEED = 180
 ENEMY_BULLET_COOLDOWN = 0.01
-ENEMY_HP = level.enemy_hp
+ENEMY_HP = 5
 PLAYER_BULLET_SPEED = 350
 PLAYER_HITBOX_RADIUS = 4
-HOME_DIR = os.path.dirname(__file__)
-BOSS1 = pg.image.load(f'{HOME_DIR}/assets/alus2.png').convert_alpha()
+BOSS1 = pg.image.load(f'{HOME_DIR}/assets/dark-crusader.png').convert_alpha()
 BOSS2 = pg.image.load(f'{HOME_DIR}/assets/boss-2.png').convert_alpha()
 BOSS3 = pg.image.load(f'{HOME_DIR}/assets/foobarhead1.png').convert_alpha()
 ROCK1 = pg.image.load(f'{HOME_DIR}/assets/rock_1.png').convert_alpha()
@@ -60,3 +57,4 @@ SCALE = 0.3
 HOME_DIR = os.path.dirname(__file__)
 MSG_FONT = pg.font.Font(f'{HOME_DIR}/assets/GoMonoNerdFontPropo-Bold.ttf', 60)
 GOTHIC_FONT = pg.font.Font(f'{HOME_DIR}/assets/VL-Gothic-Regular.ttf', 36)
+event = Event.DRUMROLL

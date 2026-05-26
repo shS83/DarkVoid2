@@ -10,6 +10,7 @@ from entities.asteroid import Meteor
 from entities.level import *
 # from core.hs_module import HighScore
 from entities.level import Level
+from entities.events import Event
 from pathlib import Path
 from entities.shield import Shield
 c.Level = Level()
@@ -32,6 +33,12 @@ class Game:
 	def __init__(self):
 		pg.init()
 		mixing()
+		c.level = Level()
+		c.level.stage = 1
+		c.event = Event.INITIATION
+		c.HOME_DIR = Path(__file__).parent.absolute()
+		print(c.HOME_DIR)
+		self.bosses=[]
 		self.screen = pg.display.set_mode((c.WIDTH, c.HEIGHT), pg.SRCALPHA, 32)
 		self.clock = pg.time.Clock()
 		self.dt = self.clock.tick(60) / 1000
@@ -86,7 +93,7 @@ class Game:
 		self.next_level_backdrop_alpha = 20
 		self.next_level_backdrop_scale = 0.1
 		self.overlay_timer = 2000
-		self.game_over_font = pg.font.SysFont(f'{c.HOME_DIR}/assets/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
+		self.game_over_font = pg.font.Font(f'{c.HOME_DIR}/assets/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
 		self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
 		self.next_level_text = self.game_over_font.render("Next Stage", True, (200, 200, 255))
 		self.next_level_backdrop_alpha = 235
@@ -145,9 +152,20 @@ class Game:
 
 
 	def spawn_enemy(self):
-
+		global bosses
 		if random.random() < 0.15:
 			self.spawn_rocks()
+
+		if random.random() < 0.2 and len(self.bosses) < 1:
+			c.BOSS_TIME = True
+			self.boss = Boss(self, (c.WIDTH // 2, -900))
+			self.boss_max_y = 160
+
+			bosses.append(self.boss)
+			self.enemies.add(self.boss)
+			self.boss_group.add(self.boss)
+			self.all_sprites.add(self.boss)
+			self.boss_spawn()
 
 		for _ in range(20):  # try 20 times
 			x = random.randint(50, c.WIDTH - 50)
@@ -184,6 +202,7 @@ class Game:
 		self.boss.hp = hp
 		self.hitbox = pg.rect.inflate(self.boss.image.get_rect(), -10)
 		c.BOSS_TIME = True
+		bosses.append(self.boss)
 		print(f"lisättiin tason {c.level.stage} bossi {name} {lvl} {image.path}")
 
 		if self.boss is not None:
@@ -209,7 +228,7 @@ class Game:
 		else:
 			print("el virgo")
 			self.boss = Boss(self, (c.WIDTH // 2, -160))
-			self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "alus2.png"))
+			self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png"))
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
 			self.all_sprites.add(self.boss)
@@ -228,6 +247,10 @@ class Game:
 				pg.mixer.Sound(f"{c.HOME_DIR}/assets/ding.mp3").play()
 
 	def update(self, dt):
+		self.enemies.update(dt)
+		self.boss_group.update(dt)
+		self.enemy_bullets.update(dt)
+		self.player_bullets.update(dt)
 		self.stars.update(dt)
 		self.asteroids.update(dt)
 		self.all_sprites.update(dt)
@@ -296,9 +319,12 @@ class Game:
 			print("bossi spawnautumassa")
 			self.boss=Boss(self, (c.WIDTH // 2, -160))
 			self.boss_timer = 0
-			self.boss_spawned_this_level = True
+			self.boss_spawned_this_level = False
+			self.boss_spawn_delay = 0
+			c.BOSS_TIME = True
 			print(f"you're fighting {c.BOSS[0].get("name")}")
 			self.boss_spawn(name=c.BOSS[0].get("name"), lvl=c.BOSS[0].get("lvl"), image=c.BOSS[0].get("boss_image"), hp=c.BOSS[0].get("boss_hp"))
+			self.bosses.append(self.boss)
 
 		if not self.player.alive:
 			self.game_over = True
@@ -315,7 +341,10 @@ class Game:
 			return
 
 	def draw(self):
+		self.effects.draw(self.screen)
 		self.screen.blit(self.background, (0, 0))
+		self.enemies.draw(self.screen)
+		self.boss_group.draw(self.screen)
 		self.powerups.draw(self.screen)
 		self.stars.draw(self.screen)
 		self.hud.draw(self.screen)
@@ -325,7 +354,7 @@ class Game:
 		if c.Event == c.Event.PAUSE:
 			pausesurface = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
 			pausesurface.fill((0, 0, 0, 120))
-
+			mixer.fadeout(1000)
 			pausetext = self.game_over_font.render("| |", True, (255, 255, 255))
 			pause_rect = pausetext.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2))
 
@@ -334,7 +363,7 @@ class Game:
 
 		pg.display.flip()
 
-		if c.Event == c.Event.NEXTLEVEL:
+		if c.event == c.Event.NEXTLEVEL:
 			# self.overlay_timer = c.OVERLAY_TIMER
 			# Screen whitening
 #			if self.overlay_timer > 0:
@@ -361,7 +390,7 @@ class Game:
 			banner_rect = self.banner.get_rect(
 				center=(c.WIDTH // 2, c.HEIGHT // 2)
 			)
-			levelup_font = pg.font.SysFont(f'{c.HOME_DIR}/assets/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
+			levelup_font = pg.font.Font(f'{c.HOME_DIR}/assets/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
 			self.banner.set_alpha(20)
 			self.screen.blit(self.banner, banner_rect)
 
@@ -434,7 +463,7 @@ class Game:
 					self.running = False
 				if event.type == pg.KEYDOWN and event.key == pg.K_PAUSE:
 					if c.Event == c.Event.PAUSE:
-						c.Event = c.Event.DRUMROLL
+						mixer.play(-1)
 						c.Event = c.Event.PLAYING
 					elif c.Event != c.Event.PAUSE:
 						c.Event = c.Event.PAUSE
@@ -442,24 +471,21 @@ class Game:
 					self.player.speed = self.player.focus_speed
 				if c.SHIELD == True and event.type == pg.KEYDOWN and event.key == pg.K_LALT:
 
-					if not self.player.shield_active:
-						self.player.shield_active = True
+					self.player.shield_active = True
+					shield = Shield(self, self.player)
 
-						shield = Shield(self, self.player)
-
-						self.effects.add(shield)
-						self.all_sprites.add(shield)
-						self.player.shield_amount -= 1
+					self.effects.add(shield)
+					self.all_sprites.add(shield)
+					self.player.shield_amount -= 1
 
 				if event.type == pg.KEYUP and event.key == pg.K_LSHIFT:
 					self.player.speed = c.PLAYER_SPEED
 
 				if event.type == pg.KEYUP and event.key == pg.K_LALT:
-					if self.player.shield_active:
-						self.player.shield_active = False
+					self.player.shield_active = False
 
 
-			if c.Event != c.Event.PAUSE:
+			if c.event != c.Event.PAUSE:
 				self.update(dt)
 			self.draw()
 

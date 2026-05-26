@@ -182,10 +182,9 @@ class Player(pg.sprite.Sprite):
 		if not keys[pg.K_LSHIFT]:
 			self.speed = c.PLAYER_SPEED
 		if keys[pg.K_LALT]:
-			if self.shield:
-				self.shield_active = True
-		# if not keys[pg.K_LALT]:
-		#	self.shield_active = False
+			self.shield_active = True
+		if not keys[pg.K_LALT]:
+			self.shield_active = False
 
 		# if keys[pg.K_LCTRL]:
 		#	self.shoot_spread()
@@ -193,8 +192,8 @@ class Player(pg.sprite.Sprite):
 		if keys[pg.K_ESCAPE]:
 			pg.quit()
 		# For debugging
-		if keys[pg.K_F7]:
-			self.shield = True
+		#if keys[pg.K_F7]:
+		#	self.shield = True
 		if keys[pg.K_F8]:
 			from entities.boss import Boss
 			self.game.boss = Boss(self.game, (random.randrange(0, 1920), -100))
