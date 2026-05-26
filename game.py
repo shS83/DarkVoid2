@@ -152,20 +152,23 @@ class Game:
 
 
 	def spawn_enemy(self):
-		global bosses
+
 		if random.random() < 0.15:
 			self.spawn_rocks()
 
-		if random.random() < 0.2 and len(self.bosses) < 1:
+		if random.random() < 0.01 and len(self.bosses) < 1:
 			c.BOSS_TIME = True
-			self.boss = Boss(self, (c.WIDTH // 2, -900))
+			self.boss = Boss(self, (c.WIDTH // 2, -160))
 			self.boss_max_y = 160
 
-			bosses.append(self.boss)
+			self.bosses.append(self.boss)
 			self.enemies.add(self.boss)
 			self.boss_group.add(self.boss)
 			self.all_sprites.add(self.boss)
 			self.boss_spawn()
+
+		for b in self.bosses:
+			b.update(1/ 60/1000)
 
 		for _ in range(20):  # try 20 times
 			x = random.randint(50, c.WIDTH - 50)
@@ -192,32 +195,30 @@ class Game:
 				self.all_sprites.add(enemy)
 				return
 
-	def boss_spawn(self, name: str = "Werner", lvl: int = 1, image: pg.image or None = c.BOSS2, hp: int = 3000):
+	def boss_spawn(self, name: str = "Werner", lvl: int = 1, image: pg.image or None = c.BOSS2, hp: int = 300):
 		print(f"{len(self.enemies)} enemies + 1 boss = {len(self.enemies)+1}")
-		if self.boss is not None:
-			return
+		if self.boss is None:
+			print("boss was no-one")
+			self.boss = Boss(self, (c.WIDTH // 2, -160))
 		self.boss.name = name
 		self.boss.lvl = lvl
 		self.boss.image = image
 		self.boss.hp = hp
-		self.hitbox = pg.rect.inflate(self.boss.image.get_rect(), -10)
+		self.hitbox = self.boss.rect.inflate(-56, -56)
 		c.BOSS_TIME = True
-		bosses.append(self.boss)
-		print(f"lisättiin tason {c.level.stage} bossi {name} {lvl} {image.path}")
+		self.bosses.append(self.boss)
+		print(self.bosses)
+		print(f"lisättiin tason {c.level.stage} bossi {name} {lvl} {image} {hp}")
 
-		if self.boss is not None:
-			print("boss already exists")
-			return
 		if c.level.stage == 3:
 			print("nextlevel shite")
 			self.boss = Boss(self, (c.WIDTH // 2, -160))
-			self.boss.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")),
-												 (160, 160))
+			self.boss.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")),(240, 240))
 			self.boss_time = c.BOSS_TIME
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
 			self.all_sprites.add(self.boss)
-		elif c.level.stage == 2:
+		if c.level.stage == 2:
 			print("kakkone on ykköne")
 			self.boss = Boss(self, (c.WIDTH // 2, -160))
 			self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")), 0.5)
@@ -225,7 +226,7 @@ class Game:
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
 			self.all_sprites.add(self.boss)
-		else:
+		if c.level.stage == 1:
 			print("el virgo")
 			self.boss = Boss(self, (c.WIDTH // 2, -160))
 			self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png"))
@@ -247,6 +248,8 @@ class Game:
 				pg.mixer.Sound(f"{c.HOME_DIR}/assets/ding.mp3").play()
 
 	def update(self, dt):
+		for b in self.bosses:
+			b.update(dt)
 		self.enemies.update(dt)
 		self.boss_group.update(dt)
 		self.enemy_bullets.update(dt)
@@ -317,14 +320,15 @@ class Game:
 				and self.boss is None
 		):
 			print("bossi spawnautumassa")
-			self.boss=Boss(self, (c.WIDTH // 2, -160))
-			self.boss_timer = 0
-			self.boss_spawned_this_level = False
-			self.boss_spawn_delay = 0
-			c.BOSS_TIME = True
-			print(f"you're fighting {c.BOSS[0].get("name")}")
-			self.boss_spawn(name=c.BOSS[0].get("name"), lvl=c.BOSS[0].get("lvl"), image=c.BOSS[0].get("boss_image"), hp=c.BOSS[0].get("boss_hp"))
-			self.bosses.append(self.boss)
+			if len(self.bosses) == 0:
+				self.boss=Boss(self, (c.WIDTH // 2, -160))
+				self.boss_timer = 0
+				self.boss_spawned_this_level = True
+				self.boss_spawn_delay = 0
+				c.BOSS_TIME = True
+				print(f"you're fighting {c.BOSS[0].get("name")}")
+				self.boss_spawn(name=c.BOSS[0].get("name"), lvl=c.BOSS[0].get("lvl"), image=c.BOSS[0].get("boss_image"), hp=c.BOSS[0].get("boss_hp"))
+				self.bosses.append(self.boss)
 
 		if not self.player.alive:
 			self.game_over = True
@@ -381,7 +385,7 @@ class Game:
 			rect_width = c.WIDTH
 			rect_height = 300
 			self.banner = pg.Surface((rect_width, rect_height), pg.SRCALPHA)
-			self.banner.fill((255, 255, 255, int(self.next_level_backdrop_alpha)-self.overlay_timer//2))
+			self.banner.fill((255, 255, 255, int(self.next_level_backdrop_alpha-self.overlay_timer//2)))
 			if self.text_alpha > 1:
 				self.next_level_backdrop_alpha += 0.01
 			elif self.text_alpha < 100:
@@ -469,7 +473,7 @@ class Game:
 						c.Event = c.Event.PAUSE
 				if event.type == pg.KEYDOWN and event.key == pg.K_LSHIFT:
 					self.player.speed = self.player.focus_speed
-				if c.SHIELD == True and event.type == pg.KEYDOWN and event.key == pg.K_LALT:
+				if self.player.shield is True and event.type == pg.KEYDOWN and event.key == pg.K_LALT:
 
 					self.player.shield_active = True
 					shield = Shield(self, self.player)

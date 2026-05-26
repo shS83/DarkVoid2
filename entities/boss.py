@@ -1,3 +1,4 @@
+import random
 import pygame as pg
 from entities.events import Event
 from entities.particle import Particle
@@ -17,8 +18,8 @@ class Boss(pg.sprite.Sprite):
 		self.game = game
 		self.test_delay = 0.3 # Tight knit
 		self.thruster_timer = 0
-		self.shoot_timer = 0.01
-		self.shoot_delay = 0.01
+		self.shoot_timer = 0.15
+		self.shoot_delay = 0.10
 		self.entering = True
 		self.hp = 300
 		self.phase_index = 0
@@ -40,25 +41,25 @@ class Boss(pg.sprite.Sprite):
 			self.phase_intro,
 			self.phase_radial,
 			self.phase_spiral,
-			self.phase_desperation,
+			# self.phase_desperation,
 		]
 
 	def update(self, dt):
 		if self.pos.y < self.max_h:
 			self.entering = True
-			self.pos.y += self.speed * dt * 10
+			self.pos.y += self.speed * dt
 		else:
 			self.entering = False
 			self.pos.y = self.max_h
 
 		if self.pos.y < self.max_h:
-			self.pos.y += self.speed * dt * 10
+			self.pos.y += self.speed * dt
 			if self.pos.y > self.max_h:
 				self.pos.y = self.max_h
 
 		self.rect.center = self.pos
 		self.hitbox.center = self.rect.center
-		print("BOSS POS:", self.pos, "RECT:", self.rect)
+		# print("BOSS POS:", self.pos, "RECT:", self.rect)
 		self.shoot_timer -= dt
 		self.phase_timer += dt
 
@@ -83,13 +84,17 @@ class Boss(pg.sprite.Sprite):
 			self.image = self.base_image
 
 	def next_phase(self):
-		self.phase_index += 1
-		self.phase_timer = 1
+		self.phase_timer = 0
+
+		if self.phase_index < len(self.phases) - 1:
+			self.phase_index += 1
+		else:
+			self.phase_index = len(self.phases) - 1
 
 	def fire_bullet(self, pos, velocity):
 		self.shoot_timer = 0
 		self.shoot_delay = self.test_delay
-		print("fire bullet phase")
+		# print("fire bullet phase")
 		if self.shoot_timer <= self.shoot_delay:
 			self.shoot_timer = self.shoot_delay
 			bullet = EnemyBullet(self.game, pos, velocity)
@@ -100,7 +105,7 @@ class Boss(pg.sprite.Sprite):
 		self.shoot_timer = 0
 		self.shoot_delay = self.test_delay
 		direction = self.game.player.pos - self.pos
-		print("aimed shot phase")
+		# print("aimed shot phase")
 		if direction.length_squared() == 0:
 			direction = pg.Vector2(0, 1)
 		else:
@@ -113,7 +118,7 @@ class Boss(pg.sprite.Sprite):
 		self.shoot_timer = 0
 		self.shoot_delay = self.test_delay
 		direction = self.game.player.pos - self.pos
-		print("aimed spread phase")
+		# print("aimed spread phase")
 		if direction.length_squared() == 0:
 			direction = pg.Vector2(0, 1)
 		else:
@@ -134,7 +139,7 @@ class Boss(pg.sprite.Sprite):
 	def radial_burst(self, count=32, speed=190, offset=0):
 		self.shoot_timer = 0
 		self.shoot_delay = self.test_delay
-		print("radial burst")
+		# print("radial burst")
 		for i in range(count):
 			angle = offset + 360 * i / count
 			direction = pg.Vector2(1, 0).rotate(angle)
@@ -149,7 +154,7 @@ class Boss(pg.sprite.Sprite):
 	def spiral_burst(self, arms=4, speed=220):
 		self.shoot_timer = 0
 		self.shoot_delay = self.test_delay
-		print("spiral burst")
+		# print("spiral burst")
 		base_angle = self.phase_timer * 180
 
 		for i in range(arms):
@@ -164,13 +169,13 @@ class Boss(pg.sprite.Sprite):
 
 	def phase_intro(self, dt):
 		self.shoot_delay = self.test_delay
-		print("intro phase")
+		# print("intro phase")
 		if self.phase_timer > 3:
 			self.next_phase()
 
 	def phase_radial(self, dt):
 		self.shoot_delay = self.test_delay
-		print("radial phase")
+		# print("radial phase")
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
 			self.radial_burst(count=28, speed=180, offset=self.phase_timer)
@@ -180,7 +185,7 @@ class Boss(pg.sprite.Sprite):
 
 	def phase_spiral(self, dt):
 		self.shoot_delay = self.test_delay
-		print("spiral phase")
+		#print("spiral phase")
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
 			self.spiral_burst(arms=5, speed=230)
@@ -190,7 +195,7 @@ class Boss(pg.sprite.Sprite):
 
 	def phase_desperation(self, dt):
 		self.shoot_delay = self.test_delay + 0.1
-		print("desperate phase")
+		# print("desperate phase")
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
 			self.aimed_spread(count=9, speed=300, spread=70)
@@ -270,7 +275,7 @@ class Boss(pg.sprite.Sprite):
 		c.event = c.Event.NEXTLEVEL
 		c.level.stage += 1
 		self.game.player.hp = c.level.lives
-
+		self.game.bosses.clear()
 
 # class Ender(Boss):
 # 	def __init__(self, game, name: str = "Dark Crusader", pos: pg.Vector2 = pg.Vector2(0, 1), image: pg.Surface = pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png")).convert_alpha()):
