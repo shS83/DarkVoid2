@@ -197,42 +197,44 @@ class Game:
 
 	def boss_spawn(self, name: str = "Werner", lvl: int = 1, image: pg.image or None = c.BOSS2, hp: int = 300):
 		print(f"{len(self.enemies)} enemies + 1 boss = {len(self.enemies)+1}")
-		if self.boss is None and len(self.bosses) < 1:
+		if self.boss is None:
 			print("boss was no-one")
 			self.boss = Boss(self, (c.WIDTH // 2, -160))
-			self.boss.name = name
-			self.boss.lvl = lvl
-			self.boss.image = image
-			self.boss.hp = hp
-			self.hitbox = self.boss.rect.inflate(-56, -56)
-			c.BOSS_TIME = True
-			self.bosses.append(self.boss)
-			print(self.bosses)
-			print(f"lisättiin tason {c.level.stage} bossi {name} {lvl} {image} {hp}")
+		self.boss.name = name
+		self.boss.lvl = lvl
+		self.boss.image = image
+		self.boss.hp = hp
+		self.hitbox = self.boss.rect.inflate(-56, -56)
+		c.BOSS_TIME = True
+		self.bosses.append(self.boss)
+		print(self.bosses)
+		print(f"lisättiin tason {c.level.stage} bossi {name} {lvl} {image} {hp}")
 
-			if c.level.stage == 3:
-				print("nextlevel shite")
-				self.boss = Boss(self, (c.WIDTH // 2, -200))
-				self.boss.image = pg.transform.smoothscale(pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")),(240, 240))
-				self.boss_time = c.BOSS_TIME
-				self.boss_group.add(self.boss)
-				self.enemies.add(self.boss)
-				self.all_sprites.add(self.boss)
-			if c.level.stage == 2:
-				print("kakkone on ykköne")
-				self.boss = Boss(self, (c.WIDTH // 2, -400))
-				self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")), 0.5)
-				self.boss_time = c.BOSS_TIME
-				self.boss_group.add(self.boss)
-				self.enemies.add(self.boss)
-				self.all_sprites.add(self.boss)
-			if c.level.stage == 1:
-				print("el virgo")
-				self.boss = Boss(self, (c.WIDTH // 2, -300))
-				self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png"))
-				self.boss_group.add(self.boss)
-				self.enemies.add(self.boss)
-				self.all_sprites.add(self.boss)
+		if c.level.stage == 3:
+			print("nextlevel shite")
+			self.boss = Boss(self, (c.WIDTH // 2, -200))
+			self.boss.image = pg.transform.smoothscale(pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")),(240, 240))
+			self.boss_time = c.BOSS_TIME
+			self.boss_group.add(self.boss)
+			self.enemies.add(self.boss)
+			self.all_sprites.add(self.boss)
+
+		if c.level.stage == 2:
+			print("kakkone on ykköne")
+			self.boss = Boss(self, (c.WIDTH // 2, -400))
+			self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")), 0.5)
+			self.boss_time = c.BOSS_TIME
+			self.boss_group.add(self.boss)
+			self.enemies.add(self.boss)
+			self.all_sprites.add(self.boss)
+
+		if c.level.stage == 1:
+			print("el virgo")
+			self.boss = Boss(self, (c.WIDTH // 2, -300))
+			self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png"))
+			self.boss_group.add(self.boss)
+			self.enemies.add(self.boss)
+			self.all_sprites.add(self.boss)
 
 			print("boss created:", self.boss.pos)
 			print("boss added to groups")
@@ -318,14 +320,14 @@ class Game:
 		):
 			print("bossi spawnautumassa")
 			self.bosses.clear()
-			self.boss=Boss(self, (c.WIDTH // 2, -160))
-			self.boss_timer = 0
-			self.boss_spawned_this_level = True
-			self.boss_spawn_delay = 200
-			c.BOSS_TIME = True
+			# self.boss=Boss(self, (c.WIDTH // 2, -300), image=pg.image.load(f"assets/dark-crusader.png"))
+			# self.boss_timer = 0
+			# self.boss_spawned_this_level = True
+			# self.boss_spawn_delay = 200
+			# c.BOSS_TIME = True
 			print(f"you're fighting {c.BOSS[0].get("name")}")
-			self.boss_spawn(name=c.BOSS[0].get("name"), lvl=c.BOSS[0].get("lvl"), image=c.BOSS[0].get("boss_image"), hp=c.BOSS[0].get("boss_hp"))
-			self.bosses.append(self.boss)
+			self.boss_spawn(name=c.BOSS[0].get("name"), lvl=c.BOSS[0].get("lvl"),
+							image=pg.image.load(f"{c.HOME_DIR}/assets/dark-crusader.png"), hp=c.level.boss_hp)
 
 		if not self.player.alive:
 			self.game_over = True
@@ -494,6 +496,6 @@ class Game:
 	pg.quit()
 	mixer.quit()
 
-	if __name__ == "__main__":
-		game = Game()
-		game.run()
+if __name__ == "__main__":
+	game = Game()
+	game.run()
