@@ -192,8 +192,9 @@ class Player(pg.sprite.Sprite):
 		if keys[pg.K_ESCAPE]:
 			pg.quit()
 		# For debugging
-		#if keys[pg.K_F7]:
-		#	self.shield = True
+		if keys[pg.K_F7]:
+			print(*self.game.bosses)
+			self.game.bosses.clear()
 		if keys[pg.K_F8]:
 			from entities.boss import Boss
 			self.game.boss = Boss(self.game, (random.randrange(0, 1920), -100))

@@ -156,16 +156,16 @@ class Game:
 		if random.random() < 0.15:
 			self.spawn_rocks()
 
-		if random.random() < 0.01 and len(self.bosses) < 1:
-			c.BOSS_TIME = True
-			self.boss = Boss(self, (c.WIDTH // 2, -160))
-			self.boss_max_y = 160
-
-			self.bosses.append(self.boss)
-			self.enemies.add(self.boss)
-			self.boss_group.add(self.boss)
-			self.all_sprites.add(self.boss)
-			self.boss_spawn()
+		#if random.random() < 0.01 and len(self.bosses) < 1:
+			# c.BOSS_TIME = True
+			# self.boss = Boss(self, (c.WIDTH // 2, -160))
+			# self.boss_max_y = 160
+			#
+			# self.bosses.append(self.boss)
+			# self.enemies.add(self.boss)
+			# self.boss_group.add(self.boss)
+			# self.all_sprites.add(self.boss)
+			# self.boss_spawn()
 
 		for b in self.bosses:
 			b.update(1/ 60/1000)
@@ -197,48 +197,45 @@ class Game:
 
 	def boss_spawn(self, name: str = "Werner", lvl: int = 1, image: pg.image or None = c.BOSS2, hp: int = 300):
 		print(f"{len(self.enemies)} enemies + 1 boss = {len(self.enemies)+1}")
-		if self.boss is None:
+		if self.boss is None and len(self.bosses) < 1:
 			print("boss was no-one")
 			self.boss = Boss(self, (c.WIDTH // 2, -160))
-		self.boss.name = name
-		self.boss.lvl = lvl
-		self.boss.image = image
-		self.boss.hp = hp
-		self.hitbox = self.boss.rect.inflate(-56, -56)
-		c.BOSS_TIME = True
-		self.bosses.append(self.boss)
-		print(self.bosses)
-		print(f"lisättiin tason {c.level.stage} bossi {name} {lvl} {image} {hp}")
+			self.boss.name = name
+			self.boss.lvl = lvl
+			self.boss.image = image
+			self.boss.hp = hp
+			self.hitbox = self.boss.rect.inflate(-56, -56)
+			c.BOSS_TIME = True
+			self.bosses.append(self.boss)
+			print(self.bosses)
+			print(f"lisättiin tason {c.level.stage} bossi {name} {lvl} {image} {hp}")
 
-		if c.level.stage == 3:
-			print("nextlevel shite")
-			self.boss = Boss(self, (c.WIDTH // 2, -160))
-			self.boss.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")),(240, 240))
-			self.boss_time = c.BOSS_TIME
-			self.boss_group.add(self.boss)
-			self.enemies.add(self.boss)
-			self.all_sprites.add(self.boss)
-		if c.level.stage == 2:
-			print("kakkone on ykköne")
-			self.boss = Boss(self, (c.WIDTH // 2, -160))
-			self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")), 0.5)
-			self.boss_time = c.BOSS_TIME
-			self.boss_group.add(self.boss)
-			self.enemies.add(self.boss)
-			self.all_sprites.add(self.boss)
-		if c.level.stage == 1:
-			print("el virgo")
-			self.boss = Boss(self, (c.WIDTH // 2, -160))
-			self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png"))
-			self.boss_group.add(self.boss)
-			self.enemies.add(self.boss)
-			self.all_sprites.add(self.boss)
+			if c.level.stage == 3:
+				print("nextlevel shite")
+				self.boss = Boss(self, (c.WIDTH // 2, -200))
+				self.boss.image = pg.transform.smoothscale(pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")),(240, 240))
+				self.boss_time = c.BOSS_TIME
+				self.boss_group.add(self.boss)
+				self.enemies.add(self.boss)
+				self.all_sprites.add(self.boss)
+			if c.level.stage == 2:
+				print("kakkone on ykköne")
+				self.boss = Boss(self, (c.WIDTH // 2, -400))
+				self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")), 0.5)
+				self.boss_time = c.BOSS_TIME
+				self.boss_group.add(self.boss)
+				self.enemies.add(self.boss)
+				self.all_sprites.add(self.boss)
+			if c.level.stage == 1:
+				print("el virgo")
+				self.boss = Boss(self, (c.WIDTH // 2, -300))
+				self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png"))
+				self.boss_group.add(self.boss)
+				self.enemies.add(self.boss)
+				self.all_sprites.add(self.boss)
 
-		#self.boss = Boss(self, (c.WIDTH // 2, -300))
-		# self.enemies.add(self.boss)
-		# self.all_sprites.add(self.boss)
-		print("boss created:", self.boss.pos)
-		print("boss added to groups")
+			print("boss created:", self.boss.pos)
+			print("boss added to groups")
 
 
 		if self.player.rect.colliderect(self.boss.rect) and not self.player.invincible_timer > 0:
@@ -261,7 +258,7 @@ class Game:
 		if not c.BOSS_TIME and not self.boss_spawned_this_level:
 			self.level_timer += dt
 			if self.boss_timer > 0:
-				self.boss_timer -= dt * 75
+				self.boss_timer -= dt * 30
 			self.enemy_spawn_timer += dt
 			if self.enemy_spawn_timer >= self.enemy_spawn_delay and len(self.enemies) < c.level.max_enemies:
 				self.enemy_spawn_timer = 0
@@ -320,15 +317,15 @@ class Game:
 				and self.boss is None
 		):
 			print("bossi spawnautumassa")
-			if len(self.bosses) == 0:
-				self.boss=Boss(self, (c.WIDTH // 2, -160))
-				self.boss_timer = 0
-				self.boss_spawned_this_level = True
-				self.boss_spawn_delay = 0
-				c.BOSS_TIME = True
-				print(f"you're fighting {c.BOSS[0].get("name")}")
-				self.boss_spawn(name=c.BOSS[0].get("name"), lvl=c.BOSS[0].get("lvl"), image=c.BOSS[0].get("boss_image"), hp=c.BOSS[0].get("boss_hp"))
-				self.bosses.append(self.boss)
+			self.bosses.clear()
+			self.boss=Boss(self, (c.WIDTH // 2, -160))
+			self.boss_timer = 0
+			self.boss_spawned_this_level = True
+			self.boss_spawn_delay = 200
+			c.BOSS_TIME = True
+			print(f"you're fighting {c.BOSS[0].get("name")}")
+			self.boss_spawn(name=c.BOSS[0].get("name"), lvl=c.BOSS[0].get("lvl"), image=c.BOSS[0].get("boss_image"), hp=c.BOSS[0].get("boss_hp"))
+			self.bosses.append(self.boss)
 
 		if not self.player.alive:
 			self.game_over = True
@@ -385,7 +382,7 @@ class Game:
 			rect_width = c.WIDTH
 			rect_height = 300
 			self.banner = pg.Surface((rect_width, rect_height), pg.SRCALPHA)
-			self.banner.fill((255, 255, 255, int(self.next_level_backdrop_alpha-self.overlay_timer//2)))
+			self.banner.fill((255, 255, 255, int(min(0, max(self.next_level_backdrop_alpha//2, 255)))))
 			if self.text_alpha > 1:
 				self.next_level_backdrop_alpha += 0.01
 			elif self.text_alpha < 100:
@@ -402,7 +399,7 @@ class Game:
 
 			clock = pg.time.Clock()
 			self.dt = clock.tick(60) / 1000
-			self.next_level_scale -= self.dt / 2.5
+			self.next_level_scale -= self.dt * 2.5
 
 			rect = self.rotated_text.get_rect(
 				center=(self.rotated_text.get_width() // 2, self.rotated_text.get_height() // 2)
@@ -415,7 +412,7 @@ class Game:
 			)
 			self.text_alpha -= 0.05
 			self.rotated_text.set_alpha(self.text_alpha)
-			self.next_level_angle += 10 * self.dt
+			self.next_level_angle += self.dt
 			self.screen.blit(rotated_text, rect)
 		pg.display.flip()
 
@@ -467,7 +464,7 @@ class Game:
 					self.running = False
 				if event.type == pg.KEYDOWN and event.key == pg.K_PAUSE:
 					if c.Event == c.Event.PAUSE:
-						mixer.play(-1)
+						mixer.music.play(-1)
 						c.Event = c.Event.PLAYING
 					elif c.Event != c.Event.PAUSE:
 						c.Event = c.Event.PAUSE
@@ -494,9 +491,9 @@ class Game:
 			self.draw()
 
 
-pg.quit()
-mixer.quit()
+	pg.quit()
+	mixer.quit()
 
-if __name__ == "__main__":
-	game = Game()
-	game.run()
+	if __name__ == "__main__":
+		game = Game()
+		game.run()
