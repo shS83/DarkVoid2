@@ -46,8 +46,7 @@ class Player(pg.sprite.Sprite):
 		self.shield_image = pg.transform.scale(random.choice(c.PALLOT), (160, 160))
 		self.shield_image_rect = self.shield_image.get_rect(center=pos)
 		self.shield_active = False
-		self.shield_amount = c.level.player_shield_amount
-
+		self.shield_amount = 0
 
 	def make_flash_image(self, image):
 		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
@@ -63,8 +62,8 @@ class Player(pg.sprite.Sprite):
 
 	def shoot_railgun(self):
 		self.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
-		self.image2 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
-		self.image2.blit(self.image, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
+		# self.image2 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
+		self.image.blit(self.image, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
 		self.bullet = PlayerBullet(self.game, self.rect.midtop, self.image, velocity=(0, -2000))
 
 		if self.fire_timer > 0:
@@ -74,7 +73,6 @@ class Player(pg.sprite.Sprite):
 
 		pg.mixer.Sound(f'{c.HOME_DIR}/assets/lasercont.wav').play()
 		self.fire_timer = self.fire_cooldown
-
 		self.game.player_bullets.add(self.bullet)
 		self.game.all_sprites.add(self.bullet)
 
@@ -154,7 +152,7 @@ class Player(pg.sprite.Sprite):
 		if kind == "shield":
 			self.power_timer = 12.0
 			self.shield = True
-
+			self.shield_amount = c.level.player_shield_amount
 
 
 	def update(self, dt):

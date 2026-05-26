@@ -180,7 +180,7 @@ class Game:
 			return
 
 		c.BOSS_TIME = True
-		print("lisättiin bossi")
+		print(f"lisättiin tason {c.level.stage} bossi")
 
 		if self.boss is not None:
 			print("boss already exists")
@@ -202,19 +202,17 @@ class Game:
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
 			self.all_sprites.add(self.boss)
-		elif c.level.stage == 1:
+		else:
 			print("el virgo")
 			self.boss = Boss(self, (c.WIDTH // 2, -160))
 			self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "alus2.png"))
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
 			self.all_sprites.add(self.boss)
-		else:
-			print("what's up, man")
-			pg.quit()
-		self.boss = Boss(self, (c.WIDTH // 2, -300))
-		self.enemies.add(self.boss)
-		self.all_sprites.add(self.boss)
+
+		#self.boss = Boss(self, (c.WIDTH // 2, -300))
+		# self.enemies.add(self.boss)
+		# self.all_sprites.add(self.boss)
 		print("boss created:", self.boss.pos)
 		print("boss added to groups")
 		#
@@ -249,6 +247,8 @@ class Game:
 			self.asteroid_spawn_delay = random.uniform(0.40, 3.2)
 			if len(self.asteroids) < c.level.max_asteroids:
 				self.spawn_asteroid()
+			if len(self.asteroids) < 2:
+				self.spawn_rocks()
 
 		for enemy in self.enemies:
 			for bullet in self.player_bullets:
@@ -268,16 +268,6 @@ class Game:
 			if asteroid.hitbox.colliderect(self.player.rect) and not self.player.invincible_timer > 0:
 				self.player.hit()
 				break
-		if (
-				self.level_timer >= self.boss_spawn_delay
-				and not self.boss_spawned_this_level
-				and self.boss is None
-		):
-			print("bossi spawnautumassa")
-
-			self.boss_timer = 0
-			self.boss_spawned_this_level = True
-			self.boss_spawn()
 
 		if self.player.alive and self.player.invincible_timer <= 0:
 			for bullet in self.enemy_bullets:
@@ -296,6 +286,17 @@ class Game:
 
 		for powerup in powerup_hits:
 			self.player.apply_powerup(powerup.kind)
+
+		if (
+				self.level_timer >= self.boss_spawn_delay
+				and not self.boss_spawned_this_level
+				and self.boss is None
+		):
+			print("bossi spawnautumassa")
+
+			self.boss_timer = 0
+			self.boss_spawned_this_level = True
+			self.boss_spawn()
 
 		if not self.player.alive:
 			self.game_over = True
@@ -332,12 +333,12 @@ class Game:
 		pg.display.flip()
 
 		if c.Event == c.Event.NEXTLEVEL:
-			self.overlay_timer = c.OVERLAY_TIMER
+			# self.overlay_timer = c.OVERLAY_TIMER
 			# Screen whitening
-			if self.overlay_timer > 0:
-				self.overlay_timer -= self.dt / 2
-			else:
-				self.overlay_timer = 0
+#			if self.overlay_timer > 0:
+				#self.overlay_timer -= self.dt / 2
+			#else:
+				# self.overlay_timer = 0
 
 			# if self.overlay_timer < 0:
 			# 	return
@@ -448,10 +449,12 @@ class Game:
 						self.all_sprites.add(shield)
 						self.player.shield_amount -= 1
 
-
-
 				if event.type == pg.KEYUP and event.key == pg.K_LSHIFT:
 					self.player.speed = c.PLAYER_SPEED
+
+				if event.type == pg.KEYUP and event.key == pg.K_LALT:
+					if self.player.shield_active:
+						self.player.shield_active = False
 
 
 			if c.Event != c.Event.PAUSE:

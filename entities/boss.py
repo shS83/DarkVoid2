@@ -10,7 +10,7 @@ from entities.level import *
 from pathlib import Path
 
 class Boss(pg.sprite.Sprite):
-	def __init__(self, game, pos, boss=False):
+	def __init__(self, game, pos, boss=True, image=pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")).convert_alpha()):
 		super().__init__()
 		self.game = game
 		self.test_delay = 0.25 # Tight knit
@@ -23,19 +23,11 @@ class Boss(pg.sprite.Sprite):
 		self.phase_index = 0
 		self.phase_timer = 0
 		self.boss_timer = c.level.boss_timer
-		if c.level.stage == 3:
-			self.image = pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")).convert_alpha()
-			self.hitbox = self.rect.inflate(-100, -100)
-		if c.level.stage == 2:
-			self.image = pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")).convert_alpha()
-			self.hitbox = self.rect.inflate(-100, -100)
-		if c.level.stage == 1:
-			self.image = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "alus2.png")).convert_alpha(), 180, 1)
-			self.hitbox = self.rect = self.image.get_rect(center=pos).inflate(-300, -300)
 		self.max_h = 160
+		self.image = image
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
-		self.flash_timer = 0
+		self.flash_timer = 0.2
 		self.rect = self.image.get_rect(center=pos)
 		self.pos = pg.Vector2(self.rect.center)
 		self.pos.y = -160
@@ -195,7 +187,7 @@ class Boss(pg.sprite.Sprite):
 			self.next_phase()
 
 	def phase_desperation(self, dt):
-		self.shoot_delay = self.test_delay
+		self.shoot_delay = self.test_delay + 0.05
 		print("desperate phase")
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
