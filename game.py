@@ -1,7 +1,6 @@
 from pygame import mixer
 import pygame as pg
 import config as c
-from entities import player
 from entities.player import Player
 from entities.boss import Boss
 from entities.enemy import Enemy
