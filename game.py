@@ -22,7 +22,7 @@ def mixing():
 	         "Jahzzar - Forest Pan.mp3", "Jahzzar - Pink Fluid.mp3", "Lightning Traveler - Celestial Drift.mp3",
 	         "Lightning Traveler - Eclipse Horizon.mp3", "Lightning Traveler - Event Horizon.mp3",
 	         "Lightning Traveler - Lunar Echo.mp3", "Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3"]
-	mixer.music.load(Path(c.HOME_DIR, "assets", f"{random.choice(tunes)}"))
+	mixer.music.load(Path(c.HOME_DIR, "assets", "audio", f"{random.choice(tunes)}"))
 	mixer.music.play(-1)
 	mixer.init(48000, -16, 2, 4096)
 	mixer.music.set_volume(0.2)
@@ -69,17 +69,17 @@ class Game:
 		self.asteroid_spawn_delay = random.uniform(5, 20)
 		self.rock_images = []
 		for i in range(1, 5):
-			img = pg.image.load(Path(c.HOME_DIR, "assets", f"rock_{i}.png")).convert_alpha()
+			img = pg.image.load(Path(c.HOME_DIR, "assets", "rocks", f"rock_{i}.png")).convert_alpha()
 			self.rock_images.append(img)
 		for i in range(1, 32):
-			img = pg.image.load(Path(c.HOME_DIR, "assets", f"exp_{i}.png")).convert_alpha()
+			img = pg.image.load(Path(c.HOME_DIR, "assets", "explosions", f"exp_{i}.png")).convert_alpha()
 			img = pg.transform.scale(img, (320, 320))
 			self.explosion_frames.append(img)
 		for i in range(1, 32):
-			img = pg.image.load(Path(c.HOME_DIR, "assets", f"exp_{i}.png")).convert_alpha()
+			img = pg.image.load(Path(c.HOME_DIR, "assets", "explosions", f"exp_{i}.png")).convert_alpha()
 			img = pg.transform.scale(img, (640, 640))
 			self.boss_explosion_frames.append(img)
-		self.background = pg.image.load(Path(c.HOME_DIR, "assets", "space_background.png")).convert()
+		self.background = pg.image.load(Path(c.HOME_DIR, "assets", "backgrounds", "space_background.png")).convert()
 		self.background = pg.transform.scale(self.background, (c.WIDTH, c.HEIGHT))
 		self.direction = 1
 		self.px = c.WIDTH // 2
@@ -93,7 +93,7 @@ class Game:
 		self.next_level_backdrop_alpha = 20
 		self.next_level_backdrop_scale = 0.1
 		self.overlay_timer = 2000
-		self.game_over_font = pg.font.Font(f'{c.HOME_DIR}/assets/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
+		self.game_over_font = pg.font.Font(f'{c.HOME_DIR}/assets/fonts/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
 		self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
 		self.next_level_text = self.game_over_font.render("Next Stage", True, (200, 200, 255))
 		self.next_level_backdrop_alpha = 235

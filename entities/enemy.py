@@ -24,13 +24,21 @@ class Enemy(pg.sprite.Sprite):
 		if self.boss_time:
 			self.boss = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png")).convert_alpha(), 180, 1)
 		self.boss_hp = 150
-		self.image = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "purplealus.png")).convert_alpha(), 180, 0.3)
-		self.image2 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "redhawk.png")).convert_alpha(), 180, 0.3)
-		self.image4 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "redalus.png")).convert_alpha(), 180, 0.3)
-		self.image5 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "grayship.png")).convert_alpha(), 180, 0.3)
-		self.image6 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "bluehawk.png")).convert_alpha(), 180, 0.3)
-		self.image7 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "blackhawk.png")).convert_alpha(), 180, 0.3)
-		self.images = [self.image2, self.image4, self.image5, self.image6, self.image7]
+		self.image1 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "purplealus.png")).convert_alpha(), 180, c.SCALE)
+		self.image2 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "redhawk.png")).convert_alpha(), 180, c.SCALE)
+		self.image3 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "turqoiseship.png")).convert_alpha(), 180, c.SCALE)
+		self.image4 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "redalus.png")).convert_alpha(), 180, c.SCALE)
+		self.image5 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "grayship.png")).convert_alpha(), 180, c.SCALE)
+		self.image6 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "bluehawk.png")).convert_alpha(), 180, c.SCALE)
+		self.image7 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "blackhawk.png")).convert_alpha(), 180, c.SCALE)
+		self.image8 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "greenhawk.png")).convert_alpha(), 180, c.SCALE)
+		self.image9 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "yellowhawk.png")).convert_alpha(), 180, c.SCALE)
+		self.image10 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "orangehawk.png")).convert_alpha(), 180, c.SCALE)
+		self.image11 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "pinkhawk.png")).convert_alpha(), 180, c.SCALE)
+		self.image12 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "purplehawk.png")).convert_alpha(), 180, c.SCALE)
+		self.image13 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "robotector.png")).convert_alpha(), 180, c.SCALE)
+		self.image14 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "lilac-thrusters.png")).convert_alpha(), 180, c.SCALE)
+		self.images = [self.image1, self.image2, self.image3, self.image4, self.image5, self.image6, self.image7, self.image8, self.image9, self.image10, self.image11, self.image12, self.image13, self.image14]
 		if self.boss_time:
 			self.image = self.boss
 			self.base_image = self.boss.copy()
@@ -38,7 +46,7 @@ class Enemy(pg.sprite.Sprite):
 			self.image = random.choice(self.images)
 			self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
-		self.flash_timer = 0
+		self.flash_timer = 0.05
 		self.rect = self.image.get_rect(center=pos)
 		self.hitbox = self.rect.inflate(-56, -56)
 		self.pos = pg.Vector2(self.rect.center)

@@ -13,7 +13,7 @@ from pathlib import Path
 
 
 class Boss(pg.sprite.Sprite):
-	def __init__(self, game, pos, boss=True, image=pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")).convert_alpha()):
+	def __init__(self, game, pos, boss=True, image=pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses", "dark-crusader.png")).convert_alpha()):
 		super().__init__()
 		self.game = game
 		self.test_delay = 0.3 # Tight knit
@@ -29,15 +29,24 @@ class Boss(pg.sprite.Sprite):
 		self.image = image
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
-		self.flash_timer = 0.2
+		self.flash_timer = 0.05
 		self.rect = self.image.get_rect(center=pos)
 		self.pos = pg.Vector2(self.rect.center)
 		self.pos.y = -160
 		self.pos.x = c.WIDTH // 2
 		self.hitbox = self.rect.inflate(-56, -56)
-		self.thruster_timer = 0.04
-		self.speed = 60
-		self.phases = [
+		self.thruster_timer = 0.12
+		self.speed = 40
+		self.phases = [self.fire_bullet,
+		                         self.aimed_shot,
+		                         self.aimed_spread,
+		                         self.radial_burst,
+		                         self.spiral_burst,
+		                         self.phase_intro,
+		                         self.phase_radial,
+		                         self.phase_spiral,
+		                         self.phase_desperation, ]
+		self.bullet_configurations = [
 			self.phase_intro,
 			self.phase_radial,
 			self.phase_spiral,
@@ -258,7 +267,7 @@ class Boss(pg.sprite.Sprite):
 			self.game.effects.add(explosion)
 			self.game.all_sprites.add(explosion)
 
-		for _ in range(5000):
+		for _ in range(4000):
 			particle = Particle(self.game, self.rect.center)
 			self.game.effects.add(particle)
 			self.game.all_sprites.add(particle)

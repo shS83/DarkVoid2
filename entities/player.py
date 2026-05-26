@@ -24,10 +24,11 @@ class Player(pg.sprite.Sprite):
 		self.fire_cooldown3 = 0.35
 		self.game = game
 		self.pauseswitch = -1
-		self.image3 = pg.image.load(Path(c.HOME_DIR, "assets", "purplealus.png")).convert_alpha()
-		self.image8 = pg.image.load(Path(c.HOME_DIR, "assets", "turqoiseship.png")).convert_alpha()
 		self.image1 = pg.image.load(Path(c.HOME_DIR, "assets", "Proper_warship.png")).convert_alpha()
-		self.images = [self.image1,self.image8, self.image3]
+		self.image2 = pg.image.load(Path(c.HOME_DIR, "assets", "lilac_thrusters.png")).convert_alpha()
+		self.image3 = pg.image.load(Path(c.HOME_DIR, "assets", "purplealus.png")).convert_alpha()
+		self.image4 = pg.image.load(Path(c.HOME_DIR, "assets", "turqoiseship.png")).convert_alpha()
+		self.images = [self.image1, self.image2, self.image3, self.image4]
 		self.image = random.choice(self.images)
 		self.image = pg.transform.smoothscale(self.image, (200, 200))
 		self.rect = self.image.get_rect(center=pos)
@@ -62,8 +63,11 @@ class Player(pg.sprite.Sprite):
 
 	def shoot_railgun(self):
 		self.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
-		# self.image2 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
+		self.image2 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
+		self.image3 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser-3.png")), (20, 100))
 		self.image.blit(self.image, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
+		self.image2.blit(self.image2, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
+		self.image3.blit(self.image3, (0,0), special_flags=pg.BLEND_RGBA_SUB)
 		self.bullet = PlayerBullet(self.game, self.rect.midtop, self.image, velocity=(0, -2000))
 
 		if self.fire_timer > 0:
@@ -192,9 +196,23 @@ class Player(pg.sprite.Sprite):
 		if keys[pg.K_ESCAPE]:
 			pg.quit()
 		# For debugging
+		if keys[pg.K_F1]:
+			self.game.debug = not self.game.debug
+		if keys[pg.K_F2]:
+			self.game.show_hitboxes = not self.game.show_hitboxes
+		if keys[pg.K_F3]:
+			self.game.show_collisions = not self.game.show_collisions
+		if keys[pg.K_F4]:
+			self.game.show_powerups = not self.game.show_powerups
+		if keys[pg.K_F5]:
+			self.game.show_enemies = not self.game.show_enemies
+		if keys[pg.K_F6]:
+			self.game.bosses[0].image = pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png"))
 		if keys[pg.K_F7]:
 			print(*self.game.bosses)
 			self.game.bosses.clear()
+			c.BOSS_TIME = False
+			c.BOSS_SPAWN_DELAY = 5.0
 		if keys[pg.K_F8]:
 			from entities.boss import Boss
 			self.game.boss = Boss(self.game, (random.randrange(0, 1920), -100))
