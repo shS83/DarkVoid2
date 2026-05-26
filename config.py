@@ -58,5 +58,5 @@ HEIGHT = 1080
 BOSS_TIME = False
 SCALE = 0.3
 HOME_DIR = os.path.dirname(__file__)
-MSG_FONT = pg.font.SysFont(f'{HOME_DIR}/assets/GoMonoNerdFontPropo-Bold.ttf', 60)
+MSG_FONT = pg.font.Font(f'{HOME_DIR}/assets/GoMonoNerdFontPropo-Bold.ttf', 60)
 GOTHIC_FONT = pg.font.Font(f'{HOME_DIR}/assets/VL-Gothic-Regular.ttf', 36)

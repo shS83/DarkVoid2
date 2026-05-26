@@ -10,7 +10,7 @@ WIDTH, x_res = 1920, 1920
 HEIGHT, y_res = 1080, 1080
 HOME_DIR = f'{config.HOME_DIR}'
 pg.init()
-msg_font = pygame.font.SysFont(
+msg_font = pygame.font.Font(
 	f'{config.HOME_DIR}/assets/GoMonoNerdFontPropo-Bold.ttf', 36)
 screen = pygame.display.set_mode([x_res, y_res], pg.SRCALPHA)
 pygame.display.set_caption("Dark Void 2")
