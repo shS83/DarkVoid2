@@ -17,7 +17,6 @@ class Boss(pg.sprite.Sprite):
 		self.thruster_timer = 0
 		self.shoot_timer = 0.001
 		self.shoot_delay = 0.001
-		self.pos = pg.Vector2(pos)
 		self.entering = False
 		self.hp = 300
 		self.phase_index = 0
@@ -28,13 +27,13 @@ class Boss(pg.sprite.Sprite):
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_timer = 0.2
-		self.rect = self.image.get_rect(center=pos)
+		self.rect = self.image.get_rect(center=self.pos)
 		self.pos = pg.Vector2(self.rect.center)
-		self.hitbox = self.rect.inflate(-56, -56)
 		self.pos.y = -160
 		self.pos.x = c.WIDTH // 2
+		self.hitbox = self.rect.inflate(-56, -56)
 		self.thruster_timer = 0.04
-		self.speed = 30
+		self.speed = 60
 		self.phases = [
 			self.phase_intro,
 			self.phase_radial,
@@ -45,19 +44,19 @@ class Boss(pg.sprite.Sprite):
 	def update(self, dt):
 		if self.pos.y < self.max_h:
 			self.entering = True
-			self.pos.y += self.speed * dt
+			self.pos.y += self.speed * dt * self.speed
 		else:
 			self.entering = False
 			self.pos.y = self.max_h
 
 		if self.pos.y < self.max_h:
-			self.pos.y += self.speed * dt
+			self.pos.y += self.speed * dt * self.speed
 			if self.pos.y > self.max_h:
 				self.pos.y = self.max_h
 
 		self.rect.center = self.pos
 		self.hitbox.center = self.rect.center
-
+		print("BOSS POS:", self.pos, "RECT:", self.rect)
 		self.shoot_timer -= dt
 		self.phase_timer += dt
 
@@ -232,7 +231,7 @@ class Boss(pg.sprite.Sprite):
 			return
 
 		self.hp -= amount
-		self.flash_timer = 0.02
+		self.flash_timer = 0.2
 
 		if self.hp <= 0:
 			self.destroy()
