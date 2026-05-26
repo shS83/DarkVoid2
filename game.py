@@ -1,7 +1,7 @@
 from pygame import mixer
 import pygame as pg
 import config as c
-from entities.events import Event
+from entities import player
 from entities.player import Player
 from entities.boss import Boss
 from entities.enemy import Enemy
@@ -9,9 +9,10 @@ from entities.star import Star
 from ui.hud import HUD
 from entities.asteroid import Meteor
 from entities.level import *
-from core.hs_module import HighScore
+# from core.hs_module import HighScore
 from entities.level import Level
 from pathlib import Path
+from entities.shield import Shield
 c.Level = Level()
 
 def mixing():
@@ -32,6 +33,10 @@ class Game:
 	def __init__(self):
 		pg.init()
 		mixing()
+		self.screen = pg.display.set_mode((c.WIDTH, c.HEIGHT), pg.SRCALPHA, 32)
+		self.clock = pg.time.Clock()
+		self.dt = self.clock.tick(60) / 1000
+		self.running = True
 		self.enemies = pg.sprite.Group()
 		self.boss_group = pg.sprite.Group()
 		self.enemy_bullets = pg.sprite.Group()
@@ -39,23 +44,32 @@ class Game:
 		self.powerups = pg.sprite.Group()
 		self.effects = pg.sprite.Group()
 		self.asteroids = pg.sprite.Group()
-		if c.Event == c.Event.NEXTLEVEL:
+		if c.level.stage == 3:
+			print("nextlevel shite")
 			self.boss = Boss(self, (c.WIDTH // 2, -300))
 			self.boss.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")), (160, 160))
 			self.boss_time = c.BOSS_TIME
 			self.boss_group.add(self.boss)
+		elif c.level.stage == 2:
+			self.boss = Boss(self, (c.WIDTH // 2, -300))
+			self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")), 0.5)
+			self.boss_time = c.BOSS_TIME
+			self.boss_group.add(self.boss)
+		elif c.level.stage == 1:
+			self.boss = Boss(self, (c.WIDTH // 2, -300))
+			self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "alus2.png"))
+			self.boss_group.add(self.boss)
 		else:
 			self.boss = None
 			self.boss_time = False
-			self.boss_image = None
+			self.boss.image = None
 		self.boss_timer = c.level.boss_timer
+		self.level_timer = 0
+		self.boss_spawn_delay = c.BOSS_SPAWN_DELAY
+		self.boss_spawned_this_level = False
 		self.boss_max_y = 160
 		self.score = 0
 		self.hud = HUD(self)
-		self.screen = pg.display.set_mode((c.WIDTH, c.HEIGHT), pg.SRCALPHA, 32)
-		self.clock = pg.time.Clock()
-		self.dt = self.clock.tick(60) / 1000
-		self.running = True
 		self.effects = pg.sprite.Group()
 		self.explosion_frames = []
 		self.boss_explosion_frames = []
@@ -89,7 +103,7 @@ class Game:
 		self.banner = pg.Surface((400, 300), pg.SRCALPHA)
 		self.next_level_backdrop_alpha = 20
 		self.next_level_backdrop_scale = 0.1
-		self.overlay_timer = 500
+		self.overlay_timer = 2000
 		self.game_over_font = pg.font.SysFont(f'{c.HOME_DIR}/assets/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
 		self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
 		self.next_level_text = self.game_over_font.render("Next Stage", True, (200, 200, 255))
@@ -106,8 +120,9 @@ class Game:
 		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 90))
 		self.all_sprites.add(self.player)
 		self.player_bullets = pg.sprite.Group()
-		if self.boss_timer <= 0 and not self.boss:
-			self.boss = Boss(self, (c.WIDTH // 2, -80))
+		if self.boss_timer <= 0 and self.level_timer >= self.boss_spawn_delay and not self.boss:
+			print("lisättiin bossi")
+			self.boss = Boss(self, (c.WIDTH // 2, -300))
 			self.enemies.add(self.boss)
 			self.all_sprites.add(self.boss)
 		self.stars = pg.sprite.Group()
@@ -139,7 +154,10 @@ class Game:
 				if test_rect.colliderect(asteroid.rect.inflate(20, 20)):
 					overlap = True
 				if self.player.rect.colliderect(asteroid.rect) and not self.player.invincible_timer > 0:
-					self.player.hit()
+					if not self.player.shield_active:
+						self.player.hit()
+					else:
+						pg.mixer.Sound(f"{c.HOME_DIR}/assets/ding.mp3").play()
 					break
 
 			if not overlap:
@@ -148,7 +166,12 @@ class Game:
 				self.all_sprites.add(asteroid)
 				return
 
+
 	def spawn_enemy(self):
+
+		if random.random() < 0.15:
+			self.spawn_rocks()
+
 		for _ in range(20):  # try 20 times
 			x = random.randint(50, c.WIDTH - 50)
 			y = -60
@@ -162,7 +185,10 @@ class Game:
 				if test_rect.colliderect(enemy.rect.inflate(20, 20)):
 					overlap = True
 				if self.player.rect.colliderect(enemy.rect) and not self.player.invincible_timer > 0:
-					self.player.hit()
+					if not self.player.shield_active:
+						self.player.hit()
+					else:
+						pg.mixer.Sound(f"{c.HOME_DIR}/assets/ding.mp3").play()
 					break
 
 			if not overlap:
@@ -172,36 +198,37 @@ class Game:
 				return
 
 	def boss_spawn(self):
+		if self.boss is not None or self.boss_timer > 0:
+			return
+		# IF RANDOMEVENT THEN SPAWN 8 ASTEROIDS
+
 		c.BOSS_TIME = True
-		x = c.WIDTH // 2
-		y = -300
-
-		if not self.boss:
-			self.boss = Boss(self, (x, y))
-
-			self.enemies.add(self.boss)
-			self.all_sprites.add(self.boss)
+		self.boss = Boss(self, (c.WIDTH // 2, -300))
+		self.enemies.add(self.boss)
+		self.all_sprites.add(self.boss)
 
 		if self.player.rect.colliderect(self.boss.rect) and not self.player.invincible_timer > 0:
-			self.player.hit()
+			if not self.player.shield_active:
+				self.player.hit()
+			else:
+				pg.mixer.Sound(f"{c.HOME_DIR}/assets/ding.mp3").play()
 
 	def update(self, dt):
-		if not c.BOSS_TIME:
-			self.boss_timer -= dt * 75
 		self.stars.update(dt)
 		self.asteroids.update(dt)
 		self.all_sprites.update(dt)
-		if not c.BOSS_TIME:
-			self.enemy_spawn_timer += dt
 
-		if not c.BOSS_TIME or self.boss_timer >= 500:
-			if self.enemy_spawn_timer >= self.enemy_spawn_delay:
+		if not c.BOSS_TIME and not self.boss_spawned_this_level:
+			self.level_timer += dt
+			if self.boss_timer > 0:
+				self.boss_timer -= dt * 75
+			self.enemy_spawn_timer += dt
+			if self.enemy_spawn_timer >= self.enemy_spawn_delay and len(self.enemies) < c.level.max_enemies:
 				self.enemy_spawn_timer = 0
-				self.enemy_spawn_delay = random.uniform(0.4, 3.6)
+				self.enemy_spawn_delay = random.uniform(0.4, 3.0)
 				self.spawn_enemy()
 
 		self.asteroid_spawn_timer += dt
-
 		if self.asteroid_spawn_timer >= self.asteroid_spawn_delay:
 			self.asteroid_spawn_timer = 0
 			self.asteroid_spawn_delay = random.uniform(0.40, 3.2)
@@ -226,12 +253,16 @@ class Game:
 			if asteroid.hitbox.colliderect(self.player.rect) and not self.player.invincible_timer > 0:
 				self.player.hit()
 				break
-			# elif asteroid.hitbox.colliderect(asteroid.rect):
-			# 	asteroid.damage(1)
-			# 	break
-		if self.boss_timer < 1:
-			self.boss_timer = 0
+		if (
+				self.level_timer >= self.boss_spawn_delay
+				and not self.boss_spawned_this_level
+				and self.boss is None
+		):
+			print(" bossi spawnautumassa")
+			c.BOSS_TIME = True
+			self.boss_spawned_this_level = True
 			self.boss_spawn()
+			self.boss_timer = 0
 
 		if self.player.alive and self.player.invincible_timer <= 0:
 			for bullet in self.enemy_bullets:
@@ -286,21 +317,24 @@ class Game:
 		pg.display.flip()
 
 		if c.Event == c.Event.NEXTLEVEL:
+			self.overlay_timer = c.OVERLAY_TIMER
 			# Screen whitening
 			if self.overlay_timer > 0:
 				self.overlay_timer -= self.dt / 2
 			else:
 				self.overlay_timer = 0
 
-			if self.overlay_timer > 0:
-				self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
-				overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
-				overlay.fill((0, 0, 50, 25))
-				self.screen.blit(overlay, (0, 0))
-				rect_width = c.WIDTH
-				rect_height = 300
-				self.banner = pg.Surface((rect_width, rect_height), pg.SRCALPHA)
-				self.banner.fill((255, 255, 255, int(self.next_level_backdrop_alpha)-self.overlay_timer//2))
+			# if self.overlay_timer < 0:
+			# 	return
+
+			self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
+			overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
+			overlay.fill((0, 0, 50, 25))
+			self.screen.blit(overlay, (0, 0))
+			rect_width = c.WIDTH
+			rect_height = 300
+			self.banner = pg.Surface((rect_width, rect_height), pg.SRCALPHA)
+			self.banner.fill((255, 255, 255, int(self.next_level_backdrop_alpha)-self.overlay_timer//2))
 			if self.text_alpha > 1:
 				self.next_level_backdrop_alpha += 0.01
 			elif self.text_alpha < 100:
@@ -348,8 +382,8 @@ class Game:
 
 			banner.fill((0, 0, 0, int(self.game_over_backdrop_alpha)))
 			if self.text_alpha > 1:
-				self.game_over_backdrop_alpha += 0.01
-			elif self.text_alpha < 100:
+				self.game_over_backdrop_alpha += 0.1
+			elif self.text_alpha > 100:
 				self.game_over_backdrop_alpha -= 1
 
 			banner_rect = banner.get_rect(
@@ -386,15 +420,28 @@ class Game:
 						c.Event = c.Event.PLAYING
 					elif c.Event != c.Event.PAUSE:
 						c.Event = c.Event.PAUSE
+				if event.type == pg.KEYDOWN and event.key == pg.K_LSHIFT:
+					self.player.speed = self.player.focus_speed
+				if c.SHIELD == True and event.type == pg.KEYDOWN and event.key == pg.K_LALT:
+
+					if not self.player.shield_active:
+						self.player.shield_active = True
+
+						shield = Shield(self, self.player)
+
+						self.effects.add(shield)
+						self.all_sprites.add(shield)
+						self.player.shield_amount -= 1
+
+
+
+				if event.type == pg.KEYUP and event.key == pg.K_LSHIFT:
+					self.player.speed = c.PLAYER_SPEED
+
 
 			if c.Event != c.Event.PAUSE:
 				self.update(dt)
 			self.draw()
-
-
-		scores = HighScore("John", self.score)
-		scores.load_scores()
-		scores.check_score(self.score)
 
 
 pg.quit()

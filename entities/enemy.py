@@ -143,7 +143,7 @@ class Enemy(pg.sprite.Sprite):
 			(self.px,
 			 self.py) = random.randrange(0, c.WIDTH), random.randrange(-150, -50)
 			powerup = PowerUp(self.game, (random.randint(0, c.WIDTH), 0),
-			                  random.choice(["health", "speed", "spread", "laser", "cannon"]))
+			                  random.choice(["health", "speed", "spread", "laser", "cannon", "shield"]))
 			self.game.powerups.add(powerup)
 			self.game.all_sprites.add(powerup)
 		self.kill()

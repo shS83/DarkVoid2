@@ -13,19 +13,25 @@ class Boss(pg.sprite.Sprite):
 	def __init__(self, game, pos, boss=True):
 		super().__init__()
 		self.game = game
+		self.test_delay = 0.25 # Tight knit
 		self.thruster_timer = 0
 		self.shoot_timer = 0.001
 		self.shoot_delay = 0.001
 		self.pos = pg.Vector2(pos)
 		self.pos.y = -c.level.boss_timer
-		self.entering = True
+		self.entering = False
 		self.hp = 300
 		self.phase_index = 0
 		self.phase_timer = 0
 		self.boss_timer = c.level.boss_timer
-		self.image = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "alus2.png")).convert_alpha(), 180, 1)
+		if c.level.stage == 2:
+			self.image = pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")).convert_alpha()
+			self.rect = self.image.get_rect(center=pos)
+			self.hitbox = self.rect.inflate(-100, -100)
+		if c.level.stage == 1:
+			self.image = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "alus2.png")).convert_alpha(), 180, 1)
+			self.hitbox = self.rect = self.image.get_rect(center=pos).inflate(-300, -300)
 		self.max_h = 160
-		self.hitbox = self.rect = self.image.get_rect(center=pos).inflate(-300, -300)
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_timer = 0
@@ -85,7 +91,7 @@ class Boss(pg.sprite.Sprite):
 
 	def fire_bullet(self, pos, velocity):
 		self.shoot_timer = 0
-		self.shoot_delay = 1.5
+		self.shoot_delay = self.test_delay
 		print("fire bullet phase")
 		if self.shoot_timer <= self.shoot_delay:
 			self.shoot_timer = self.shoot_delay
@@ -95,7 +101,7 @@ class Boss(pg.sprite.Sprite):
 
 	def aimed_shot(self, speed=260):
 		self.shoot_timer = 0
-		self.shoot_delay = 1.5
+		self.shoot_delay = self.test_delay
 		direction = self.game.player.pos - self.pos
 		print("aimed shot phase")
 		if direction.length_squared() == 0:
@@ -108,7 +114,7 @@ class Boss(pg.sprite.Sprite):
 
 	def aimed_spread(self, count=7, speed=260, spread=50):
 		self.shoot_timer = 0
-		self.shoot_delay = 1.5
+		self.shoot_delay = self.test_delay
 		direction = self.game.player.pos - self.pos
 		print("aimed spread phase")
 		if direction.length_squared() == 0:
@@ -130,7 +136,7 @@ class Boss(pg.sprite.Sprite):
 
 	def radial_burst(self, count=32, speed=190, offset=0):
 		self.shoot_timer = 0
-		self.shoot_delay = 1.5
+		self.shoot_delay = self.test_delay
 		print("radial burst")
 		for i in range(count):
 			angle = offset + 360 * i / count
@@ -145,7 +151,7 @@ class Boss(pg.sprite.Sprite):
 
 	def spiral_burst(self, arms=4, speed=220):
 		self.shoot_timer = 0
-		self.shoot_delay = 1.5
+		self.shoot_delay = self.test_delay
 		print("spiral burst")
 		base_angle = self.phase_timer * 180
 
@@ -160,13 +166,13 @@ class Boss(pg.sprite.Sprite):
 			)
 
 	def phase_intro(self, dt):
-		self.shoot_delay = 1.5
+		self.shoot_delay = self.test_delay
 		print("intro phase")
 		if self.phase_timer > 3:
 			self.next_phase()
 
 	def phase_radial(self, dt):
-		self.shoot_delay = 1.5
+		self.shoot_delay = self.test_delay
 		print("radial phase")
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
@@ -176,7 +182,7 @@ class Boss(pg.sprite.Sprite):
 			self.next_phase()
 
 	def phase_spiral(self, dt):
-		self.shoot_delay = 1.5
+		self.shoot_delay = self.test_delay
 		print("spiral phase")
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
@@ -186,7 +192,7 @@ class Boss(pg.sprite.Sprite):
 			self.next_phase()
 
 	def phase_desperation(self, dt):
-		self.shoot_delay = 1.5
+		self.shoot_delay = self.test_delay
 		print("desperate phase")
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
@@ -258,12 +264,12 @@ class Boss(pg.sprite.Sprite):
 		self.game.score += 5000
 		self.kill()
 		self.game.boss_killed = True
-		self.game.boss = Boss(self.game, (0, 0), boss=False)
-		self.game.boss.image = pg.image.load(Path(c.HOME_DIR , "assets", "foobarhead1.png")).convert_alpha()
-		self.game.boss.rect = self.game.boss.image.get_rect(center=self.game.boss.rect.center)
-		self.game.boss.hitbox = self.rect.inflate(-100, -100)
-		self.game.player.hp = 5
+		self.game.boss = None
+		c.level_timer = 0
+		self.game.boss_spawned_this_level = False
+		self.boss_timer = c.level.boss_timer
 		# Man you got to level 2
 		c.BOSS_TIME = False
-		c.event = Event.NEXTLEVEL
+		c.event = c.Event.NEXTLEVEL
 		c.level.stage += 1
+		self.game.player.hp = c.level.lives

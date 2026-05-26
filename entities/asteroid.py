@@ -4,7 +4,6 @@ import config as c
 from entities.explosion import Explosion
 from entities.particle import Particle
 from entities.powerup import PowerUp
-from entities.level import Level
 
 class Meteor(pg.sprite.Sprite):
 	def __init__(self, game, pos):
@@ -74,7 +73,7 @@ class Meteor(pg.sprite.Sprite):
 		self.game.score += 50
 		if random.random() < 0.15:
 			powerup = PowerUp(self.game, (random.randint(0, c.WIDTH), 0),
-			                  random.choice(["health", "speed", "spread", "laser", "cannon"]))
+			                  random.choice(["health", "speed", "spread", "laser", "cannon", "shield"]))
 			self.game.powerups.add(powerup)
 			self.game.all_sprites.add(powerup)
 		self.kill()

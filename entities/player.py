@@ -42,6 +42,12 @@ class Player(pg.sprite.Sprite):
 		self.hitbox_radius = c.PLAYER_HITBOX_RADIUS
 		self.particles = pg.sprite.Group()
 		self.all_sprites = pg.sprite.LayeredUpdates()
+		self.shield = False
+		self.shield_image = pg.transform.scale(random.choice(c.PALLOT), (160, 160))
+		self.shield_image_rect = self.shield_image.get_rect(center=pos)
+		self.shield_active = False
+		self.shield_amount = c.level.player_shield_amount
+
 
 	def make_flash_image(self, image):
 		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
@@ -58,7 +64,6 @@ class Player(pg.sprite.Sprite):
 	def shoot_railgun(self):
 		self.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
 		self.image2 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
-		self.image2.map_rgb((255, 150, 150))
 		self.image2.blit(self.image, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
 		self.bullet = PlayerBullet(self.game, self.rect.midtop, self.image, velocity=(0, -2000))
 
@@ -67,7 +72,7 @@ class Player(pg.sprite.Sprite):
 		if self.rect.y - self.bullet.rect.y < 0:
 			self.bullet.kill()
 
-		pg.mixer.Sound(f'{c.HOME_DIR}/assets/laser-jatkuva.wav').play()
+		pg.mixer.Sound(f'{c.HOME_DIR}/assets/lasercont.wav').play()
 		self.fire_timer = self.fire_cooldown
 
 		self.game.player_bullets.add(self.bullet)
@@ -104,30 +109,32 @@ class Player(pg.sprite.Sprite):
 			self.game.all_sprites.add(bullet)
 
 	def hit(self):
-		self.flash_timer = 0.05
-		if self.invincible_timer > 0:
-			return
-		pg.mixer.Sound(f'{c.HOME_DIR}/assets/clink.wav').play()
-		self.lives -= 1
-		self.invincible_timer = 2.0
-		for _ in range(100):
-			particle = Particle(self.game, self.rect.center)
-			self.game.effects.add(particle)
-			self.game.all_sprites.add(particle)
-
-		if self.lives <= 0:
-			explosion_sound = f'{c.HOME_DIR}/assets/explosion1-long.wav'
-			pg.mixer.Sound(explosion_sound).play()
-			explosion = Explosion(self.game, self.rect.center)
-			self.game.effects.add(explosion)
-			self.game.all_sprites.add(explosion)
-			for _ in range(10000):
+		if self.shield_active == False:
+			self.flash_timer = 0.05
+			if self.invincible_timer > 0:
+				return
+			pg.mixer.Sound(f'{c.HOME_DIR}/assets/clink.wav').play()
+			self.lives -= 1
+			self.invincible_timer = 2.0
+			for _ in range(100):
 				particle = Particle(self.game, self.rect.center)
 				self.game.effects.add(particle)
 				self.game.all_sprites.add(particle)
-			self.alive = False
-			self.game.game_over = True
-			self.kill()
+		else:
+			pg.mixer.Sound(f"{c.HOME_DIR}/assets/ding.mp3").play()
+			if self.lives <= 0:
+				explosion_sound = f'{c.HOME_DIR}/assets/explosion1-long.wav'
+				pg.mixer.Sound(explosion_sound).play()
+				explosion = Explosion(self.game, self.rect.center)
+				self.game.effects.add(explosion)
+				self.game.all_sprites.add(explosion)
+				for _ in range(15000):
+					particle = Particle(self.game, self.rect.center)
+					self.game.effects.add(particle)
+					self.game.all_sprites.add(particle)
+				self.alive = False
+				self.game.game_over = True
+				self.kill()
 
 	def apply_powerup(self, kind):
 		if kind == "spread":
@@ -144,6 +151,10 @@ class Player(pg.sprite.Sprite):
 		if kind == "cannon":
 			self.power_timer = 12.0
 			self.fire_cooldown = 0.01
+		if kind == "shield":
+			self.power_timer = 12.0
+			self.shield = True
+
 
 
 	def update(self, dt):
@@ -159,7 +170,7 @@ class Player(pg.sprite.Sprite):
 			direction.y -= 1
 		if keys[pg.K_DOWN] or keys[pg.K_s]:
 			direction.y += 1
-		if keys[pg.K_LSHIFT]:
+		if keys[pg.K_LCTRL]:
 			self.shoot_railgun()
 		if keys[pg.K_SPACE] or mouse[0] == 1:
 			if self.shoot_mode == "spread":
@@ -168,20 +179,27 @@ class Player(pg.sprite.Sprite):
 				self.shoot_railgun()
 			else:
 				self.shoot_normal()
+		if keys[pg.K_LSHIFT]:
+			self.speed = c.PLAYER_FOCUS_SPEED
+		if not keys[pg.K_LSHIFT]:
+			self.speed = c.PLAYER_SPEED
+		if keys[pg.K_LALT]:
+			self.shield_active = True
+		# if not keys[pg.K_LALT]:
+		#	self.shield_active = False
+
 		# if keys[pg.K_LCTRL]:
 		#	self.shoot_spread()
 
 		if keys[pg.K_ESCAPE]:
 			pg.quit()
 		# For debugging
+		if keys[pg.K_F7]:
+			self.shield = True
 		if keys[pg.K_F8]:
-			Asteroid = Meteor(self.game, (c.WIDTH// 2, c.HEIGHT// 2))
-			self.asteroid_group.add(Asteroid)
-			self.all_sprites.add(Asteroid)
-		if keys[pg.K_F8]:
-			self.game.Level.up()
+			self.game.boss_spawn()
 		if keys[pg.K_F9]:
-			powerup = PowerUp(self.game, (self.rect.x, 0), kind=random.choice(["health", "speed", "spread", "laser", "cannon"]))
+			powerup = PowerUp(self.game, (random.randrange(0, 1920), 0), kind=random.choice(["health", "speed", "spread", "laser", "cannon", "shield"]))
 			self.game.powerups.add(powerup)
 			self.game.all_sprites.add(powerup)
 		if keys[pg.K_F11]:
@@ -194,7 +212,8 @@ class Player(pg.sprite.Sprite):
 
 		if self.power_timer <= 0:
 			self.shoot_mode = "normal"
-			self.speed = 350
+			self.shield = False
+			self.speed = c.PLAYER_SPEED
 			self.fire_cooldown2 = 0.08
 		self.thruster_timer -= dt
 
@@ -242,9 +261,9 @@ class Player(pg.sprite.Sprite):
 						direction=(0, 1),
 						color=(255, 140, 140),
 						speed_range=(320, 700),
-						size_range=(2, 4),
-						life_range=(0.12, 0.22),
-						spread=10
+						size_range=(2, 6),
+						life_range=(0.12, 0.42),
+						spread=15
 					)
 					self.game.effects.add(particle)
 					self.game.all_sprites.add(particle)

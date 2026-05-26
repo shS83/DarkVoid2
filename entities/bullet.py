@@ -1,12 +1,11 @@
 import pygame as pg
 import config as c
 from pathlib import Path
+from entities.glitter import Glitter
 
 class PlayerBullet(pg.sprite.Sprite):
 	def __init__(self, game, pos, image=pg.image.load(Path(c.HOME_DIR, "assets", "laser.png")).convert_alpha(), velocity=(0, -800)):
 		super().__init__()
-		if pos == (0, 0) or pos is None:
-			print("BAD own BULLET POS:", pos, "velocity:", velocity)
 		self.image = image
 		self.game = game
 		self.pos = pg.Vector2(pos)
@@ -25,17 +24,16 @@ class PlayerBullet(pg.sprite.Sprite):
 class EnemyBullet(pg.sprite.Sprite):
 	def __init__(self, game, pos, velocity):
 		super().__init__()
-		if pos == (0, 0) or pos is None:
-			print("BAD enemy BULLET POS:", pos, "velocity:", velocity)
-		self.image = pg.Surface((15, 15), pg.SRCALPHA)
+		self.image = pg.Surface((16, 16), pg.SRCALPHA)
 		self.game = game
 		self.pos = pg.Vector2(pos)
 		self.rect = self.image.get_rect(center=self.pos)
 		self.velocity = pg.Vector2(velocity)
-		self.radius = 6
-		pg.draw.circle(self.image, (255, 80, 120), (6, 6), self.radius)
-		pg.draw.circle(self.image, (255, 0, 0), (6, 6), self.radius-2)
-		pg.draw.circle(self.image, (120, 0, 0), (6, 6), self.radius - 4)
+		self.radius = 8
+		pg.draw.circle(self.image, (60, 0, 0), (6, 6), self.radius)
+		pg.draw.circle(self.image, (255, 0, 0), (6, 6), self.radius - 2)
+		pg.draw.circle(self.image, (255, 80, 120), (6, 6), self.radius - 4)
+		pg.draw.circle(self.image, (255, 255, 160), (6, 6), self.radius - 6)
 
 
 	def update(self, dt):

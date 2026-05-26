@@ -16,7 +16,7 @@ class Glitter(pg.sprite.Sprite):
 		self.image = pg.Surface((self.size, self.size), pg.SRCALPHA)
 		pg.draw.circle(
 			self.image,
-			(255, 255, random.randint(120, 255)),
+			(255, random.randint(120, 255), random.randint(120, 255)),
 			(self.size // 2, self.size // 2),
 			self.size // 2
 		)

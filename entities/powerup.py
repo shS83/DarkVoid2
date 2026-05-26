@@ -9,7 +9,7 @@ class PowerUp(pg.sprite.Sprite):
 		super().__init__()
 
 		self.game = game
-		self.kind = kind or random.choice(["spread", "health", "speed", "laser", "cannon"])
+		self.kind = kind or random.choice(["spread", "health", "speed", "laser", "cannon", "shield"])
 		self.pos = pg.Vector2(pos)
 
 		path = Path(c.HOME_DIR, "assets", f"powerup-{self.kind}.png")
@@ -33,10 +33,10 @@ class PowerUp(pg.sprite.Sprite):
 		if self.glitter_timer <= 0:
 			self.glitter_timer = 0.025
 
-			for _ in range(4):
+			for _ in range(8):
 				glitter_pos = (
-					self.rect.centerx + random.randint(-26, 26),
-					self.rect.centery + random.randint(-26, 26),
+					self.rect.centerx + random.randint(-32, 32),
+					self.rect.centery + random.randint(-32, 32),
 				)
 
 				glitter = Glitter(self.game, glitter_pos)
