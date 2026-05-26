@@ -176,32 +176,47 @@ class Game:
 				return
 
 	def boss_spawn(self):
-# 		if self.boss is not None or self.boss_timer > 0 or not self.override:
-#			return
-		if self.boss_timer <= 0 and self.level_timer >= self.boss_spawn_delay and not self.boss:
-			c.BOSS_TIME = True
-			print("lisättiin bossi")
-			if c.level.stage == 3:
-				print("nextlevel shite")
-				self.boss = Boss(self, (c.WIDTH // 2, -300))
-				self.boss.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")),
-													 (160, 160))
-				self.boss_time = c.BOSS_TIME
-				self.boss_group.add(self.boss)
-			elif c.level.stage == 2:
-				print("kakkone on ykköne")
-				self.boss = Boss(self, (c.WIDTH // 2, -300))
-				self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")), 0.5)
-				self.boss_time = c.BOSS_TIME
-				self.boss_group.add(self.boss)
-			elif c.level.stage == 1:
-				print("el virgo")
-				self.boss = Boss(self, (c.WIDTH // 2, -300))
-				self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "alus2.png"))
-				self.boss_group.add(self.boss)
-			else:
-				print("what's up, man")
-				pg.quit()
+		if self.boss is not None:
+			return
+
+		c.BOSS_TIME = True
+		print("lisättiin bossi")
+
+		if self.boss is not None:
+			print("boss already exists")
+			return
+		if c.level.stage == 3:
+			print("nextlevel shite")
+			self.boss = Boss(self, (c.WIDTH // 2, -160))
+			self.boss.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")),
+												 (160, 160))
+			self.boss_time = c.BOSS_TIME
+			self.boss_group.add(self.boss)
+			self.enemies.add(self.boss)
+			self.all_sprites.add(self.boss)
+		elif c.level.stage == 2:
+			print("kakkone on ykköne")
+			self.boss = Boss(self, (c.WIDTH // 2, -160))
+			self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")), 0.5)
+			self.boss_time = c.BOSS_TIME
+			self.boss_group.add(self.boss)
+			self.enemies.add(self.boss)
+			self.all_sprites.add(self.boss)
+		elif c.level.stage == 1:
+			print("el virgo")
+			self.boss = Boss(self, (c.WIDTH // 2, -160))
+			self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "alus2.png"))
+			self.boss_group.add(self.boss)
+			self.enemies.add(self.boss)
+			self.all_sprites.add(self.boss)
+		else:
+			print("what's up, man")
+			pg.quit()
+		self.boss = Boss(self, (c.WIDTH // 2, -300))
+		self.enemies.add(self.boss)
+		self.all_sprites.add(self.boss)
+		print("boss created:", self.boss.pos)
+		print("boss added to groups")
 		#
 		# self.boss = Boss(self, (c.WIDTH // 2, -300))
 		# self.enemies.add(self.boss)
@@ -255,13 +270,14 @@ class Game:
 				break
 		if (
 				self.level_timer >= self.boss_spawn_delay
+				and not self.boss_spawned_this_level
 				and self.boss is None
 		):
-			print(" bossi spawnautumassa")
-			c.BOSS_TIME = True
+			print("bossi spawnautumassa")
+
+			self.boss_timer = 0
 			self.boss_spawned_this_level = True
 			self.boss_spawn()
-			self.boss_timer = 0
 
 		if self.player.alive and self.player.invincible_timer <= 0:
 			for bullet in self.enemy_bullets:

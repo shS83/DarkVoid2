@@ -38,7 +38,7 @@ class Boss(pg.sprite.Sprite):
 		self.flash_timer = 0
 		self.rect = self.image.get_rect(center=pos)
 		self.pos = pg.Vector2(self.rect.center)
-		self.pos.y = -900
+		self.pos.y = -160
 		self.pos.x = c.WIDTH // 2
 		self.thruster_timer = 0.04
 		self.speed = 30
