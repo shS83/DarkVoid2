@@ -1,6 +1,5 @@
 import pygame as pg
 from pathlib import Path
-from pathlib import Path
 import config as c
 from entities.bullet import PlayerBullet
 from entities.explosion import Explosion
