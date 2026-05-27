@@ -93,9 +93,10 @@ class Game:
 		self.stage_banner_stage = self.level.stage
 		self.boss_hp = 300
 		self.boss_dict = {}
+		self.celtic_font = pg.sysfont.SysFont("GEORGIA.TTF", 128, italic=True)
 		self.game_over = False
 		self.game_over_timer = 0
-		self.game_over_text = self.game_over_font.render("YOU FELL", True, (255, 40, 40))
+		self.game_over_text = self.celtic_font.render("YOU DIED", True, (255, 40, 40))
 		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 90))
 		self.all_sprites.add(self.player)
 		self.player_bullets = pg.sprite.Group()
@@ -311,7 +312,7 @@ class Game:
 		banner = pg.Surface((c.WIDTH, banner_height), pg.SRCALPHA)
 		banner.fill((20, 95, 220, alpha))
 
-		white_rect = pg.Rect(0, 34, c.WIDTH, 72)
+		white_rect = pg.Rect(0, 10, c.WIDTH, 120)
 		pg.draw.rect(banner, (255, 255, 255, alpha), white_rect)
 
 		stage_text = self.stage_font.render(f"STAGE {self.level.stage}", True, (0, 0, 0))

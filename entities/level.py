@@ -7,7 +7,7 @@ class Level:
 	def __init__(self):
 		self.stage = 1
 		self.asteroids = 3
-		self.lives = 5
+		self.lives = 3
 		self.enemy_spawn_delay = random.uniform(2, 6.0)
 		self.enemy_spawn_timer = 0
 		self.asteroid_spawn_timer = 0
