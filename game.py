@@ -213,7 +213,7 @@ class Game:
 		if c.level.stage == 3:
 			print("nextlevel shite")
 			self.boss = Boss(self, (c.WIDTH // 2, -200))
-			self.boss.image = pg.transform.smoothscale(pg.image.load(Path(c.HOME_DIR, "assets", "foobarhead1.png")),(240, 240))
+			self.boss.image = pg.transform.smoothscale(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses","foobarhead1.png")),(240, 240))
 			self.boss_time = c.BOSS_TIME
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
@@ -222,7 +222,7 @@ class Game:
 		if c.level.stage == 2:
 			print("kakkone on ykköne")
 			self.boss = Boss(self, (c.WIDTH // 2, -400))
-			self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "boss-2.png")), 0.5)
+			self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses", "boss-2.png")), 0.5)
 			self.boss_time = c.BOSS_TIME
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
@@ -393,7 +393,7 @@ class Game:
 			banner_rect = self.banner.get_rect(
 				center=(c.WIDTH // 2, c.HEIGHT // 2)
 			)
-			levelup_font = pg.font.Font(f'{c.HOME_DIR}/assets/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
+			levelup_font = pg.font.Font(f'{c.HOME_DIR}/assets/fonts/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
 			self.banner.set_alpha(20)
 			self.screen.blit(self.banner, banner_rect)
 
