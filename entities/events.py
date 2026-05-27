@@ -11,5 +11,3 @@ class Event(Enum):
 	GAME_OVER = 6
 	PAUSE = 7
 	PLAYING = 8
-
-Event = Event.PLAYING

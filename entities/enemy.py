@@ -32,9 +32,9 @@ class Enemy(pg.sprite.Sprite):
 		self.image6 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "ships","bluehawk.png")).convert_alpha(), 180, c.SCALE)
 		self.image7 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "ships","blackhawk.png")).convert_alpha(), 180, c.SCALE)
 		self.image8 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "ships","orangeship.png")).convert_alpha(), 180, c.SCALE)
-		# self.image9 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "lilac-thrusters.png")).convert_alpha(), 180, c.SCALE)
+		self.image9 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "lilac-thrusters.png")).convert_alpha(), 180, c.SCALE)
 		self.image10 = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "ships","robotector.png")).convert_alpha(), 180, c.SCALE)
-		self.images = [self.image1, self.image2, self.image3, self.image4, self.image5, self.image6, self.image7, self.image8, self.image10]
+		self.images = [self.image1, self.image2, self.image3, self.image4, self.image5, self.image6, self.image7, self.image8, self.image9, self.image10]
 		if self.boss_time:
 			self.image = self.boss
 			self.base_image = self.boss.copy()

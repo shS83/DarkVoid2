@@ -63,8 +63,8 @@ class Player(pg.sprite.Sprite):
 		self.vulcan_sound_timer = 0
 		self.vulcan_sound_delay = 0.07
 
-		self.minigun_sound = pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/minigun.mp3")
-		self.minigun_sound.set_volume(0.1)
+		self.minigun_sound = pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/gundam-vulcan-machine-gun-sound.mp3")
+		self.minigun_sound.set_volume(0.2)
 
 	def make_flash_image(self, image):
 		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
@@ -373,7 +373,7 @@ class Player(pg.sprite.Sprite):
 		if keys[pg.K_F5]:
 			self.game.show_enemies = not self.game.show_enemies
 		if keys[pg.K_F6]:
-			self.game.bosses[0].image = pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses", "dark-crusader.png"))
+			self.game.boss.destroy()
 		if keys[pg.K_F7]:
 			print(*self.game.bosses)
 			self.game.bosses.clear()
@@ -381,8 +381,8 @@ class Player(pg.sprite.Sprite):
 			c.BOSS_SPAWN_DELAY = 5.0
 		if keys[pg.K_F8]:
 			from entities.boss import Boss
-			self.game.boss = Boss(self.game, (random.randrange(0, 1920), -100))
 			self.game.boss = {}
+			self.game.boss = Boss(self.game, (random.randrange(0, 1920), -100))
 			c.BOSS_TIME = True
 			c.BOSS_SPAWN_DELAY = 0
 			#self.game.boss = self.game.boss_spawn(name="Bane", lvl=1, image=c.BOSS[1].get("boss_image"), hp=c.BOSS[1].get("hp"))

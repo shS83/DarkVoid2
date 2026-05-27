@@ -10,63 +10,58 @@ from pygame.transform import rotozoom
 from pathlib import Path
 
 class Boss(pg.sprite.Sprite):
-	def __init__(self, game, name="Unnamed", pos=(320, -160), image=None, hp=1000, lvl=1):
+	def __init__(
+        self,
+        game,
+        name="Unnamed",
+        pos=(320, -160),
+        image=None,
+		hp=1000,
+		lvl=1,
+	):
 		super().__init__()
 
 		self.game = game
 		self.name = name
 		self.lvl = lvl
 		self.hp = hp
+
 		if image is None:
-			image = pg.image.load(f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png").convert_alpha()
-		print(image)
-		self.image = image
-		self.image = pg.transform.scale(self.image, (220, 220))
+			image = pg.image.load(
+				f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png"
+			).convert_alpha()
+
+		elif isinstance(image, (str, Path)):
+			image = pg.image.load(image).convert_alpha()
+
+		self.image = pg.transform.rotate(pg.transform.smoothscale(image, (800, 800)), 180)
 
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
+		self.flash_timer = 0
 
 		self.rect = self.image.get_rect(center=pos)
 		self.pos = pg.Vector2(self.rect.center)
 
-		self.hitbox = self.rect.inflate(-40, -40)
-		self.angle = 0
-		self.test_delay = 0.3 # Tight knit
-		# self.thruster_timer = 0
-		self.shoot_timer = 0.15
-		self.shoot_delay = 0.10
+		self.hitbox = self.rect.inflate(-56, -56)
+
 		self.target_y = 160
 		self.speed = 120
 		self.entering = True
-		self.hp = 300
+
+		self.shoot_timer = 0.8
+		self.shoot_delay = 0.8
+
 		self.phase_index = 0
 		self.phase_timer = 0
-		self.boss_timer = self.game.level.boss_timer
-		self.max_h = 160
-		print(image)
-		self.image = image
-		self.base_image = self.image.copy()
-		self.flash_image = self.make_flash_image(self.base_image)
-		self.flash_timer = 0.05
-		self.pos = pg.Vector2(0, -1)
-		self.rect = self.image.get_rect(center=pos)
-		self.rect.y = -160
-		self.rect.x = c.WIDTH // 2
-		self.hitbox = self.rect.inflate(-56, -56)
+
 		self.thruster_timer = 0.12
-		self.phases = [	# self.aimed_shot,
-		                # self.aimed_spread,
-		                        # self.radial_burst,
-		                         self.spiral_burst,
-		                # self.phase_intro,
-		                         self.phase_radial,
-		                         self.phase_spiral,
-		                         self.phase_desperation, ]
-		self.bullet_configurations = [
-			self.phase_intro,
-			self.phase_radial,
-			self.phase_spiral,
-			# self.phase_desperation,
+
+		self.phases = [
+            self.phase_intro,
+            self.phase_radial,
+            self.phase_spiral,
+            self.phase_desperation,
 		]
 
 	def update(self, dt):
@@ -78,7 +73,7 @@ class Boss(pg.sprite.Sprite):
 				self.pos.y = self.target_y
 		else:
 			self.entering = False
-
+		rotozoom(self.image, 0, -self.pos.y / 100)
 		self.rect.center = self.pos
 		self.hitbox.center = self.rect.center
 
@@ -115,18 +110,12 @@ class Boss(pg.sprite.Sprite):
 			self.phase_index = len(self.phases) - 1
 
 	def fire_bullet(self, pos, velocity):
-		self.shoot_timer = 0
-		self.shoot_delay = self.test_delay
-		# print("fire bullet phase")
-		if self.shoot_timer <= self.shoot_delay:
-			self.shoot_timer = self.shoot_delay
-			bullet = EnemyBullet(self.game, pos, velocity)
+		bullet = EnemyBullet(self.game, pos, velocity)
 		self.game.enemy_bullets.add(bullet)
 		self.game.all_sprites.add(bullet)
 
 	def aimed_shot(self, speed=260):
 		self.shoot_timer = 0
-		self.shoot_delay = self.test_delay
 		direction = self.game.player.pos - self.pos
 		# print("aimed shot phase")
 		if direction.length_squared() == 0:
@@ -139,7 +128,6 @@ class Boss(pg.sprite.Sprite):
 
 	def aimed_spread(self, count=7, speed=260, spread=50):
 		self.shoot_timer = 0
-		self.shoot_delay = self.test_delay
 		direction = self.game.player.pos - self.pos
 		# print("aimed spread phase")
 		if direction.length_squared() == 0:
@@ -161,7 +149,6 @@ class Boss(pg.sprite.Sprite):
 
 	def radial_burst(self, count=32, speed=190, offset=0):
 		self.shoot_timer = 0
-		self.shoot_delay = self.test_delay
 		# print("radial burst")
 		for i in range(int(count)):
 			angle = offset + 360 * i / count
@@ -176,7 +163,6 @@ class Boss(pg.sprite.Sprite):
 
 	def spiral_burst(self, arms=4, speed=220):
 		self.shoot_timer = 0
-		self.shoot_delay = self.test_delay
 		# print("spiral burst")
 		direction = pg.Vector2(1, 1)
 		base_angle = self.phase_timer * 180
@@ -192,23 +178,21 @@ class Boss(pg.sprite.Sprite):
 			)
 
 	def phase_intro(self, dt):
-		self.shoot_delay = self.test_delay
 		# print("intro phase")
 		if self.phase_timer > 3:
 			self.next_phase()
 
 	def phase_radial(self, dt):
-		self.shoot_delay = self.test_delay
-		# print("radial phase")
+		self.shoot_delay = 0.9
+
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
-			self.radial_burst(count=28, speed=180, offset=self.phase_timer)
+			self.radial_burst(count=18, speed=180, offset=self.phase_timer * 35)
 
 		if self.phase_timer > 10:
 			self.next_phase()
 
 	def phase_spiral(self, dt):
-		self.shoot_delay = self.test_delay
 		#print("spiral phase")
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
@@ -218,7 +202,6 @@ class Boss(pg.sprite.Sprite):
 			self.next_phase()
 
 	def phase_desperation(self, dt):
-		self.shoot_delay = self.test_delay + 0.1
 		# print("desperate phase")
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
@@ -267,45 +250,27 @@ class Boss(pg.sprite.Sprite):
 		if self.hp <= 0:
 			self.destroy()
 
-	def destroy(self, dt=pg.time.Clock().tick(60) / 1000):
-		explosion = None
-		interval = 400
-		explosion_sounds = [f'{c.HOME_DIR}/assets/audio/explosion2.wav', f'{c.HOME_DIR}/assets/audio/explosion1-long.wav',
-		                    f'{c.HOME_DIR}/assets/audio/explosion3.wav']
-		pg.mixer.Sound(random.choice(explosion_sounds)).play()
-		now = pg.time.get_ticks()
-		if dt + now > 1000 + interval:
-			pg.mixer.Sound(random.choice(explosion_sounds)).play()
+	def destroy(self):
+		explosion = Explosion(self.game, self.rect.center, boss=True)
+		self.game.effects.add(explosion)
+		self.game.all_sprites.add(explosion)
 
-		if not explosion:
-			explosion = Explosion(self.game, self.rect.center, boss=True)
-			self.game.effects.add(explosion)
-			self.game.all_sprites.add(explosion)
-
-		for _ in range(1500):
+		for _ in range(250):
 			particle = Particle(self.game, self.rect.center)
 			self.game.effects.add(particle)
 			self.game.all_sprites.add(particle)
+
 		self.game.score += 5000
 
 		c.BOSS_TIME = False
+		c.event = c.Event.NEXTLEVEL
+
 		self.game.boss = None
-		self.game.boss_timer = c.BOSS_SPAWN_DELAY
+		self.game.level_timer = 0
+		self.game.boss_spawned_this_level = False
 
 		self.game.level.up()
 
 		self.kill()
-		self.game.boss_killed = True
-		self.game.boss = None
-		self.game.level_timer = 0
-		self.game.boss_spawned_this_level = False
-		self.boss_timer = self.game.level.boss_timer
-		# Man you got to level 2
-		c.BOSS_TIME = False
-		c.event = c.Event.NEXTLEVEL
-		self.game.level.up()
-		c.NEXTBOSS = c.BOSS.pop(0)
-		self.game.player.hp = self.game.level.lives
-		self.game.bosses.clear()
 
 

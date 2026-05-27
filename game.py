@@ -1,6 +1,8 @@
 import random
 from pygame import mixer
 import pygame as pg
+from pygame.transform import rotozoom
+
 from entities.player import Player
 from entities.boss import Boss
 from entities.enemy import Enemy
@@ -96,6 +98,7 @@ class Game:
 		self.game_over_font = pg.font.Font(f'{c.HOME_DIR}/assets/fonts/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
 		self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
 		self.next_level_text = self.game_over_font.render("Next Stage", True, (200, 200, 255))
+		self.rotated_text2 = pg.Surface((400, 100), pg.SRCALPHA)
 		self.next_level_backdrop_alpha = 235
 		self.next_level_backdrop_scale = 0.1
 		self.boss_hp = 300
@@ -151,7 +154,7 @@ class Game:
 					if not self.player.shield_active:
 						self.player.hit()
 					else:
-						pg.mixer.Sound(f"{c.HOME_DIR}/assets/ding.mp3").play()
+						self.play_sound(f"{c.HOME_DIR}/assets/ding.mp3").play()
 					break
 
 			if not overlap:
@@ -195,14 +198,20 @@ class Game:
 				self.all_sprites.add(enemy)
 				return
 
-	def boss_spawn(self, name:str ="Unnamed", lvl:int = 1, image:pg.Surface | None = None, hp:int=1000, pos: pg.Vector2 | None = None) -> object:
+	def boss_spawn(self, boss_dict=None):
 		if self.boss is not None:
 			return
 
+		if boss_dict is None:
+			boss_dict = {}
+
 		c.BOSS_TIME = True
 
-		if pos is None:
-			pos = (c.WIDTH // 2, -160)
+		name = boss_dict.get("name", "Unnamed Boss")
+		pos = boss_dict.get("pos", (c.WIDTH // 2, -160))
+		image = boss_dict.get("boss_image", None)
+		hp = boss_dict.get("boss_hp", self.level.boss_hp)
+		lvl = boss_dict.get("lvl", self.level.stage)
 
 		self.boss = Boss(
 			self,
@@ -210,55 +219,15 @@ class Game:
 			pos=pos,
 			image=image,
 			hp=hp,
-			lvl=lvl
+			lvl=lvl,
 		)
 
 		self.enemies.add(self.boss)
 		self.all_sprites.add(self.boss)
 
-		if self.level.stage == 3:
-			print("nextlevel shite")
-			if not self.level.next_boss_candidate or self.level.nextboss:
-				c.NEXTBOSS = c.BOSS.pop(0)
-			self.boss = Boss(self, c.NEXTBOSS.get("pos"), (0, -1))
-			self.boss.image = pg.transform.smoothscale(pg.image.load(
-				c.NEXTBOSS.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png")).convert_alpha(), (240, 240))
-			self.boss_hp = self.level.boss_hp
-			self.boss_time = c.BOSS_TIME
-			self.boss_group.add(self.boss)
-			self.enemies.add(self.boss)
-			self.all_sprites.add(self.boss)
-			self.boss_spawned_this_level = True
+		self.boss_spawned_this_level = True
 
-		if self.level.stage == 2:
-			print("kakkone on ykköne")
-			if not self.level.next_boss_candidate or self.level.nextboss:
-				c.NEXTBOSS = c.BOSS.pop(0)
-			self.boss = Boss(self, c.NEXTBOSS.get("pos"), (0, -1))
-			self.boss.image = pg.image.load(
-				c.NEXTBOSS.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png")).convert_alpha()
-			self.boss_hp = self.level.boss_hp
-			self.angle += 1
-			self.boss_time = c.BOSS_TIME
-			self.boss_group.add(self.boss)
-			self.enemies.add(self.boss)
-			self.all_sprites.add(self.boss)
-			self.boss_spawned_this_level = True
-
-		if self.level.stage == 1:
-			print("el virgo")
-			if not self.level.next_boss_candidate or self.level.nextboss:
-				c.NEXTBOSS = c.BOSS.pop(0)
-			self.boss = Boss(self, c.NEXTBOSS.get("pos"), (0, -1))
-			self.boss.image = pg.image.load(c.NEXTBOSS.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png")).convert_alpha()
-			self.boss_hp = self.level.boss_hp
-			self.boss_time = c.BOSS_TIME
-			self.boss_group.add(self.boss)
-			self.enemies.add(self.boss)
-			self.all_sprites.add(self.boss)
-			self.boss_spawned_this_level = True
-			print("boss created:", self.boss.pos)
-			print("boss added to groups")
+		print(f"Boss spawned: {name} at {pos}, hp={hp}")
 
 
 		if self.player.rect.colliderect(self.boss.rect) and not self.player.invincible_timer > 0:
@@ -269,41 +238,39 @@ class Game:
 		return self.boss
 
 	def update(self, dt):
-		for b in self.bosses:
-			b.update(dt)
-		self.enemies.update(dt)
-		self.boss_group.update(dt)
-		self.enemy_bullets.update(dt)
-		self.player_bullets.update(dt)
 		self.stars.update(dt)
-		self.asteroids.update(dt)
 		self.all_sprites.update(dt)
 
-		if not c.BOSS_TIME and self.boss is None and not self.boss_spawned_this_level:
-			c.BOSS_TIMER -= dt * 100
-			if not c.NEXTBOSS:
-				self.boss_dict = c.BOSS.pop(0)
-				c.NEXTBOSS = self.boss_dict.copy()
+		if not c.BOSS_TIME and self.boss is None:
+			self.level_timer += dt
 
-			if c.BOSS_TIMER <= 0 and not c.BOSS_TIME:
-				c.BOSS_TIME = True
-				if self.boss_dict.get("name") == "Mr. Robot":
-					self.boss_dict = c.BOSS.pop(0)
-					c.NEXTBOSS = self.boss_dict.copy()
-				self.boss_timer = self.boss_dict.get("boss_timer")
+			self.enemy_spawn_timer += dt
 
-				self.boss_spawn(name=self.boss_dict.get("name", "unknown"),
-					lvl=self.level.stage,
-					pos=self.boss_dict.get("pos", (c.WIDTH // 2, -160)),
-					image=pg.image.load(self.boss_dict.get("image", f"{c.HOME_DIR}/assets/ships/bosses/boss-2.png")).convert_alpha(),
-					hp=self.level.boss_hp)
-				self.boss_spawned_this_level = True
-				self.level_timer += dt
-				self.enemy_spawn_timer += dt
-			if self.enemy_spawn_timer >= self.enemy_spawn_delay and len(self.enemies) < self.level.max_enemies:
+			if (
+					self.enemy_spawn_timer >= self.enemy_spawn_delay
+					and len(self.enemies) < self.level.max_enemies
+			):
 				self.enemy_spawn_timer = 0
 				self.enemy_spawn_delay = random.uniform(0.4, 3.0)
 				self.spawn_enemy()
+
+			if self.level_timer >= self.boss_spawn_delay:
+				print("bossi spawnautumassa")
+
+				if not c.BOSS:
+					print("No bosses left in c.BOSS")
+					return
+
+				boss_dict = c.BOSS.pop(0)
+
+				if boss_dict.get("name") == "Mr. Robot":
+					if c.BOSS:
+						boss_dict = c.BOSS.pop(0)
+
+				print(f"you're fighting {boss_dict.get('name')}")
+
+				self.level_timer = 0
+				self.boss_spawn(boss_dict)
 
 			self.asteroid_spawn_timer += dt
 			if self.asteroid_spawn_timer >= self.asteroid_spawn_delay:
@@ -385,15 +352,17 @@ class Game:
 				return
 
 	def draw(self):
-		self.effects.draw(self.screen)
-		self.screen.blit(self.background, (0, 0))
-		self.enemies.draw(self.screen)
-		self.boss_group.draw(self.screen)
-		self.powerups.draw(self.screen)
-		self.stars.draw(self.screen)
-		self.hud.draw(self.screen)
-		self.asteroids.draw(self.screen)
-		self.all_sprites.draw(self.screen)
+		if c.Event != c.Event.PAUSE:
+			self.screen.blit(self.background, (0, 0))
+
+			self.stars.draw(self.screen)
+			self.all_sprites.draw(self.screen)
+			self.hud.draw(self.screen)
+
+			if self.boss is not None and c.DEBUG:
+				pg.draw.rect(self.screen, (255, 0, 0), self.boss.hitbox, 3)
+
+			pg.display.flip()
 
 		if c.Event == c.Event.PAUSE:
 			pausesurface = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
@@ -408,7 +377,7 @@ class Game:
 			pg.display.flip()
 
 		if c.event == c.Event.NEXTLEVEL:
-			self.level.next_boss_candidate = self.level.boss_tree.pop(0)
+			self.level.next_boss_candidate = c.BOSS.pop(0)
 			self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
 			overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
 			overlay.fill((0, 0, 50, 25))
@@ -430,7 +399,10 @@ class Game:
 			self.screen.blit(self.banner, banner_rect)
 
 			self.rotated_text.blit(next_level_text := levelup_font.render("Next Stage", True, (0, 0, 255)), (c.WIDTH // 2, c.HEIGHT // 2))
-
+			rotating_surf = pg.Surface((400, 100), pg.SRCALPHA)
+			rotating_surf.blit(next_level_text, (c.WIDTH // 2, c.HEIGHT // 2)), (0, 0)
+			rotozoom(rotating_surf, scale = self.next_level_backdrop_scale, angle = self.next_level_angle, center = (c.WIDTH // 2, c.HEIGHT // 2), surface = self.screen)
+			rotating_surf.set_alpha(self.next_level_backdrop_alpha)
 			clock = pg.time.Clock()
 			self.dt = clock.tick(60) / 1000
 			self.next_level_scale -= self.dt * 2.5
