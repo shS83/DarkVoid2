@@ -8,41 +8,55 @@ from entities.bullet import EnemyBullet
 import config as c
 from pygame.transform import rotozoom
 from pathlib import Path
-from entities.level import Level
-level = Level()
-
 
 class Boss(pg.sprite.Sprite):
-	def __init__(self, game: object, name : str="Fresh Prince of Bel-Air", pos: pg.Vector2 = (0, -1), boss: bool = True, image: pg.Surface = pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses", "dark-crusader.png")).convert_alpha()):
+	def __init__(self, game, name="Unnamed", pos=(320, -160), image=None, hp=1000, lvl=1):
 		super().__init__()
+
 		self.game = game
-		self.name = "Kauppaneuvos Paukku" or name
+		self.name = name
+		self.lvl = lvl
+		self.hp = hp
+		if image is None:
+			image = f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png"
+
+		self.image = pg.image.load(image).convert_alpha()
+		self.image = pg.transform.scale(self.image, (220, 220))
+
+		self.base_image = self.image.copy()
+		self.flash_image = self.make_flash_image(self.base_image)
+
+		self.rect = self.image.get_rect(center=pos)
+		self.pos = pg.Vector2(self.rect.center)
+
+		self.hitbox = self.rect.inflate(-40, -40)
 		self.angle = 0
 		self.test_delay = 0.3 # Tight knit
-		self.thruster_timer = 0
+		# self.thruster_timer = 0
 		self.shoot_timer = 0.15
 		self.shoot_delay = 0.10
+		self.target_y = 160
+		self.speed = 120
 		self.entering = True
 		self.hp = 300
 		self.phase_index = 0
 		self.phase_timer = 0
-		self.boss_timer = level.boss_timer
+		self.boss_timer = self.game.level.boss_timer
 		self.max_h = 160
-		self.image = image
+		self.image = pg.image.load(image).convert_alpha()
 		print(self.image)
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_timer = 0.05
-		self.pos = pg.Vector2(pos)
+		self.pos = pg.Vector2(0, -1)
 		self.rect = self.image.get_rect(center=pos)
 		self.rect.y = -160
 		self.rect.x = c.WIDTH // 2
 		self.hitbox = self.rect.inflate(-56, -56)
 		self.thruster_timer = 0.12
-		self.speed = 40
 		self.phases = [	# self.aimed_shot,
 		                # self.aimed_spread,
-		                         self.radial_burst,
+		                        # self.radial_burst,
 		                         self.spiral_burst,
 		                # self.phase_intro,
 		                         self.phase_radial,
@@ -56,20 +70,18 @@ class Boss(pg.sprite.Sprite):
 		]
 
 	def update(self, dt):
-		if self.pos.y < self.max_h:
+		if self.pos.y < self.target_y:
 			self.entering = True
 			self.pos.y += self.speed * dt
+
+			if self.pos.y > self.target_y:
+				self.pos.y = self.target_y
 		else:
 			self.entering = False
-			self.pos.y = self.max_h
-
-		if self.pos.y < self.max_h:
-			self.pos.y += self.speed * dt
-			if self.pos.y > self.max_h:
-				self.pos.y = self.max_h
 
 		self.rect.center = self.pos
 		self.hitbox.center = self.rect.center
+
 		print("BOSS POS:", self.pos, "RECT:", self.rect, "HP:", self.hp, "PHASE:", self.phase_index, "TIMER:", self.phase_timer, "NAME:" , self.name)
 		self.shoot_timer -= dt
 		self.phase_timer += dt
@@ -151,7 +163,7 @@ class Boss(pg.sprite.Sprite):
 		self.shoot_timer = 0
 		self.shoot_delay = self.test_delay
 		# print("radial burst")
-		for i in range(count):
+		for i in range(int(count)):
 			angle = offset + 360 * i / count
 			direction = pg.Vector2(1, 0).rotate(angle)
 
@@ -166,10 +178,11 @@ class Boss(pg.sprite.Sprite):
 		self.shoot_timer = 0
 		self.shoot_delay = self.test_delay
 		# print("spiral burst")
+		direction = pg.Vector2(1, 1)
 		base_angle = self.phase_timer * 180
 
-		for i in range(arms):
-			angle = base_angle + i * (360 / arms)
+		for i in range(int(arms)):
+			angle = round(base_angle + i * (360 / arms))
 			direction = pg.Vector2(1, 0).rotate(angle)
 		if self.shoot_timer <= self.shoot_delay:
 			self.shoot_timer = self.shoot_delay
@@ -269,23 +282,30 @@ class Boss(pg.sprite.Sprite):
 			self.game.effects.add(explosion)
 			self.game.all_sprites.add(explosion)
 
-		for _ in range(4000):
+		for _ in range(1500):
 			particle = Particle(self.game, self.rect.center)
 			self.game.effects.add(particle)
 			self.game.all_sprites.add(particle)
-
 		self.game.score += 5000
+
+		c.BOSS_TIME = False
+		self.game.boss = None
+		self.game.boss_timer = c.BOSS_SPAWN_DELAY
+
+		self.game.level.up()
+
 		self.kill()
 		self.game.boss_killed = True
 		self.game.boss = None
-		level_timer = 0
+		self.game.level_timer = 0
 		self.game.boss_spawned_this_level = False
-		self.boss_timer = level.boss_timer
+		self.boss_timer = self.game.level.boss_timer
 		# Man you got to level 2
 		c.BOSS_TIME = False
 		c.event = c.Event.NEXTLEVEL
-		level.stage += 1
+		self.game.level.up()
 		c.NEXTBOSS = c.BOSS.pop(0)
-		self.game.player.hp = level.lives
+		self.game.player.hp = self.game.level.lives
 		self.game.bosses.clear()
+
 

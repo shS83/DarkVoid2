@@ -49,6 +49,7 @@ ROCK_IMAGES = [ROCK1, ROCK2, ROCK3, ROCK4, ROCK5, ROCK6]
 BOSS = [{"name": "Dark Crusader", "pos": "(WIDTH //2, -200)", "lvl": 1, "boss_hp": 300, "boss_time": 3000, "boss_image": BOSS1},
 		{"name": "Eldritch Marauder", "pos": "(WIDTH //2, -400)", "lvl": 2, "boss_hp": 400, "boss_time": 4000, "boss_image": BOSS2},
 		{"name":" Aural Alien", "lvl": 3, "pos": "(WIDTH //2, -300)", "boss_hp": 500, "boss_time": 5000, "boss_image": BOSS3}]
+NEXTBOSS = False
 SHIELD = False
 WIDTH = 1920
 HEIGHT = 1080

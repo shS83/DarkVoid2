@@ -4,7 +4,6 @@ from pathlib import Path
 import config as c
 from entities.vulcan import VulcanBullet, MuzzleFlash, VulcanSpark, ShellCasing
 from pygame import mouse
-from entities.level import Level
 from entities.bullet import PlayerBullet
 from entities.explosion import Explosion
 from entities.particle import Particle
@@ -12,15 +11,15 @@ from entities.thruster_particle import ThrusterParticle
 from pygame.transform import rotate, smoothscale_by
 import random
 from entities.powerup import PowerUp
-level = Level()
 
 class Player(pg.sprite.Sprite):
 	def __init__(self, game, pos):
 		super().__init__()
 		self.bullet = PlayerBullet(game, pos, velocity=(0, -800))
+		self.game = game
 		self.shoot_mode = "normal"
 		self.power_timer = 0
-		self.lives = level.lives
+		self.lives = self.game.level.lives
 		self.invincible_timer = 0
 		self.thruster_timer = 0
 		self.alive = True
@@ -39,7 +38,7 @@ class Player(pg.sprite.Sprite):
 		self.image = random.choice(self.images)
 		self.image = pg.transform.smoothscale(self.image, (200, 200))
 		self.rect = self.image.get_rect(center=pos)
-		self.pos = c.WIDTH // 2, c.HEIGHT - 120
+		self.pos = pg.Vector2(self.rect.center)
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_toggle_timer = 0
@@ -236,7 +235,7 @@ class Player(pg.sprite.Sprite):
 		if kind == "shield":
 			self.power_timer = 12.0
 			self.shield = True
-			self.shield_amount = level.player_shield_amount
+			self.shield_amount = self.game.level.player_shield_amount
 
 	def shoot_vulcan(self, dt):
 		if self.vulcan_timer > 0:
@@ -317,7 +316,7 @@ class Player(pg.sprite.Sprite):
 		self.vulcan_sound_timer = self.vulcan_sound_delay
 
 		if hasattr(self.game, "play_sound"):
-			self.game.play_sound(self.minigun_sound, 0.22)
+			self.game.play_sound(self.minigun_sound, 0.11)
 		else:
 			self.minigun_sound.play()
 

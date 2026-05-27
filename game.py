@@ -32,8 +32,8 @@ class Game:
 	def __init__(self):
 		pg.init()
 		mixing()
-		level = Level()
-		level.stage = 1
+		self.level = Level()
+		self.level.stage = 1
 		c.event = Event.INITIATION
 		c.HOME_DIR = Path(__file__).parent.absolute()
 		print(c.HOME_DIR)
@@ -190,31 +190,35 @@ class Game:
 				self.all_sprites.add(enemy)
 				return
 
-	def boss_spawn(self, name: str = "Werthog", lvl: int = 1, image: pg.image or None = c.BOSS2, hp: int = 300):
-		print(f"{len(self.enemies)} enemies + 1 boss = {len(self.enemies)+1}")
-		if self.boss is None:
-			print("boss was no-one")
-			self.ikea = c.BOSS.pop(0)
-			print(f"Replaced by {self.ikea.get("name")}")
-			self.boss = Boss(self, name=self.ikea.get("name", "Unnamed"), pos = self.ikea.get("pos", "(c.WIDTH // 2, -160))"))
-		self.boss.name = name
-		self.boss.lvl = lvl
-		self.boss.image = self.ikea.get("image")
-		print(self.boss.image)
-		print(self.ikea)
-		self.boss.rect = self.boss.image.get_rect(center=self.boss.pos)
-		self.boss.hp = level.boss_hp
-		self.angle = 0
-		self.hitbox = self.boss.rect.inflate(-56, -56)
+	def boss_spawn(self, name="Unnamed", lvl=1, image=None, hp=1000, pos=None):
+		if self.boss is not None:
+			return
+
 		c.BOSS_TIME = True
-		self.bosses.append(self.boss)
-		print(self.bosses)
-		print(f"lisättiin tason {level.stage} bossi {self.boss.name} {self.boss.lvl} {self.boss.image} {self.boss.hp}")
+
+		if pos is None:
+			pos = (c.WIDTH // 2, -160)
+
+		self.boss = Boss(
+			self,
+			name=name,
+			pos=pos,
+			image=image,
+			hp=hp,
+			lvl=lvl
+		)
+
+		self.enemies.add(self.boss)
+		self.all_sprites.add(self.boss)
 
 		if level.stage == 3:
 			print("nextlevel shite")
-			self.boss = Boss(self, (c.WIDTH // 2, -200))
-			self.boss.image = pg.transform.smoothscale(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses","foobarhead1.png")),(240, 240))
+			if not level.next_boss_candidate or level.nextboss:
+				c.NEXTBOSS = c.BOSS.pop(0)
+			self.boss = Boss(self, c.NEXTBOSS.get("pos"), (0, -1))
+			self.boss.image = pg.transform.smoothscale(pg.image.load(
+				c.NEXTBOSS.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png")).convert_alpha(), (240, 240))
+			self.boss_hp = level.boss_hp
 			self.boss_time = c.BOSS_TIME
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
@@ -223,9 +227,13 @@ class Game:
 
 		if level.stage == 2:
 			print("kakkone on ykköne")
-			self.boss = Boss(self, (c.WIDTH // 2, -400))
+			if not level.next_boss_candidate or level.nextboss:
+				c.NEXTBOSS = c.BOSS.pop(0)
+			self.boss = Boss(self, c.NEXTBOSS.get("pos"), (0, -1))
+			self.boss.image = pg.image.load(
+				c.NEXTBOSS.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png")).convert_alpha()
+			self.boss_hp = level.boss_hp
 			self.angle += 1
-			self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses", "boss-2.png")), self.angle)
 			self.boss_time = c.BOSS_TIME
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
@@ -234,9 +242,12 @@ class Game:
 
 		if level.stage == 1:
 			print("el virgo")
-			level.nextboss_candidate = level.nextboss
-			self.boss = Boss(self, (c.WIDTH // 2, -300))
-			self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses", "dark-crusader.png"))
+			if not level.next_boss_candidate or level.nextboss:
+				c.NEXTBOSS = c.BOSS.pop(0)
+			self.boss = Boss(self, c.NEXTBOSS.get("pos"), (0, -1))
+			self.boss.image = pg.image.load(c.NEXTBOSS.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png")).convert_alpha()
+			self.boss_hp = level.boss_hp
+			self.boss_time = c.BOSS_TIME
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
 			self.all_sprites.add(self.boss)
@@ -262,10 +273,21 @@ class Game:
 		self.asteroids.update(dt)
 		self.all_sprites.update(dt)
 
-		if not c.BOSS_TIME and not self.boss_spawned_this_level:
+		if not c.BOSS_TIME and self.boss is None:
+			self.boss_timer -= dt
+			if not c.NEXTBOSS:
+				self.boss_dict = c.BOSS.pop(0)
+				c.NEXTBOSS = self.boss_dict.copy()
+
+			if self.boss_timer <= 0:
+				self.boss_timer = 0
+				self.boss_spawn(
+					name=self.boss_dict.get("name", "unknown"),
+					lvl=self.level.stage,
+					image=self.boss_dict.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png"),
+					hp=self.level.boss_hp
+				)
 			self.level_timer += dt
-			if self.boss_timer > 0:
-				self.boss_timer -= dt * 30
 			self.enemy_spawn_timer += dt
 			if self.enemy_spawn_timer >= self.enemy_spawn_delay and len(self.enemies) < level.max_enemies:
 				self.enemy_spawn_timer = 0
@@ -331,11 +353,6 @@ class Game:
 		):
 			print("bossi spawnautumassa")
 			self.bosses.clear()
-			# self.boss=Boss(self, (c.WIDTH // 2, -300), image=pg.image.load(f"assets/dark-crusader.png"))
-			# self.boss_timer = 0
-			# self.boss_spawned_this_level = True
-			# self.boss_spawn_delay = 200
-			# c.BOSS_TIME = True
 			if level.next_boss_candidate is None:
 				print("nöössi")
 			boss_dict = c.BOSS.pop(0)
