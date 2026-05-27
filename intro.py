@@ -15,7 +15,7 @@ def alpha():
 	y_res = 1080
 	screen = pg.display.set_mode((x_res, y_res), pg.SRCALPHA, 32)
 	HOME_DIR = os.path.dirname(__file__)
-	screen.blit(pg.image.load(Path(HOME_DIR, "assets", "stimu_wallpaper.png")), (0, 0))
+	screen.blit(pg.image.load(Path(HOME_DIR, "assets", "backgrounds", "stimu_wallpaper.png")), (0, 0))
 	pg.event.clear()
 	pg.mixer.music.load(Path(HOME_DIR, "assets", "Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3"))
 	pg.mixer.music.play(-1)
@@ -33,10 +33,13 @@ def alpha():
 	screen.blit(fontti.render("シ", True, (255, 255, 255)), (screen.get_width()// 2, screen.get_height()// 2))
 	running = True
 	cooldown = 500
+	in_logo = True
 	switch = True
 	i = 0
 	last = 0
-	logointerval = 500
+	logointerval = 5
+	sleep(logointerval)
+
 	pg.display.set_caption("Dark Void 2 - The Avoided")
 	INITEVENT = pg.USEREVENT + 1
 	pg.time.set_timer(INITEVENT, 5000, 20000)
@@ -45,10 +48,12 @@ def alpha():
 		(0, 0, 0, 255)
 	)
 	pg.display.flip()
-	sleep(2)
+
+
 	timer.tick(159)
 	xd2, yd2 = font2.size("press space to continue")
-	font.render("press space to continue", True, (255, 255, 255))
+	spacetext = font.render("press space to continue", True, (255, 255, 255))
+
 	f = 0
 	finished = True
 	in_logo = True
@@ -121,3 +126,6 @@ def alpha():
 		dt = timer.tick(60), 1000
 
 Game().run()
+
+if __name__ == "__main__":
+	alpha()

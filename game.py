@@ -401,7 +401,7 @@ class Game:
 			self.rotated_text.blit(next_level_text := levelup_font.render("Next Stage", True, (0, 0, 255)), (c.WIDTH // 2, c.HEIGHT // 2))
 			rotating_surf = pg.Surface((400, 100), pg.SRCALPHA)
 			rotating_surf.blit(next_level_text, (c.WIDTH // 2, c.HEIGHT // 2)), (0, 0)
-			rotozoom(rotating_surf, scale = self.next_level_backdrop_scale, angle = self.next_level_angle, center = (c.WIDTH // 2, c.HEIGHT // 2), surface = self.screen)
+			rotozoom(rotating_surf, scale = self.next_level_backdrop_scale, angle = self.next_level_angle)
 			rotating_surf.set_alpha(self.next_level_backdrop_alpha)
 			clock = pg.time.Clock()
 			self.dt = clock.tick(60) / 1000

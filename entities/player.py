@@ -64,7 +64,7 @@ class Player(pg.sprite.Sprite):
 		self.vulcan_sound_delay = 0.07
 
 		self.minigun_sound = pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/gundam-vulcan-machine-gun-sound.mp3")
-		self.minigun_sound.set_volume(0.2)
+		self.minigun_sound.set_volume(0.4)
 
 	def make_flash_image(self, image):
 		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
