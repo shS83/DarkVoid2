@@ -156,9 +156,11 @@ BOSS_TIME = False
 SCALE = 0.4
 HOME_DIR = os.path.dirname(__file__)
 MSG_FONT = pg.font.Font(
-    Path(f"{HOME_DIR}", "assets", "fonts", "GoMonoNerdFontPropo-Bold.ttf", 60)
+    Path(f"{HOME_DIR}", "assets", "fonts", "GoMonoNerdFontPropo-Bold.ttf"), 60
 )
+
 GOTHIC_FONT = pg.font.Font(
-    Path(f"{HOME_DIR}", "assets", "fonts", "VL-Gothic-Regular.ttf", 36)
+    Path(f"{HOME_DIR}", "assets", "fonts", "VL-Gothic-Regular.ttf"), 36
 )
+
 event = Event.DRUMROLL
