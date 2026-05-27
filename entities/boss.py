@@ -37,13 +37,17 @@ class Boss(pg.sprite.Sprite):
 		else:
 			self.image = pg.transform.rotate(pg.transform.smoothscale(image, (800, 800)), 0)
 		self.base_image = self.image.copy()
+		self.mask = pg.mask.from_surface(self.base_image)
+		self.hitbox_template = self.base_image.get_bounding_rect(min_alpha=24).inflate(-18, -18)
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_timer = 0
 
 		self.rect = self.image.get_rect(center=pos)
 		self.pos = pg.Vector2(self.rect.center)
 
-		self.hitbox = self.rect.inflate(-56, -56)
+		self.hitbox = self.hitbox_template.copy()
+		self.hitbox.x += self.rect.x
+		self.hitbox.y += self.rect.y
 
 		self.target_y = 250
 		self.speed = 120
@@ -77,7 +81,9 @@ class Boss(pg.sprite.Sprite):
 			self.entering = False
 
 		self.rect.center = self.pos
-		self.hitbox.center = self.rect.center
+		self.hitbox = self.hitbox_template.copy()
+		self.hitbox.x += self.rect.x
+		self.hitbox.y += self.rect.y
 
 		self.shoot_timer -= dt
 		self.secondary_timer -= dt
@@ -370,4 +376,3 @@ class Boss(pg.sprite.Sprite):
 		self.game.level.up()
 
 		self.kill()
-

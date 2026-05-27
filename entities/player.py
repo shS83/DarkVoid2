@@ -149,9 +149,9 @@ class Player(pg.sprite.Sprite):
 		self.game.play_sound(self.minigun_sound, 0.2)
 
 	def shoot_railgun(self):
-		self.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
-		self.image2 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
-		self.image3 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser3.png")), (20, 100))
+		self.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser-red.png")), (30, 120))
+		self.image2 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser-red.png")), (30, 120))
+		self.image3 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser-red.png")), (30, 120))
 		self.image.blit(self.image, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
 		self.image2.blit(self.image2, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
 		self.image3.blit(self.image3, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)

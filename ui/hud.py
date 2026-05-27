@@ -17,7 +17,8 @@ class HUD:
 			True,
 			(240, 240, 255)
 		)
-		first_text = f"BOSS ARRIVING in {c.BOSS_TIMER}"
+		#first_text = f"BOSS ARRIVING in {round(c.BOSS_TIMER)}"
+		first_text = ""
 		if c.BOSS_TIMER <= 1 and self.game.boss is not None:
 			first_text = f"BOSS HP LEFT: {self.game.boss.hp}"
 		text2 = self.small_font.render(

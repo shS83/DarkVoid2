@@ -86,17 +86,16 @@ class Game:
 		self.py = -42
 		self.dt = 0
 		self.all_sprites = pg.sprite.LayeredUpdates()
-		self.game_over_font = pg.font.Font(f'{c.HOME_DIR}/assets/fonts/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
+		self.game_over_font = pg.font.Font(f'{c.HOME_DIR}/assets/fonts/JetBrainsMonoNerdFont-SemiBold.ttf', 96)
 		self.stage_font = pg.font.Font(f'{c.HOME_DIR}/assets/fonts/JetBrainsMonoNerdFont-SemiBold.ttf', 96)
 		self.stage_banner_duration = 2.4
 		self.stage_banner_timer = self.stage_banner_duration
 		self.stage_banner_stage = self.level.stage
 		self.boss_hp = 300
 		self.boss_dict = {}
-		self.celtic_font = pg.sysfont.SysFont("GEORGIA.TTF", 128, italic=True)
 		self.game_over = False
 		self.game_over_timer = 0
-		self.game_over_text = self.celtic_font.render("YOU DIED", True, (255, 40, 40))
+		self.game_over_text = self.game_over_font.render("YOU DIED", True, (255, 40, 40))
 		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 90))
 		self.all_sprites.add(self.player)
 		self.player_bullets = pg.sprite.Group()
@@ -125,6 +124,26 @@ class Game:
 		if self.player.lives <= 0 or not self.player.alive:
 			self.player.alive = False
 			self.game_over = True
+
+	def bullet_hits_target(self, bullet, target):
+		target_hitbox = getattr(target, "hitbox", target.rect)
+
+		if not target_hitbox.colliderect(bullet.rect):
+			return False
+
+		if hasattr(target, "mask"):
+			bullet_mask = getattr(bullet, "mask", None)
+
+			if bullet_mask is None:
+				bullet_mask = pg.mask.from_surface(bullet.image)
+
+			offset = (
+				bullet.rect.left - target.rect.left,
+				bullet.rect.top - target.rect.top,
+			)
+			return target.mask.overlap(bullet_mask, offset) is not None
+
+		return True
 
 	def spawn_asteroid(self):
 		x = random.randint(-40, c.WIDTH + 40)
@@ -262,7 +281,6 @@ class Game:
 					and self.boss is None
 			):
 				if c.BOSS:
-					print("bossi spawnautumassa")
 					boss_dict = c.BOSS.pop(0)
 					self.boss_spawn(
 						name=boss_dict.get("name", "unknown"),
@@ -344,10 +362,8 @@ class Game:
 	def handle_collisions(self):
 		# Player bullets vs enemies/bosses
 		for enemy in list(self.enemies):
-			enemy_hitbox = getattr(enemy, "hitbox", enemy.rect)
-
 			for bullet in list(self.player_bullets):
-				if enemy_hitbox.colliderect(bullet.rect):
+				if self.bullet_hits_target(bullet, enemy):
 					bullet.kill()
 
 					damage = getattr(bullet, "damage", 1)
