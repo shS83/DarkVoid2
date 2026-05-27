@@ -46,13 +46,14 @@ DING = pg.mixer.Sound(f'{HOME_DIR}/assets/audio/ding.mp3')
 BEACHES=[BEACH1, BEACH2, BEACH3, BEACH4]
 BACKGROUND = BEACH3
 ROCK_IMAGES = [ROCK1, ROCK2, ROCK3, ROCK4, ROCK5, ROCK6]
-BOSS = [{"name": "Dark Crusader", "pos": "(WIDTH //2, -200)", "lvl": 1, "boss_hp": 300, "boss_time": 3000, "boss_image": BOSS1},
-		{"name": "Eldritch Marauder", "pos": "(WIDTH //2, -400)", "lvl": 2, "boss_hp": 400, "boss_time": 4000, "boss_image": BOSS2},
-		{"name":" Aural Alien", "lvl": 3, "pos": "(WIDTH //2, -300)", "boss_hp": 500, "boss_time": 5000, "boss_image": BOSS3}]
-NEXTBOSS = False
-SHIELD = False
 WIDTH = 1920
 HEIGHT = 1080
+BOSS = [{"name": "Mr. Robot", "pos": (WIDTH // 2, -200), "lvl": 0, "boss_hp": 1, "boss_time": 500, "boss_image": pg.Surface((100,100))},
+		{"name": "Dark Crusader", "pos": (WIDTH // 2, -200), "lvl": 1, "boss_hp": 300, "boss_time": 3000, "boss_image": BOSS1},
+		{"name": "Eldritch Marauder", "pos": (WIDTH // 2, -400), "lvl": 2, "boss_hp": 400, "boss_time": 4000, "boss_image": BOSS2},
+		{"name": "Aural Alien", "lvl": 3, "pos": (WIDTH // 2, -300), "boss_hp": 500, "boss_time": 5000, "boss_image": BOSS3}]
+NEXTBOSS = False
+SHIELD = False
 BOSS_TIME = False
 SCALE = 0.3
 HOME_DIR = os.path.dirname(__file__)
