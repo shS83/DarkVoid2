@@ -289,32 +289,6 @@ class Game:
 				self.game_over_backdrop_alpha = 80
 
 			return
-			# if (
-			# 		self.level_timer >= self.boss_spawn_delay
-			# 		and not self.boss_spawned_this_level
-			# 		and self.boss is None
-			# ):
-			# 	print("bossi spawnautumassa")
-			# 	self.bosses.clear()
-			# 	if self.level.next_boss_candidate is None:
-			# 		print("nöössi")
-			# 	boss_dict = c.BOSS.pop(0)
-			# 	print(f"you're fighting {boss_dict.get("name")}")
-			# 	self.boss_spawn(name=boss_dict.get("name", "unknown"), lvl=self.level.stage,
-			# 					image=boss_dict.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png"), hp=self.level.boss_hp)
-			# if not self.player.alive:
-			# 	self.game_over = True
-			#
-			# if self.game_over:
-			# 	self.game_over_scale += self.game_over_scale_dir * 0.4 * dt
-			# 	self.text_alpha -= 0.3
-			# 	self.game_over_backdrop_scale += 2.8 * dt
-			# 	if self.game_over_backdrop_scale > 6:
-			# 		self.game_over_backdrop_scale = 6
-			# 	self.game_over_backdrop_alpha -= 50 * dt
-			# 	if self.game_over_backdrop_alpha < 80:
-			# 		self.game_over_backdrop_alpha = 80
-			# 	return
 
 	def draw(self):
 		if c.Event != c.Event.PAUSE:
@@ -445,7 +419,7 @@ class Game:
 				self.player.apply_powerup(powerup.kind)
 
 		if c.event == c.Event.NEXTLEVEL:
-			if len(c.BOSS) == 5 - self.level.stage and not self.level.next_boss_candidates:
+			if len(c.BOSS) == 5 - self.level.stage and not self.level.next_boss_candidates and not len(c.BOSS) == 0:
 				self.level.next_boss_candidate = c.BOSS.pop(0)
 			self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
 			overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
