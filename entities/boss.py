@@ -37,8 +37,7 @@ class Boss(pg.sprite.Sprite):
 		self.hitbox = self.rect.inflate(-56, -56)
 		self.thruster_timer = 0.12
 		self.speed = 40
-		self.phases = [self.fire_bullet,
-		                         self.aimed_shot,
+		self.phases = [self.aimed_shot,
 		                         self.aimed_spread,
 		                         self.radial_burst,
 		                         self.spiral_burst,
@@ -247,7 +246,7 @@ class Boss(pg.sprite.Sprite):
 			return
 
 		self.hp -= amount
-		self.flash_timer = 0.2
+		self.flash_timer = 0.1
 
 		if self.hp <= 0:
 			self.destroy()
@@ -255,8 +254,8 @@ class Boss(pg.sprite.Sprite):
 	def destroy(self, dt=pg.time.Clock().tick(60) / 1000):
 		explosion = None
 		interval = 400
-		explosion_sounds = [f'{c.HOME_DIR}/assets/explosion2.wav', f'{c.HOME_DIR}/assets/explosion1-long.wav',
-		                    f'{c.HOME_DIR}/assets/explosion3.wav']
+		explosion_sounds = [f'{c.HOME_DIR}/assets/audio/explosion2.wav', f'{c.HOME_DIR}/assets/audio/explosion1-long.wav',
+		                    f'{c.HOME_DIR}/assets/audio/explosion3.wav']
 		pg.mixer.Sound(random.choice(explosion_sounds)).play()
 		now = pg.time.get_ticks()
 		if dt + now > 1000 + interval:

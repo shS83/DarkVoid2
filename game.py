@@ -231,7 +231,7 @@ class Game:
 		if c.level.stage == 1:
 			print("el virgo")
 			self.boss = Boss(self, (c.WIDTH // 2, -300))
-			self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png"))
+			self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses", "dark-crusader.png"))
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
 			self.all_sprites.add(self.boss)
@@ -327,7 +327,7 @@ class Game:
 			# c.BOSS_TIME = True
 			print(f"you're fighting {c.BOSS[0].get("name")}")
 			self.boss_spawn(name=c.BOSS[0].get("name"), lvl=c.BOSS[0].get("lvl"),
-							image=pg.image.load(f"{c.HOME_DIR}/assets/dark-crusader.png"), hp=c.level.boss_hp)
+							image=pg.image.load(f"{c.HOME_DIR}/assets/ships/bosses/dark-crusader.png"), hp=c.level.boss_hp)
 
 		if not self.player.alive:
 			self.game_over = True

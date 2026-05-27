@@ -59,8 +59,8 @@ class Meteor(pg.sprite.Sprite):
 			self.destroy()
 
 	def destroy(self):
-		explosion_sounds = [f'{c.HOME_DIR}/assets/explosion2.wav', f'{c.HOME_DIR}/assets/explosion1-long.wav',
-		                    f'{c.HOME_DIR}/assets/explosion3.wav']
+		explosion_sounds = [f'{c.HOME_DIR}/assets/audio/explosion2.wav', f'{c.HOME_DIR}/assets/audio/explosion1-long.wav',
+		                    f'{c.HOME_DIR}/assets/audio/explosion3.wav']
 		pg.mixer.Sound(random.choice(explosion_sounds)).play()
 
 		explosion = Explosion(self.game, self.rect.center)

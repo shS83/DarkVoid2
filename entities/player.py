@@ -5,6 +5,7 @@ from entities.bullet import PlayerBullet
 from entities.explosion import Explosion
 from entities.particle import Particle
 from entities.thruster_particle import ThrusterParticle
+from pygame.transform import rotate, smoothscale_by
 import random
 from entities.powerup import PowerUp
 
@@ -24,11 +25,12 @@ class Player(pg.sprite.Sprite):
 		self.fire_cooldown3 = 0.35
 		self.game = game
 		self.pauseswitch = -1
-		self.image1 = pg.image.load(Path(c.HOME_DIR, "assets", "Proper_warship.png")).convert_alpha()
-		self.image2 = pg.image.load(Path(c.HOME_DIR, "assets", "lilac_thrusters.png")).convert_alpha()
-		self.image3 = pg.image.load(Path(c.HOME_DIR, "assets", "purplealus.png")).convert_alpha()
-		self.image4 = pg.image.load(Path(c.HOME_DIR, "assets", "turqoiseship.png")).convert_alpha()
-		self.images = [self.image1, self.image2, self.image3, self.image4]
+		self.image1 = smoothscale_by(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "Proper_warship.png")).convert_alpha(), c.SCALE)
+		self.image2 = smoothscale_by(rotate(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "lilac-thrusters.png")).convert_alpha(), 180), c.SCALE)
+		self.image3 = smoothscale_by(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "purplealus.png")).convert_alpha(), c.SCALE)
+		self.image4 = smoothscale_by(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "turqoiseship.png")).convert_alpha(), c.SCALE)
+		self.image5 = smoothscale_by(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "finnfighter.png")).convert_alpha(), c.SCALE)
+		self.images = [self.image5]#self.image1, self.image2, self.image3, self.image4]
 		self.image = random.choice(self.images)
 		self.image = pg.transform.smoothscale(self.image, (200, 200))
 		self.rect = self.image.get_rect(center=pos)
@@ -64,7 +66,7 @@ class Player(pg.sprite.Sprite):
 	def shoot_railgun(self):
 		self.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
 		self.image2 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser_2.png")), (20, 100))
-		self.image3 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser-3.png")), (20, 100))
+		self.image3 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser3.png")), (20, 100))
 		self.image.blit(self.image, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
 		self.image2.blit(self.image2, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
 		self.image3.blit(self.image3, (0,0), special_flags=pg.BLEND_RGBA_SUB)
@@ -75,7 +77,7 @@ class Player(pg.sprite.Sprite):
 		if self.rect.y - self.bullet.rect.y < 0:
 			self.bullet.kill()
 
-		pg.mixer.Sound(f'{c.HOME_DIR}/assets/lasercont.wav').play()
+		pg.mixer.Sound(f'{c.HOME_DIR}/assets/audio/lasercont.wav').play()
 		self.fire_timer = self.fire_cooldown
 		self.game.player_bullets.add(self.bullet)
 		self.game.all_sprites.add(self.bullet)
@@ -86,7 +88,7 @@ class Player(pg.sprite.Sprite):
 			return
 		if self.rect.y - bullet.rect.y < 0:
 			bullet.kill()
-		pg.mixer.Sound(f'{c.HOME_DIR}/assets/lasersound2.wav').play()
+		pg.mixer.Sound(f'{c.HOME_DIR}/assets/audio/lasersound2.wav').play()
 		self.fire_timer = self.fire_cooldown2
 		self.game.player_bullets.add(bullet)
 		self.game.all_sprites.add(bullet)
@@ -115,7 +117,7 @@ class Player(pg.sprite.Sprite):
 			self.flash_timer = 0.05
 			if self.invincible_timer > 0:
 				return
-			pg.mixer.Sound(f'{c.HOME_DIR}/assets/clink.wav').play()
+			pg.mixer.Sound(f'{c.HOME_DIR}/assets/audio/clink.wav').play()
 			self.lives -= 1
 			self.invincible_timer = 2.0
 			for _ in range(100):
@@ -123,7 +125,7 @@ class Player(pg.sprite.Sprite):
 				self.game.effects.add(particle)
 				self.game.all_sprites.add(particle)
 		else:
-			pg.mixer.Sound(f"{c.HOME_DIR}/assets/ding.mp3").play()
+			pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/ding.mp3").play()
 			if self.lives <= 0:
 				explosion_sound = f'{c.HOME_DIR}/assets/explosion1-long.wav'
 				pg.mixer.Sound(explosion_sound).play()
@@ -207,7 +209,7 @@ class Player(pg.sprite.Sprite):
 		if keys[pg.K_F5]:
 			self.game.show_enemies = not self.game.show_enemies
 		if keys[pg.K_F6]:
-			self.game.bosses[0].image = pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png"))
+			self.game.bosses[0].image = pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses", "dark-crusader.png"))
 		if keys[pg.K_F7]:
 			print(*self.game.bosses)
 			self.game.bosses.clear()
@@ -249,12 +251,12 @@ class Player(pg.sprite.Sprite):
 			engine_right = (self.rect.centerx + 10, self.rect.centery + 42)
 			for engine_pos in [engine_left, engine_right]:
 				# hot core
-				for _ in range(4):
+				for _ in range(8):
 					particle = ThrusterParticle(
 						self.game,
 						engine_pos,
 						direction=(0, 1),
-						color=(255, 220, 235),
+						color=(255, 0, 0),
 						speed_range=(280, 520),
 						size_range=(1, 5),
 						life_range=(0.12, 0.46),
@@ -264,16 +266,16 @@ class Player(pg.sprite.Sprite):
 					self.game.all_sprites.add(particle)
 
 				# purple/blue outer flame
-				for _ in range(4):
+				for _ in range(8):
 					particle = ThrusterParticle(
 						self.game,
 						engine_pos,
 						direction=(0, 1),
-						color=(255, 115, 240),
+						color=(255, 255, 0),
 						speed_range=(180, 380),
 						size_range=(2, 6),
 						life_range=(0.18, 0.38),
-						spread=10
+						spread=15
 					)
 					self.game.effects.add(particle)
 					self.game.all_sprites.add(particle)
