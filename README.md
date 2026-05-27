@@ -2,10 +2,12 @@
 
 Dark Void 2 repository
 
-# Trying to do everything better, farther, taller, bigger..
+# Trying to do everything better, farther, taller, bigger, faster, shorter, darker and while moaning and grunting....
+
+27.5.2026 Released 0.45 binaries version for Linux and Windows. 3 Levels work now somehow.
 
 It's going to be an epic fail or a wild success.
 
-To install you need pygame. Not compiled yet to binaries so running manually with python is the only viable option.
+To use the source path you need pygame. On Windows I had some trouble with SDL-mixer on the original pygame package so on Windows I recommend pygame-ce. Linux works just fine with anything.
 
 Currently 26.5. at 0.113 alpha version only 1 level works. More is to come.
