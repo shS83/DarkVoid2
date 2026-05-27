@@ -31,11 +31,10 @@ class EnemyBullet(pg.sprite.Sprite):
 		self.rect = self.image.get_rect(center=self.pos)
 		self.velocity = pg.Vector2(velocity)
 		self.radius = 8
-		center = (self.radius, self.radius)
-		pg.draw.circle(self.image, (60, 0, 0), center, self.radius)
-		pg.draw.circle(self.image, (255, 0, 0), center, self.radius - 2)
-		pg.draw.circle(self.image, (255, 80, 120), center, self.radius - 4)
-		pg.draw.circle(self.image, (255, 255, 160), center, self.radius - 6)
+		pg.draw.circle(self.image, (60, 0, 0), (6, 6), self.radius)
+		pg.draw.circle(self.image, (255, 0, 0), (6, 6), self.radius - 2)
+		pg.draw.circle(self.image, (255, 80, 120), (6, 6), self.radius - 4)
+		pg.draw.circle(self.image, (255, 255, 160), (6, 6), self.radius - 6)
 
 
 	def update(self, dt):
