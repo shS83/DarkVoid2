@@ -1,8 +1,10 @@
 import random
 import config as c
+from pathlib import Path
+import pygame as pg
 
 class Level:
-	def __init__(self,):
+	def __init__(self):
 		self.stage = 1
 		self.asteroids = 3
 		self.lives = 5
@@ -15,13 +17,16 @@ class Level:
 		self.player_shield_amount = 5
 		self.enemy_hp = 5
 		self.asteroid_hp = 2
-		self.boss = "Placeholder guy"
+		self.boss = None
+		self.next_boss_candidate = None
 		self.boss_timer = 2000
 		self.boss_hp = 300
 		self.max_asteroids = 6
 		self.asteroid_speed = 1
 
+
 	def up(self):
+		#self.next_boss_candidate = self.boss_tree.pop(0)
 		self.player_shield_amount += 1
 		self.enemy_bullet_cooldown -= 0.03
 		self.stage += 1

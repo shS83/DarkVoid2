@@ -48,10 +48,11 @@ def alpha():
 	sleep(2)
 	timer.tick(159)
 	xd2, yd2 = font2.size("press space to continue")
+	font.render("press space to continue", True, (255, 255, 255))
 	f = 0
 	finished = True
-	in_logo = False
-	begin = False
+	in_logo = True
+	begin = True
 	LOGOEVENT = pg.USEREVENT + 2
 	FADEOUTEVENT = pg.USEREVENT + 3
 	INITGAME = pg.USEREVENT + 4
@@ -71,6 +72,7 @@ def alpha():
 					pg.event.clear()
 					in_logo = True
 					i = 100
+					i+=1
 					pg.event.post(pg.event.Event(LOGOEVENT))
 
 			if event.type == LOGOEVENT:

@@ -1,3 +1,4 @@
+import random
 from pygame import mixer
 import pygame as pg
 import config as c
@@ -7,13 +8,12 @@ from entities.enemy import Enemy
 from entities.star import Star
 from ui.hud import HUD
 from entities.asteroid import Meteor
-from entities.level import *
 # from core.hs_module import HighScore
 from entities.level import Level
 from entities.events import Event
 from pathlib import Path
 from entities.shield import Shield
-c.Level = Level()
+level = Level()
 
 def mixing():
 	mixer.init()
@@ -28,13 +28,12 @@ def mixing():
 	mixer.music.set_volume(0.2)
 	mixer.set_num_channels(32)
 
-
 class Game:
 	def __init__(self):
 		pg.init()
 		mixing()
-		c.level = Level()
-		c.level.stage = 1
+		level = Level()
+		level.stage = 1
 		c.event = Event.INITIATION
 		c.HOME_DIR = Path(__file__).parent.absolute()
 		print(c.HOME_DIR)
@@ -52,7 +51,7 @@ class Game:
 		self.asteroids = pg.sprite.Group()
 		self.boss = None
 		self.boss_time = False
-		self.boss_timer = c.level.boss_timer
+		self.boss_timer = level.boss_timer
 		self.level_timer = 0
 		self.boss_spawn_delay = c.BOSS_SPAWN_DELAY
 		self.boss_spawned_this_level = False
@@ -114,6 +113,13 @@ class Game:
 		for _ in range(200):
 			self.stars.add(Star())
 
+	def play_sound(self, sound, volume=1.0):
+		channel = pg.mixer.find_channel(True)
+
+		if channel:
+			sound.set_volume(volume)
+			channel.play(sound)
+
 	def spawn_asteroid(self):
 		x = random.randint(-40, c.WIDTH + 40)
 		y = random.randint(-40, c.HEIGHT + 40)
@@ -156,17 +162,6 @@ class Game:
 		if random.random() < 0.15:
 			self.spawn_rocks()
 
-		#if random.random() < 0.01 and len(self.bosses) < 1:
-			# c.BOSS_TIME = True
-			# self.boss = Boss(self, (c.WIDTH // 2, -160))
-			# self.boss_max_y = 160
-			#
-			# self.bosses.append(self.boss)
-			# self.enemies.add(self.boss)
-			# self.boss_group.add(self.boss)
-			# self.all_sprites.add(self.boss)
-			# self.boss_spawn()
-
 		for b in self.bosses:
 			b.update(1/ 60/1000)
 
@@ -195,22 +190,25 @@ class Game:
 				self.all_sprites.add(enemy)
 				return
 
-	def boss_spawn(self, name: str = "Werner", lvl: int = 1, image: pg.image or None = c.BOSS2, hp: int = 300):
+	def boss_spawn(self, name: str = "Werthog", lvl: int = 1, image: pg.image or None = c.BOSS2, hp: int = 300):
 		print(f"{len(self.enemies)} enemies + 1 boss = {len(self.enemies)+1}")
 		if self.boss is None:
 			print("boss was no-one")
-			self.boss = Boss(self, (c.WIDTH // 2, -160))
+			self.dictate = c.BOSS.pop(0)
+			self.boss = Boss(self, name=self.dictate.get("name", "Unnamed"), pos = self.dictate.get("pos", "(c.WIDTH // 2, -160))"), image=self.dictate.get("image"), hp=level.boss_hp)
 		self.boss.name = name
 		self.boss.lvl = lvl
 		self.boss.image = image
+		self.boss.rect = self.boss.image.get_rect(center=self.boss.pos)
 		self.boss.hp = hp
+		self.angle = 0
 		self.hitbox = self.boss.rect.inflate(-56, -56)
 		c.BOSS_TIME = True
 		self.bosses.append(self.boss)
 		print(self.bosses)
-		print(f"lisättiin tason {c.level.stage} bossi {name} {lvl} {image} {hp}")
+		print(f"lisättiin tason {level.stage} bossi {name} {lvl} {image} {hp}")
 
-		if c.level.stage == 3:
+		if level.stage == 3:
 			print("nextlevel shite")
 			self.boss = Boss(self, (c.WIDTH // 2, -200))
 			self.boss.image = pg.transform.smoothscale(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses","foobarhead1.png")),(240, 240))
@@ -218,24 +216,28 @@ class Game:
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
 			self.all_sprites.add(self.boss)
+			self.boss_spawned_this_level = True
 
-		if c.level.stage == 2:
+		if level.stage == 2:
 			print("kakkone on ykköne")
 			self.boss = Boss(self, (c.WIDTH // 2, -400))
-			self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses", "boss-2.png")), 0.5)
+			self.angle += 1
+			self.boss.image = pg.transform.rotate(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses", "boss-2.png")), self.angle)
 			self.boss_time = c.BOSS_TIME
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
 			self.all_sprites.add(self.boss)
+			self.boss_spawned_this_level = True
 
-		if c.level.stage == 1:
+		if level.stage == 1:
 			print("el virgo")
+			level.nextboss_candidate = level.nextboss
 			self.boss = Boss(self, (c.WIDTH // 2, -300))
 			self.boss.image = pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses", "dark-crusader.png"))
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
 			self.all_sprites.add(self.boss)
-
+			self.boss_spawned_this_level = True
 			print("boss created:", self.boss.pos)
 			print("boss added to groups")
 
@@ -262,7 +264,7 @@ class Game:
 			if self.boss_timer > 0:
 				self.boss_timer -= dt * 30
 			self.enemy_spawn_timer += dt
-			if self.enemy_spawn_timer >= self.enemy_spawn_delay and len(self.enemies) < c.level.max_enemies:
+			if self.enemy_spawn_timer >= self.enemy_spawn_delay and len(self.enemies) < level.max_enemies:
 				self.enemy_spawn_timer = 0
 				self.enemy_spawn_delay = random.uniform(0.4, 3.0)
 				self.spawn_enemy()
@@ -271,7 +273,7 @@ class Game:
 		if self.asteroid_spawn_timer >= self.asteroid_spawn_delay:
 			self.asteroid_spawn_timer = 0
 			self.asteroid_spawn_delay = random.uniform(0.40, 3.2)
-			if len(self.asteroids) < c.level.max_asteroids:
+			if len(self.asteroids) < level.max_asteroids:
 				self.spawn_asteroid()
 			if len(self.asteroids) < 2:
 				self.spawn_rocks()
@@ -293,6 +295,9 @@ class Game:
 		for asteroid in self.asteroids:
 			if asteroid.hitbox.colliderect(self.player.rect) and not self.player.invincible_timer > 0:
 				self.player.hit()
+				if self.player.lives <= 0:
+					self.player.alive = False
+					self.game_over = True
 				break
 
 		if self.player.alive and self.player.invincible_timer <= 0:
@@ -302,6 +307,9 @@ class Game:
 				if distance < self.player.hitbox_radius + bullet.radius:
 					bullet.kill()
 					self.player.hit()
+					if self.player.lives <= 0:
+						self.player.alive = False
+						self.game_over = True
 					break
 
 		powerup_hits = pg.sprite.spritecollide(
@@ -325,10 +333,12 @@ class Game:
 			# self.boss_spawned_this_level = True
 			# self.boss_spawn_delay = 200
 			# c.BOSS_TIME = True
-			print(f"you're fighting {c.BOSS[0].get("name")}")
-			self.boss_spawn(name=c.BOSS[0].get("name"), lvl=c.BOSS[0].get("lvl"),
-							image=pg.image.load(f"{c.HOME_DIR}/assets/ships/bosses/dark-crusader.png"), hp=c.level.boss_hp)
-
+			if level.next_boss_candidate is None:
+				print("nöössi")
+			boss_dict = c.BOSS.pop(0)
+			print(f"you're fighting {boss_dict.get("name")}")
+			self.boss_spawn(name=boss_dict.get("name", "unknown"), lvl=level.stage,
+							image=boss_dict.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png"), hp=level.boss_hp)
 		if not self.player.alive:
 			self.game_over = True
 
@@ -367,16 +377,7 @@ class Game:
 		pg.display.flip()
 
 		if c.event == c.Event.NEXTLEVEL:
-			# self.overlay_timer = c.OVERLAY_TIMER
-			# Screen whitening
-#			if self.overlay_timer > 0:
-				#self.overlay_timer -= self.dt / 2
-			#else:
-				# self.overlay_timer = 0
-
-			# if self.overlay_timer < 0:
-			# 	return
-
+			level.next_boss_candidate = level.boss_tree.pop(0)
 			self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
 			overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
 			overlay.fill((0, 0, 50, 25))

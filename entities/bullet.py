@@ -2,10 +2,10 @@ import pygame as pg
 import config as c
 from pathlib import Path
 from entities.glitter import Glitter
-HOME_DIR = Path(__file__).parent.parent.absolute()
+c.HOME_DIR = Path(__file__).parent.parent.absolute()
 
 class PlayerBullet(pg.sprite.Sprite):
-	def __init__(self, game, pos, image=pg.image.load(Path(HOME_DIR, "assets", "laser.png")).convert_alpha(), velocity=(0, -800)):
+	def __init__(self, game, pos, image=pg.image.load(Path(c.HOME_DIR, "assets", "laser.png")).convert_alpha(), velocity=(0, -800)):
 		super().__init__()
 		self.image = image
 		self.game = game

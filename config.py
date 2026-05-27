@@ -1,7 +1,7 @@
 import pygame as pg
 import os
-
 from entities.events import Event
+
 
 pg.init()
 pg.mixer.init()
@@ -46,9 +46,9 @@ DING = pg.mixer.Sound(f'{HOME_DIR}/assets/audio/ding.mp3')
 BEACHES=[BEACH1, BEACH2, BEACH3, BEACH4]
 BACKGROUND = BEACH3
 ROCK_IMAGES = [ROCK1, ROCK2, ROCK3, ROCK4, ROCK5, ROCK6]
-BOSS = [{"name": "Dark Crusader", "lvl": 1, "boss_hp": 300, "boss_time": 3000, "boss_image": BOSS1},
-		{"name": "Illithid", "lvl": 2, "boss_hp": 400, "boss_time": 4000, "boss_image": BOSS2},
-		{"name":"Fubar", "lvl": 3, "boss_hp": 500, "boss_time": 5000, "boss_image": BOSS3}]
+BOSS = [{"name": "Dark Crusader", "pos": "(WIDTH //2, -200)", "lvl": 1, "boss_hp": 300, "boss_time": 3000, "boss_image": BOSS1},
+		{"name": "Eldritch Marauder", "pos": "(WIDTH //2, -400)", "lvl": 2, "boss_hp": 400, "boss_time": 4000, "boss_image": BOSS2},
+		{"name":" Aural Alien", "lvl": 3, "pos": "(WIDTH //2, -300)", "boss_hp": 500, "boss_time": 5000, "boss_image": BOSS3}]
 SHIELD = False
 WIDTH = 1920
 HEIGHT = 1080

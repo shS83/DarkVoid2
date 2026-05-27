@@ -7,15 +7,16 @@ from entities.explosion import Explosion
 from entities.bullet import EnemyBullet
 import config as c
 from pygame.transform import rotozoom
-from entities.level import level
 from pathlib import Path
-
+from entities.level import Level
+level = Level()
 
 
 class Boss(pg.sprite.Sprite):
-	def __init__(self, game, pos, boss=True, image=pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses", "dark-crusader.png")).convert_alpha()):
+	def __init__(self, game: object, name : str="Fresh Prince of Bel-Air", pos: pg.Vector2 = (0, -1), boss: bool = True, image: pg.Surface = pg.image.load(Path(c.HOME_DIR, "assets", "ships", "bosses", "dark-crusader.png")).convert_alpha()):
 		super().__init__()
 		self.game = game
+		self.name = "Kauppaneuvos Paukku" or name
 		self.test_delay = 0.3 # Tight knit
 		self.thruster_timer = 0
 		self.shoot_timer = 0.15
@@ -24,7 +25,7 @@ class Boss(pg.sprite.Sprite):
 		self.hp = 300
 		self.phase_index = 0
 		self.phase_timer = 0
-		self.boss_timer = c.level.boss_timer
+		self.boss_timer = level.boss_timer
 		self.max_h = 160
 		self.image = image
 		self.base_image = self.image.copy()
@@ -37,11 +38,11 @@ class Boss(pg.sprite.Sprite):
 		self.hitbox = self.rect.inflate(-56, -56)
 		self.thruster_timer = 0.12
 		self.speed = 40
-		self.phases = [self.aimed_shot,
-		                         self.aimed_spread,
+		self.phases = [	# self.aimed_shot,
+		                # self.aimed_spread,
 		                         self.radial_burst,
 		                         self.spiral_burst,
-		                         self.phase_intro,
+		                # self.phase_intro,
 		                         self.phase_radial,
 		                         self.phase_spiral,
 		                         self.phase_desperation, ]
@@ -67,7 +68,7 @@ class Boss(pg.sprite.Sprite):
 
 		self.rect.center = self.pos
 		self.hitbox.center = self.rect.center
-		# print("BOSS POS:", self.pos, "RECT:", self.rect)
+		print("BOSS POS:", self.pos, "RECT:", self.rect, "HP:", self.hp, "PHASE:", self.phase_index, "TIMER:", self.phase_timer, "NAME:" , self.name)
 		self.shoot_timer -= dt
 		self.phase_timer += dt
 
@@ -275,86 +276,14 @@ class Boss(pg.sprite.Sprite):
 		self.kill()
 		self.game.boss_killed = True
 		self.game.boss = None
-		c.level_timer = 0
+		level_timer = 0
 		self.game.boss_spawned_this_level = False
-		self.boss_timer = c.level.boss_timer
+		self.boss_timer = level.boss_timer
 		# Man you got to level 2
 		c.BOSS_TIME = False
 		c.event = c.Event.NEXTLEVEL
-		c.level.stage += 1
-		self.game.player.hp = c.level.lives
+		level.stage += 1
+		c.NEXTBOSS = c.BOSS.pop(0)
+		self.game.player.hp = level.lives
 		self.game.bosses.clear()
 
-# class Ender(Boss):
-# 	def __init__(self, game, name: str = "Dark Crusader", pos: pg.Vector2 = pg.Vector2(0, 1), image: pg.Surface = pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png")).convert_alpha()):
-# 		super().__init__()
-# 		self.game = game
-# 		self.rect = pg.Rect(0, 0, 128, 128)
-# 		self.image = rotozoom(pg.image.load(Path(c.HOME_DIR, "assets", "dark-crusader.png")).convert_alpha(), 180, 1)
-# 		self.name = name
-# 		self.test_delay = 0.25
-# 		self.thruster_timer = 0
-# 		self.shoot_timer = 0.001
-# 		self.shoot_delay = 0.001
-# 		self.entering = True
-# 		self.hp = 300
-# 		self.phase_index = 0
-# 		self.phase_timer = 0
-# 		self.boss_timer = c.level.boss_timer
-# 		self.max_h = 160
-# 		self.image = image
-# 		self.base_image = self.image.copy()
-# 		self.flash_image = self.make_flash_image(self.base_image)
-# 		self.flash_timer = 0.2
-# 		self.rect = self.image.get_rect(center=pos)
-# 		self.pos = pg.Vector2(self.rect.center)
-# 		self.pos.y = -160
-# 		self.pos.x = c.WIDTH // 2
-# 		self.hitbox = self.rect.inflate(-56, -56)
-# 		self.thruster_timer = 0.04
-# 		self.speed = 60
-# 		self.phases = [
-# 			self.phase_intro,
-# 			self.phase_radial,
-# 			self.phase_spiral,
-# 			self.phase_desperation,
-# 		]
-#
-# 	def update(self, dt):
-# 		if self.pos.y < self.max_h:
-# 			self.entering = True
-# 			self.pos.y += self.speed * dt * 10
-# 		else:
-# 			self.entering = False
-# 			self.pos.y = self.max_h
-#
-# 		if self.pos.y < self.max_h:
-# 			self.pos.y += self.speed * dt * 10
-# 			if self.pos.y > self.max_h:
-# 				self.pos.y = self.max_h
-#
-# 		self.rect.center = self.pos
-# 		self.hitbox.center = self.rect.center
-# 		print("BOSS POS:", self.pos, "RECT:", self.rect)
-# 		self.shoot_timer -= dt
-# 		self.phase_timer += dt
-#
-# 		self.phases[self.phase_index](dt)
-#
-# 		self.thruster_timer -= dt
-# 		if self.thruster_timer <= 0:
-# 			self.thruster_timer = 0.04
-# 			particle = ThrusterParticle(
-# 				self.game,
-# 				self.rect.midtop,
-# 				direction=(0, -1),
-# 				color=(255, 120, 40)
-# 			)
-# 			self.game.effects.add(particle)
-# 			self.game.all_sprites.add(particle)
-#
-# 		if self.flash_timer > 0:
-# 			self.flash_timer -= dt
-# 			self.image = self.flash_image
-# 		else:
-# 			self.image = self.base_image
