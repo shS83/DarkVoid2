@@ -20,8 +20,8 @@ class HUD:
 			True,
 			(240, 240, 255)
 		)
-		first_text = f"BOSS ARRIVING in {round(self.game.boss_timer)}"
-		if self.game.boss_timer <= 1 and self.game.boss is not None:
+		first_text = f"BOSS ARRIVING in {c.BOSS_TIMER}"
+		if c.BOSS_TIMER <= 1 and self.game.boss is not None:
 			first_text = f"BOSS HP LEFT: {self.game.boss.hp}"
 		text2 = self.small_font.render(
 			first_text,
@@ -31,10 +31,10 @@ class HUD:
 		text3 = self.font.render(f"LEVEL {level.stage}", True, (255, 200, 255))
 		text4= ""
 		text5= ""
-		if self.game.player.shield_active:
+		if self.game.player.shield:
 			text4 = self.font.render(f"SHIELD ACTIVE", True, (255, 200, 255))
 		text5 = self.font.render(f"SHIELDS LEFT", True, (255, 200, 255))
-		if self.game.player.shield_active:
+		if self.game.player.shield:
 			for i in range(self.game.player.shield_amount):
 				screen.blit(pg.transform.scale(self.game.player.shield_image, (20, 20)), (16 + i * 24, 175))
 

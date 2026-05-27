@@ -13,7 +13,7 @@ from entities.events import Event
 from pathlib import Path
 from entities.shield import Shield
 import config as c
-level = Level()
+
 
 def mixing():
 	mixer.init()
@@ -51,7 +51,8 @@ class Game:
 		self.asteroids = pg.sprite.Group()
 		self.boss = None
 		self.boss_time = False
-		self.boss_timer = level.boss_timer
+		self.boss_timer = self.level.boss_timer
+		c.BOSS_TIMER = self.boss_timer
 		self.level_timer = 0
 		self.boss_spawn_delay = c.BOSS_SPAWN_DELAY
 		self.boss_spawned_this_level = False
@@ -97,6 +98,8 @@ class Game:
 		self.next_level_text = self.game_over_font.render("Next Stage", True, (200, 200, 255))
 		self.next_level_backdrop_alpha = 235
 		self.next_level_backdrop_scale = 0.1
+		self.boss_hp = 300
+		self.boss_dict = {}
 		self.game_over = False
 		self.game_over_angle = 0
 		self.game_over_scale = 0.1
@@ -113,7 +116,8 @@ class Game:
 		for _ in range(200):
 			self.stars.add(Star())
 
-	def play_sound(self, sound, volume=1.0):
+	@staticmethod
+	def play_sound(sound, volume=1.0):
 		channel = pg.mixer.find_channel(True)
 
 		if channel:
@@ -162,8 +166,9 @@ class Game:
 		if random.random() < 0.15:
 			self.spawn_rocks()
 
+		clock = pg.time.Clock()
 		for b in self.bosses:
-			b.update(1/ 60/1000)
+			b.update(clock.tick(60) * 0.001)
 
 		for _ in range(20):  # try 20 times
 			x = random.randint(50, c.WIDTH - 50)
@@ -190,7 +195,7 @@ class Game:
 				self.all_sprites.add(enemy)
 				return
 
-	def boss_spawn(self, name="Unnamed", lvl=1, image=None, hp=1000, pos=None):
+	def boss_spawn(self, name:str ="Unnamed", lvl:int = 1, image:pg.Surface | None = None, hp:int=1000, pos: pg.Vector2 | None = None) -> object:
 		if self.boss is not None:
 			return
 
@@ -211,28 +216,28 @@ class Game:
 		self.enemies.add(self.boss)
 		self.all_sprites.add(self.boss)
 
-		if level.stage == 3:
+		if self.level.stage == 3:
 			print("nextlevel shite")
-			if not level.next_boss_candidate or level.nextboss:
+			if not self.level.next_boss_candidate or self.level.nextboss:
 				c.NEXTBOSS = c.BOSS.pop(0)
 			self.boss = Boss(self, c.NEXTBOSS.get("pos"), (0, -1))
 			self.boss.image = pg.transform.smoothscale(pg.image.load(
 				c.NEXTBOSS.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png")).convert_alpha(), (240, 240))
-			self.boss_hp = level.boss_hp
+			self.boss_hp = self.level.boss_hp
 			self.boss_time = c.BOSS_TIME
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
 			self.all_sprites.add(self.boss)
 			self.boss_spawned_this_level = True
 
-		if level.stage == 2:
+		if self.level.stage == 2:
 			print("kakkone on ykköne")
-			if not level.next_boss_candidate or level.nextboss:
+			if not self.level.next_boss_candidate or self.level.nextboss:
 				c.NEXTBOSS = c.BOSS.pop(0)
 			self.boss = Boss(self, c.NEXTBOSS.get("pos"), (0, -1))
 			self.boss.image = pg.image.load(
 				c.NEXTBOSS.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png")).convert_alpha()
-			self.boss_hp = level.boss_hp
+			self.boss_hp = self.level.boss_hp
 			self.angle += 1
 			self.boss_time = c.BOSS_TIME
 			self.boss_group.add(self.boss)
@@ -240,13 +245,13 @@ class Game:
 			self.all_sprites.add(self.boss)
 			self.boss_spawned_this_level = True
 
-		if level.stage == 1:
+		if self.level.stage == 1:
 			print("el virgo")
-			if not level.next_boss_candidate or level.nextboss:
+			if not self.level.next_boss_candidate or self.level.nextboss:
 				c.NEXTBOSS = c.BOSS.pop(0)
 			self.boss = Boss(self, c.NEXTBOSS.get("pos"), (0, -1))
 			self.boss.image = pg.image.load(c.NEXTBOSS.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png")).convert_alpha()
-			self.boss_hp = level.boss_hp
+			self.boss_hp = self.level.boss_hp
 			self.boss_time = c.BOSS_TIME
 			self.boss_group.add(self.boss)
 			self.enemies.add(self.boss)
@@ -261,6 +266,7 @@ class Game:
 				self.player.hit()
 			else:
 				pg.mixer.Sound(f"{c.HOME_DIR}/assets/ding.mp3").play()
+		return self.boss
 
 	def update(self, dt):
 		for b in self.bosses:
@@ -273,21 +279,28 @@ class Game:
 		self.asteroids.update(dt)
 		self.all_sprites.update(dt)
 
-		if not c.BOSS_TIME and self.boss is None:
-			self.boss_timer -= dt
+		if not c.BOSS_TIME and self.boss is None and not self.boss_spawned_this_level:
+			c.BOSS_TIMER -= dt * 100
 			if not c.NEXTBOSS:
 				self.boss_dict = c.BOSS.pop(0)
 				c.NEXTBOSS = self.boss_dict.copy()
 
-			if self.boss_timer <= 0:
-				self.boss_timer = 0
+			if c.BOSS_TIMER <= 0 and not c.BOSS_TIME:
+				c.BOSS_TIME = True
+				if self.boss_dict.get("name") == "Mr. Robot":
+					self.boss_dict = c.BOSS.pop(0)
+					c.NEXTBOSS = self.boss_dict.copy()
+				self.boss_timer = self.boss_dict.get("boss_timer")
+
 				self.boss_spawn(name=self.boss_dict.get("name", "unknown"),
 					lvl=self.level.stage,
+					pos=self.boss_dict.get("pos", (c.WIDTH // 2, -160)),
 					image=pg.image.load(self.boss_dict.get("image", f"{c.HOME_DIR}/assets/ships/bosses/boss-2.png")).convert_alpha(),
 					hp=self.level.boss_hp)
+				self.boss_spawned_this_level = True
 				self.level_timer += dt
 				self.enemy_spawn_timer += dt
-			if self.enemy_spawn_timer >= self.enemy_spawn_delay and len(self.enemies) < level.max_enemies:
+			if self.enemy_spawn_timer >= self.enemy_spawn_delay and len(self.enemies) < self.level.max_enemies:
 				self.enemy_spawn_timer = 0
 				self.enemy_spawn_delay = random.uniform(0.4, 3.0)
 				self.spawn_enemy()
@@ -296,7 +309,7 @@ class Game:
 			if self.asteroid_spawn_timer >= self.asteroid_spawn_delay:
 				self.asteroid_spawn_timer = 0
 				self.asteroid_spawn_delay = random.uniform(0.40, 3.2)
-			if len(self.asteroids) < level.max_asteroids:
+			if len(self.asteroids) < self.level.max_asteroids:
 				self.spawn_asteroid()
 			if len(self.asteroids) < 2:
 				self.spawn_rocks()
@@ -351,12 +364,12 @@ class Game:
 			):
 				print("bossi spawnautumassa")
 				self.bosses.clear()
-				if level.next_boss_candidate is None:
+				if self.level.next_boss_candidate is None:
 					print("nöössi")
 				boss_dict = c.BOSS.pop(0)
 				print(f"you're fighting {boss_dict.get("name")}")
-				self.boss_spawn(name=boss_dict.get("name", "unknown"), lvl=level.stage,
-								image=boss_dict.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png"), hp=level.boss_hp)
+				self.boss_spawn(name=boss_dict.get("name", "unknown"), lvl=self.level.stage,
+								image=boss_dict.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png"), hp=self.level.boss_hp)
 			if not self.player.alive:
 				self.game_over = True
 
@@ -371,108 +384,108 @@ class Game:
 					self.game_over_backdrop_alpha = 80
 				return
 
-		def draw(self):
-			self.effects.draw(self.screen)
-			self.screen.blit(self.background, (0, 0))
-			self.enemies.draw(self.screen)
-			self.boss_group.draw(self.screen)
-			self.powerups.draw(self.screen)
-			self.stars.draw(self.screen)
-			self.hud.draw(self.screen)
-			self.asteroids.draw(self.screen)
-			self.all_sprites.draw(self.screen)
+	def draw(self):
+		self.effects.draw(self.screen)
+		self.screen.blit(self.background, (0, 0))
+		self.enemies.draw(self.screen)
+		self.boss_group.draw(self.screen)
+		self.powerups.draw(self.screen)
+		self.stars.draw(self.screen)
+		self.hud.draw(self.screen)
+		self.asteroids.draw(self.screen)
+		self.all_sprites.draw(self.screen)
 
-			if c.Event == c.Event.PAUSE:
-				pausesurface = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
-				pausesurface.fill((0, 0, 0, 120))
-				mixer.fadeout(1000)
-				pausetext = self.game_over_font.render("| |", True, (255, 255, 255))
-				pause_rect = pausetext.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2))
+		if c.Event == c.Event.PAUSE:
+			pausesurface = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
+			pausesurface.fill((0, 0, 0, 120))
+			mixer.fadeout(1000)
+			pausetext = self.game_over_font.render("| |", True, (255, 255, 255))
+			pause_rect = pausetext.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2))
 
-				pausesurface.blit(pausetext, pause_rect)
-				self.screen.blit(pausesurface, (0, 0))
+			pausesurface.blit(pausetext, pause_rect)
+			self.screen.blit(pausesurface, (0, 0))
 
-				pg.display.flip()
-
-			if c.event == c.Event.NEXTLEVEL:
-				level.next_boss_candidate = level.boss_tree.pop(0)
-				self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
-				overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
-				overlay.fill((0, 0, 50, 25))
-				self.screen.blit(overlay, (0, 0))
-				rect_width = c.WIDTH
-				rect_height = 300
-				self.banner = pg.Surface((rect_width, rect_height), pg.SRCALPHA)
-				self.banner.fill((255, 255, 255, int(min(0, max(self.next_level_backdrop_alpha//2, 255)))))
-				if self.text_alpha > 1:
-					self.next_level_backdrop_alpha += 0.01
-				elif self.text_alpha < 100:
-					self.next_level_backdrop_alpha -= 1
-
-				banner_rect = self.banner.get_rect(
-					center=(c.WIDTH // 2, c.HEIGHT // 2)
-				)
-				levelup_font = pg.font.Font(f'{c.HOME_DIR}/assets/fonts/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
-				self.banner.set_alpha(20)
-				self.screen.blit(self.banner, banner_rect)
-
-				self.rotated_text.blit(next_level_text := levelup_font.render("Next Stage", True, (0, 0, 255)), (c.WIDTH // 2, c.HEIGHT // 2))
-
-				clock = pg.time.Clock()
-				self.dt = clock.tick(60) / 1000
-				self.next_level_scale -= self.dt * 2.5
-
-				rect = self.rotated_text.get_rect(
-					center=(self.rotated_text.get_width() // 2, self.rotated_text.get_height() // 2)
-				)
-				pg.draw.rect(self.screen, self.rotated_text.get_bounding_rect(), (255, 0, 0, 255))
-				rotated_text = pg.transform.rotozoom(
-					self.next_level_text,
-					self.next_level_angle,
-					self.next_level_scale
-				)
-				self.text_alpha -= 0.05
-				self.rotated_text.set_alpha(self.text_alpha)
-				self.next_level_angle += self.dt
-				self.screen.blit(rotated_text, rect)
 			pg.display.flip()
 
-			if self.game_over:
-				# Screen darkening
-				overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
-				overlay.fill((0, 0, 0, 25))
-				self.screen.blit(overlay, (0, 0))
+		if c.event == c.Event.NEXTLEVEL:
+			self.level.next_boss_candidate = self.level.boss_tree.pop(0)
+			self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
+			overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
+			overlay.fill((0, 0, 50, 25))
+			self.screen.blit(overlay, (0, 0))
+			rect_width = c.WIDTH
+			rect_height = 300
+			self.banner = pg.Surface((rect_width, rect_height), pg.SRCALPHA)
+			self.banner.fill((255, 255, 255, int(min(0, max(self.next_level_backdrop_alpha//2, 255)))))
+			if self.text_alpha > 1:
+				self.next_level_backdrop_alpha += 0.01
+			elif self.text_alpha < 100:
+				self.next_level_backdrop_alpha -= 1
 
-				# Expanding dark rectangle
-				rect_width = c.WIDTH
-				rect_height = 300
+			banner_rect = self.banner.get_rect(
+				center=(c.WIDTH // 2, c.HEIGHT // 2)
+			)
+			levelup_font = pg.font.Font(f'{c.HOME_DIR}/assets/fonts/JetBrainsMonoNerdFont-SemiBold.ttf', 72)
+			self.banner.set_alpha(20)
+			self.screen.blit(self.banner, banner_rect)
 
-				banner = pg.Surface((rect_width, rect_height), pg.SRCALPHA)
+			self.rotated_text.blit(next_level_text := levelup_font.render("Next Stage", True, (0, 0, 255)), (c.WIDTH // 2, c.HEIGHT // 2))
 
-				banner.fill((0, 0, 0, int(self.game_over_backdrop_alpha)))
-				if self.text_alpha > 1:
-					self.game_over_backdrop_alpha += 0.1
-				elif self.text_alpha > 100:
-					self.game_over_backdrop_alpha -= 1
+			clock = pg.time.Clock()
+			self.dt = clock.tick(60) / 1000
+			self.next_level_scale -= self.dt * 2.5
 
-				banner_rect = banner.get_rect(
-					center=(c.WIDTH // 2, c.HEIGHT // 2)
-				)
+			rect = self.rotated_text.get_rect(
+				center=(self.rotated_text.get_width() // 2, self.rotated_text.get_height() // 2)
+			)
+			pg.draw.rect(self.screen, self.rotated_text.get_bounding_rect(), (255, 0, 0, 255))
+			rotated_text = pg.transform.rotozoom(
+				self.next_level_text,
+				self.next_level_angle,
+				self.next_level_scale
+			)
+			self.text_alpha -= 0.05
+			self.rotated_text.set_alpha(self.text_alpha)
+			self.next_level_angle += self.dt
+			self.screen.blit(rotated_text, rect)
+		pg.display.flip()
 
-				self.screen.blit(banner, banner_rect)
+		if self.game_over:
+			# Screen darkening
+			overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
+			overlay.fill((0, 0, 0, 25))
+			self.screen.blit(overlay, (0, 0))
 
-				rotated_text = pg.transform.rotozoom(
-					self.game_over_text,
-					self.game_over_angle,
-					self.game_over_scale
-				)
-				rotated_text.set_alpha(self.text_alpha)
-				rect = rotated_text.get_rect(
-					center=(c.WIDTH // 2, c.HEIGHT // 2)
-				)
+			# Expanding dark rectangle
+			rect_width = c.WIDTH
+			rect_height = 300
 
-				self.screen.blit(rotated_text, rect)
-			pg.display.flip()
+			banner = pg.Surface((rect_width, rect_height), pg.SRCALPHA)
+
+			banner.fill((0, 0, 0, int(self.game_over_backdrop_alpha)))
+			if self.text_alpha > 1:
+				self.game_over_backdrop_alpha += 0.1
+			elif self.text_alpha > 100:
+				self.game_over_backdrop_alpha -= 1
+
+			banner_rect = banner.get_rect(
+				center=(c.WIDTH // 2, c.HEIGHT // 2)
+			)
+
+			self.screen.blit(banner, banner_rect)
+
+			rotated_text = pg.transform.rotozoom(
+				self.game_over_text,
+				self.game_over_angle,
+				self.game_over_scale
+			)
+			rotated_text.set_alpha(self.text_alpha)
+			rect = rotated_text.get_rect(
+				center=(c.WIDTH // 2, c.HEIGHT // 2)
+			)
+
+			self.screen.blit(rotated_text, rect)
+		pg.display.flip()
 
 	def run(self):
 		while self.running:

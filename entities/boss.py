@@ -18,9 +18,9 @@ class Boss(pg.sprite.Sprite):
 		self.lvl = lvl
 		self.hp = hp
 		if image is None:
-			image = f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png"
-
-		self.image = pg.image.load(image).convert_alpha()
+			image = pg.image.load(f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png").convert_alpha()
+		print(image)
+		self.image = image
 		self.image = pg.transform.scale(self.image, (220, 220))
 
 		self.base_image = self.image.copy()
@@ -43,8 +43,8 @@ class Boss(pg.sprite.Sprite):
 		self.phase_timer = 0
 		self.boss_timer = self.game.level.boss_timer
 		self.max_h = 160
-		self.image = pg.image.load(image).convert_alpha()
-		print(self.image)
+		print(image)
+		self.image = image
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_timer = 0.05
