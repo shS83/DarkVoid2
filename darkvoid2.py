@@ -1,142 +1,145 @@
+import math
 import pygame as pg
-import random
-import os
-from pygame.transform import rotozoom
 from game import Game
-from time import sleep
 from pathlib import Path
 
+def _load_font(path, size, fallback=None):
+    if Path(path).exists():
+        return pg.font.Font(path, size)
+    return pg.font.SysFont(fallback, size)
+
 def alpha():
-	pg.init()
-	timer = pg.time.Clock()
 
+        pg.init()
+        pg.mixer.init()
 
-	x_res = 1920
-	y_res = 1080
-	screen = pg.display.set_mode((x_res, y_res), pg.SRCALPHA, 32)
-	HOME_DIR = os.path.dirname(__file__)
-	screen.blit(pg.image.load(Path(HOME_DIR, "assets", "backgrounds", "stimu_wallpaper.png")), (0, 0))
-	pg.event.clear()
-	pg.mixer.music.load(Path(HOME_DIR, "assets", "audio", "Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3"))
-	pg.mixer.music.play(-1)
-	pg.mixer.init(48000, -16, 2, 4096)
-	pg.mixer.music.set_volume(0.2)
-	pg.mixer.set_num_channels(32)
-	font_size = 200
-	fontti = pg.font.Font(Path(HOME_DIR, "assets", "fonts", "VL-Gothic-Regular.ttf"), font_size)
-	textfont = pg.font.Font(Path(HOME_DIR, "assets", "fonts", "GoMonoNerdFontPropo-Bold.ttf"), 200)
-	fonts = ['arial black', 'constantia', 'warheliosconcbold', 'averiasansbold', 'goodtimes', 'prceltic', 'novaround', 'xfiles', fontti, textfont, 'urwgothic', 'notosansgothic']
-	pg.display.set_icon(fontti.render("シ", True, (0, 255, 0)))
-	font = pg.font.SysFont(fonts[1], 36)
-	# font = pg.font.SysFont('msgothic', 72)
-	font2 = pg.font.SysFont('msgothic', 48)
-	screen.blit(fontti.render("シ", True, (255, 255, 255)), (screen.get_width()// 2, screen.get_height()// 2))
-	running = True
-	cooldown = 500
-	in_logo = True
-	switch = True
-	i = 0
-	last = 0
-	logointerval = 5
-	sleep(logointerval)
+        clock = pg.time.Clock()
+        home_dir = Path(__file__).parent.absolute()
+        x_res = 1920
+        y_res = 1080
 
-	pg.display.set_caption("Dark Void 2 - The Avoided")
-	INITEVENT = pg.USEREVENT + 1
-	pg.time.set_timer(INITEVENT, 50000, 20000)
-	surf = pg.surface.Surface((1920, 1080), pg.SRCALPHA, 32).convert_alpha()
-	surf.fill(
-		(0, 0, 0, 255)
-	)
-	pg.display.flip()
+        screen = pg.display.set_mode((x_res, y_res), pg.SRCALPHA, 32)
+        pg.display.set_caption("Dark Void 2 - The Avoided")
 
+        wallpaper = pg.image.load(
+            home_dir / "assets" / "backgrounds" / "stimu_wallpaper.png"
+        ).convert()
+        wallpaper = pg.transform.smoothscale(wallpaper, (x_res, y_res))
 
-	timer.tick(159)
-	xd2, yd2 = font2.size("press space to continue")
-	spacetext = font.render("press space to continue", True, (255, 255, 255))
+        title_font = _load_font(
+            home_dir / "assets" / "fonts" / "GoMonoNerdFontPropo-Bold.ttf",
+            150,
+            "arial black",
+        )
+        subtitle_font = _load_font(
+            home_dir / "assets" / "fonts" / "GoMonoNerdFontPropo-Bold.ttf",
+            72,
+            "arial black",
+        )
+        prompt_font = _load_font(
+            home_dir / "assets" / "fonts" / "VL-Gothic-Regular.ttf",
+            42,
+            "consolas",
+        )
 
-	f = 0
-	finished = True
-	in_logo = True
-	begin = True
-	LOGOEVENT = pg.USEREVENT + 2
-	FADEOUTEVENT = pg.USEREVENT + 3
-	INITGAME = pg.USEREVENT + 4
-	pg.event.post(pg.event.Event(LOGOEVENT))
+        icon_font = _load_font(
+            home_dir / "assets" / "fonts" / "VL-Gothic-Regular.ttf",
+            96,
+            "consolas",
+        )
+        pg.display.set_icon(icon_font.render("DV2", True, (0, 255, 0)))
 
-	while running:
+        try:
+            pg.mixer.music.load(home_dir / "assets" / "audio" / "1000 Handz - Announcement.mp3")
+            pg.mixer.music.play(-1)
+            pg.mixer.music.set_volume(0.2)
+        except pg.error:
+            pass
 
-		for event in pg.event.get():
+        start_time = pg.time.get_ticks()
+        wallpaper_duration = 5.0
+        fade_duration = 1.2
+        katakana_text = "ダーク ヴォイド 2"
+        running = True
 
-			if event.type == pg.QUIT:
-				running = True
+        while running:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    return False
 
-			if event.type == pg.KEYDOWN:
-				if event.key == pg.K_SPACE:
-					running = False
+                if event.type == pg.KEYDOWN:
+                    elapsed = (pg.time.get_ticks() - start_time) / 1000
 
-					pg.event.clear()
-					in_logo = True
-					i = 100
-					i+=1
-					pg.event.post(pg.event.Event(LOGOEVENT))
+                    if event.key in (pg.K_SPACE, pg.K_RETURN) and elapsed > wallpaper_duration + fade_duration:
+                        pg.mixer.music.fadeout(500)
+                        return True
 
-			if event.type == LOGOEVENT:
-				direction = 1
-				i = 255
-				i += -direction
-				direction = 1
-				if i < 1:
-					direction = -direction
-				now = pg.time.get_ticks()
-				if now - last >= cooldown:
-					last = now
-				screen.fill((0, 0, 0))
-				screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
-							(x_res  // 2 - 500, y_res // 3))
-				screen.blit(fontti.render("ヾ", True, (255, 255, 255)),
-							(screen.get_width() // 2, screen.get_height() // 2 - 20))
-				screen.blit(textfont.render("The AVOiDED", True, (255, 0, 0)), (x_res  // 2-500, y_res //  2 + 140))
-				screen.blit(font.render("press space to avoid...", True, (255, 200, 255)), (x_res / 2 // 2 - 100, y_res // 2 + 400))
-				pg.event.post(pg.event.Event(LOGOEVENT))
-				running = True
-				while running:
-					pg.display.flip()
-					dt = timer.tick(60) / 1000
-					for event in pg.event.get():
-						if event.type == pg.KEYDOWN:
-							if event.key == pg.K_SPACE:
-								running = False
-								pg.event.clear()
-								pg.event.post(pg.event.Event(INITGAME))
+                    if event.key == pg.K_ESCAPE:
+                        return False
 
-			if event.type == LOGOEVENT:
-				if in_logo:
-					now = pg.time.get_ticks()
-					screen.fill((0, 0, 0))
-					pg.event.post(pg.event.Event(LOGOEVENT))
+            elapsed = (pg.time.get_ticks() - start_time) / 1000
 
-			if event.type == FADEOUTEVENT:
-				in_logo = False
-				if i > 1:
-					now = pg.time.get_ticks()
-					if now - last >= cooldown:
-						screen.fill((0, 0, 0))
-						screen.blit(textfont.render("DARK VOID 2", True, (i, 0, 0)),
-									(x_res, 2 - xd2, 2, y_res, 2 - yd2, 2))
-						i -= 2
-						if i < 2:
-							pg.event.clear()
-				pg.event.post(pg.event.Event(FADEOUTEVENT))
+            screen.blit(wallpaper, (0, 0))
 
-			if event.type == INITGAME:
-				finished = True
-				running = False
+            if elapsed < wallpaper_duration:
+                pg.display.flip()
+                clock.tick(60)
+                continue
 
-		pg.display.flip()
-		dt = timer.tick(60), 1000
+            fade_out = min(1, (elapsed - wallpaper_duration) / fade_duration)
+            fade_in = min(1, max(0, elapsed - wallpaper_duration - fade_duration) / fade_duration)
 
+            black = pg.Surface((x_res, y_res), pg.SRCALPHA)
+            black.fill((0, 0, 0, int(255 * fade_out)))
+            screen.blit(black, (0, 0))
 
+            if fade_in <= 0:
+                pg.display.flip()
+                clock.tick(60)
+                continue
+
+            screen.fill((0, 0, 0))
+
+            pulse = 175 + int(math.sin(elapsed * 2.4) * 50)
+            title = title_font.render("DARK VOID 2", True, (pulse, 20, 30))
+            title.set_alpha(int(255 * fade_in))
+            title_rect = title.get_rect(center=(x_res // 2, y_res // 2 - 120))
+            screen.blit(title, title_rect)
+
+            subtitle = subtitle_font.render("THE AVOIDED", True, (255, 255, 255))
+            subtitle.set_alpha(int(230 * fade_in))
+            subtitle_rect = subtitle.get_rect(center=(x_res // 2, y_res // 2 + 24))
+            screen.blit(subtitle, subtitle_rect)
+
+            katakana = prompt_font.render(katakana_text, True, (120, 210, 255))
+            katakana.set_alpha(int(210 * fade_in))
+            katakana_rect = katakana.get_rect(center=(x_res // 2, y_res // 2 + 100))
+            screen.blit(katakana, katakana_rect)
+
+            for x, y, scale, phase in [
+                (190, 170, 1.0, 0.0),
+                (x_res - 190, y_res - 190, 0.9, 1.2),
+                (260, y_res - 210, 0.75, 2.0),
+                (x_res - 300, 180, 0.7, 2.8),
+            ]:
+                alpha = int((90 + math.sin(elapsed * 1.6 + phase) * 45) * fade_in)
+                ghost = prompt_font.render(katakana_text, True, (60, 110, 170))
+                ghost = pg.transform.smoothscale_by(ghost, scale)
+                ghost.set_alpha(alpha)
+                screen.blit(ghost, ghost.get_rect(center=(x, y)))
+
+            if fade_in >= 1:
+                prompt_alpha = 150 + int(math.sin(elapsed * 4.0) * 80)
+                prompt = prompt_font.render("press SPACE to avoid", True, (210, 230, 255))
+                prompt.set_alpha(prompt_alpha)
+                prompt_rect = prompt.get_rect(center=(x_res // 2, y_res - 120))
+                screen.blit(prompt, prompt_rect)
+
+            pg.display.flip()
+            clock.tick(60)
+
+        return False
 
 if __name__ == "__main__":
-	alpha()
-	Game().run()
+    if alpha():
+        Game().run()

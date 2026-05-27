@@ -1,8 +1,5 @@
 import pygame as pg
 import config as c
-from entities.level import Level
-
-level = Level()
 
 class HUD:
 	def __init__(self, game):
@@ -28,7 +25,7 @@ class HUD:
 			True,
 			(255, 50, 50),
 		)
-		text3 = self.font.render(f"LEVEL {level.stage}", True, (255, 200, 255))
+		text3 = self.font.render(f"STAGE {self.game.level.stage}", True, (255, 200, 255))
 		text4= ""
 		text5= ""
 		if self.game.player.shield:

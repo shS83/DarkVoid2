@@ -198,32 +198,44 @@ class Player(pg.sprite.Sprite):
 			self.game.all_sprites.add(bullet)
 
 	def hit(self):
-		if self.shield_active == False:
-			self.flash_timer = 0.05
-			if self.invincible_timer > 0:
-				return
-			pg.mixer.Sound(f'{c.HOME_DIR}/assets/audio/clink.wav').play()
-			self.lives -= 1
-			self.invincible_timer = 2.0
-			for _ in range(100):
-				particle = Particle(self.game, self.rect.center)
-				self.game.effects.add(particle)
-				self.game.all_sprites.add(particle)
-		else:
+		if self.invincible_timer > 0 or not self.alive:
+			return
+
+		if self.shield_active:
 			pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/ding.mp3").play()
-			if self.lives <= 0:
-				explosion_sound = f'{c.HOME_DIR}/assets/explosion1-long.wav'
-				pg.mixer.Sound(explosion_sound).play()
-				explosion = Explosion(self.game, self.rect.center)
-				self.game.effects.add(explosion)
-				self.game.all_sprites.add(explosion)
-				for _ in range(15000):
-					particle = Particle(self.game, self.rect.center)
-					self.game.effects.add(particle)
-					self.game.all_sprites.add(particle)
-				self.alive = False
-				self.game.game_over = True
-				self.kill()
+			return
+
+		self.flash_timer = 0.05
+		pg.mixer.Sound(f'{c.HOME_DIR}/assets/audio/clink.wav').play()
+		self.lives -= 1
+		self.invincible_timer = 2.0
+
+		for _ in range(100):
+			particle = Particle(self.game, self.rect.center)
+			self.game.effects.add(particle)
+			self.game.all_sprites.add(particle)
+
+		if self.lives <= 0:
+			self.die()
+
+	def die(self):
+		if not self.alive:
+			return
+
+		explosion_sound = f'{c.HOME_DIR}/assets/audio/explosion1-long.wav'
+		pg.mixer.Sound(explosion_sound).play()
+		explosion = Explosion(self.game, self.rect.center)
+		self.game.effects.add(explosion)
+		self.game.all_sprites.add(explosion)
+
+		for _ in range(900):
+			particle = Particle(self.game, self.rect.center)
+			self.game.effects.add(particle)
+			self.game.all_sprites.add(particle)
+
+		self.alive = False
+		self.game.game_over = True
+		self.kill()
 
 	def apply_powerup(self, kind):
 		if kind == "spread":
@@ -371,10 +383,6 @@ class Player(pg.sprite.Sprite):
 			self.speed = c.PLAYER_FOCUS_SPEED
 		if not keys[pg.K_LSHIFT]:
 			self.speed = c.PLAYER_SPEED
-		if keys[pg.K_LALT]:
-			self.shield_active = True
-		if not keys[pg.K_LALT]:
-			self.shield_active = False
 		if mouse[2] == 1 or mouse[1] == 1:
 			self.shoot_vulcan(dt)
 			self.vulcan_timer -= dt
@@ -424,6 +432,7 @@ class Player(pg.sprite.Sprite):
 		if self.power_timer <= 0:
 			self.shoot_mode = "normal"
 			self.shield = False
+			self.shield_active = False
 			self.speed = c.PLAYER_SPEED
 			self.fire_cooldown2 = 0.08
 		self.thruster_timer -= dt

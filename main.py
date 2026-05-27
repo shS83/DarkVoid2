@@ -1,5 +1,7 @@
 from darkvoid2 import alpha
+from game import Game
 
 if __name__ == '__main__':
-	'''Something should had be happening here, but I've avoided it.'''
-	alpha()
+	""" The avoider is hence devoid of the void."""
+	if alpha():
+		Game().run()
