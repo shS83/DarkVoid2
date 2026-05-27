@@ -52,7 +52,7 @@ def alpha():
 	f = 0
 	finished = True
 	in_logo = True
-	begin = True
+	begin = asTrue
 	LOGOEVENT = pg.USEREVENT + 2
 	FADEOUTEVENT = pg.USEREVENT + 3
 	INITGAME = pg.USEREVENT + 4

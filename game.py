@@ -1,7 +1,6 @@
 import random
 from pygame import mixer
 import pygame as pg
-import config as c
 from entities.player import Player
 from entities.boss import Boss
 from entities.enemy import Enemy
@@ -13,6 +12,7 @@ from entities.level import Level
 from entities.events import Event
 from pathlib import Path
 from entities.shield import Shield
+import config as c
 level = Level()
 
 def mixing():
@@ -194,19 +194,22 @@ class Game:
 		print(f"{len(self.enemies)} enemies + 1 boss = {len(self.enemies)+1}")
 		if self.boss is None:
 			print("boss was no-one")
-			self.dictate = c.BOSS.pop(0)
-			self.boss = Boss(self, name=self.dictate.get("name", "Unnamed"), pos = self.dictate.get("pos", "(c.WIDTH // 2, -160))"), image=self.dictate.get("image"), hp=level.boss_hp)
+			self.ikea = c.BOSS.pop(0)
+			print(f"Replaced by {self.ikea.get("name")}")
+			self.boss = Boss(self, name=self.ikea.get("name", "Unnamed"), pos = self.ikea.get("pos", "(c.WIDTH // 2, -160))"))
 		self.boss.name = name
 		self.boss.lvl = lvl
-		self.boss.image = image
+		self.boss.image = self.ikea.get("image")
+		print(self.boss.image)
+		print(self.ikea)
 		self.boss.rect = self.boss.image.get_rect(center=self.boss.pos)
-		self.boss.hp = hp
+		self.boss.hp = level.boss_hp
 		self.angle = 0
 		self.hitbox = self.boss.rect.inflate(-56, -56)
 		c.BOSS_TIME = True
 		self.bosses.append(self.boss)
 		print(self.bosses)
-		print(f"lisättiin tason {level.stage} bossi {name} {lvl} {image} {hp}")
+		print(f"lisättiin tason {level.stage} bossi {self.boss.name} {self.boss.lvl} {self.boss.image} {self.boss.hp}")
 
 		if level.stage == 3:
 			print("nextlevel shite")

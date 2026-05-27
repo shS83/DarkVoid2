@@ -17,6 +17,7 @@ class Boss(pg.sprite.Sprite):
 		super().__init__()
 		self.game = game
 		self.name = "Kauppaneuvos Paukku" or name
+		self.angle = 0
 		self.test_delay = 0.3 # Tight knit
 		self.thruster_timer = 0
 		self.shoot_timer = 0.15
@@ -28,13 +29,14 @@ class Boss(pg.sprite.Sprite):
 		self.boss_timer = level.boss_timer
 		self.max_h = 160
 		self.image = image
+		print(self.image)
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_timer = 0.05
+		self.pos = pg.Vector2(pos)
 		self.rect = self.image.get_rect(center=pos)
-		self.pos = pg.Vector2(self.rect.center)
-		self.pos.y = -160
-		self.pos.x = c.WIDTH // 2
+		self.rect.y = -160
+		self.rect.x = c.WIDTH // 2
 		self.hitbox = self.rect.inflate(-56, -56)
 		self.thruster_timer = 0.12
 		self.speed = 40
