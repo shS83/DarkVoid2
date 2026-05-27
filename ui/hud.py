@@ -33,7 +33,7 @@ class HUD:
 		text5= ""
 		if self.game.player.shield:
 			text4 = self.font.render(f"SHIELD ACTIVE", True, (255, 200, 255))
-		text5 = self.font.render(f"SHIELDS LEFT", True, (255, 200, 255))
+			text5 = self.font.render(f"SHIELDS LEFT", True, (255, 200, 255))
 		if self.game.player.shield:
 			for i in range(self.game.player.shield_amount):
 				screen.blit(pg.transform.scale(self.game.player.shield_image, (20, 20)), (16 + i * 24, 175))
@@ -42,7 +42,7 @@ class HUD:
 		screen.blit(text2, (16, 40))
 		screen.blit(text3, (16, 120))
 
-		if self.game.player.shield_active:
+		if self.game.player.shield:
 			screen.blit(text4, (16, 180))
 			screen.blit(text5, (16, 160))
 

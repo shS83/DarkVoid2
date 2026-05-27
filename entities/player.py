@@ -3,7 +3,7 @@ import pygame as pg
 from pathlib import Path
 import config as c
 from entities.vulcan import VulcanBullet, MuzzleFlash, VulcanSpark, ShellCasing
-from pygame import mouse
+from pygame import mixer
 from entities.bullet import PlayerBullet
 from entities.explosion import Explosion
 from entities.particle import Particle
@@ -12,9 +12,12 @@ from pygame.transform import rotate, smoothscale_by
 import random
 from entities.powerup import PowerUp
 
+
 class Player(pg.sprite.Sprite):
 	def __init__(self, game, pos):
 		super().__init__()
+		pg.mixer.init()
+		self.mixer = mixer
 		self.bullet = PlayerBullet(game, pos, velocity=(0, -800))
 		self.game = game
 		self.shoot_mode = "normal"
@@ -36,7 +39,7 @@ class Player(pg.sprite.Sprite):
 		self.image5 = smoothscale_by(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "finnfighter.png")).convert_alpha(), c.SCALE)
 		self.images = [self.image5]#self.image1, self.image2, self.image3, self.image4]
 		self.image = random.choice(self.images)
-		self.image = pg.transform.smoothscale(self.image, (200, 200))
+		self.image = pg.transform.smoothscale_by(self.image, c.SCALE)
 		self.rect = self.image.get_rect(center=pos)
 		self.pos = pg.Vector2(self.rect.center)
 		self.base_image = self.image.copy()
@@ -50,10 +53,14 @@ class Player(pg.sprite.Sprite):
 		self.particles = pg.sprite.Group()
 		self.all_sprites = pg.sprite.LayeredUpdates()
 		self.shield = False
-		self.shield_image = pg.transform.scale(random.choice(c.PALLOT), (160, 160))
-		self.shield_image_rect = self.shield_image.get_rect(center=pos)
 		self.shield_active = False
+		self.shield_hit_timer = 0
+		self.shield_hit_cooldown = 0.12
+		self.shield_image = pg.transform.scale(random.choice([c.PALLO1, c.PALLO2, c.PALLO3]), (160, 160))
+		self.shield_image_rect = self.shield_image.get_rect(center=pos)
 		self.shield_amount = 0
+		self.shield_sound = pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/ding.mp3")
+		self.shield_sound.set_volume(0.7)
 		self.vulcan_timer = 0
 		self.vulcan_cooldown = 0.028
 
@@ -63,8 +70,9 @@ class Player(pg.sprite.Sprite):
 		self.vulcan_sound_timer = 0
 		self.vulcan_sound_delay = 0.07
 
-		self.minigun_sound = pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/gundam-vulcan-machine-gun-sound.mp3")
-		self.minigun_sound.set_volume(0.4)
+
+		self.minigun_sound = mixer.Sound(f"{c.HOME_DIR}/assets/audio/gundam-vulcan-machine-gun-sound.mp3")
+		self.minigun_sound.set_volume(1.0)
 
 	def make_flash_image(self, image):
 		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
@@ -146,7 +154,7 @@ class Player(pg.sprite.Sprite):
 		self.image3 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser3.png")), (20, 100))
 		self.image.blit(self.image, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
 		self.image2.blit(self.image2, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
-		self.image3.blit(self.image3, (0,0), special_flags=pg.BLEND_RGBA_SUB | pg.BLEND_RGB_MAX)
+		self.image3.blit(self.image3, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
 		self.bullet = PlayerBullet(self.game, self.rect.midtop, self.image, velocity=(0, -2000))
 
 		if self.fire_timer > 0:
@@ -172,7 +180,7 @@ class Player(pg.sprite.Sprite):
 
 	def shoot_spread(self):
 		self.image = pg.Surface((6, 20), pg.SRCALPHA)
-		pg.draw.rect(self.image, (255, 0, 0), (0, 0, 5, 25))
+		# pg.draw.rect(self.image, (255, 0, 0), (0, 0, 5, 25))
 		bullet_data = [
 			((self.rect.centerx, self.rect.top), (0, -850)),
 			((self.rect.centerx - 10, self.rect.top + 8), (-180, -760)),
@@ -320,6 +328,22 @@ class Player(pg.sprite.Sprite):
 		else:
 			self.minigun_sound.play()
 
+	def receive_hit(self):
+		if self.invincible_timer > 0:
+			return
+
+		if self.shield_active:
+			if self.shield_hit_timer <= 0:
+				self.shield_hit_timer = self.shield_hit_cooldown
+
+				if hasattr(self.game, "play_sound"):
+					self.game.play_sound(self.shield_sound, 0.5)
+				else:
+					self.shield_sound.play()
+
+			return
+
+		self.hit()
 	def update(self, dt):
 		keys = pg.key.get_pressed()
 		mouse = pg.mouse.get_pressed()
@@ -355,10 +379,6 @@ class Player(pg.sprite.Sprite):
 			self.shoot_vulcan(dt)
 			self.vulcan_timer -= dt
 			self.vulcan_sound_timer -= dt
-
-		# if keys[pg.K_LCTRL]:
-		#	self.shoot_spread()
-
 		if keys[pg.K_ESCAPE]:
 			pg.quit()
 		# For debugging
@@ -411,8 +431,8 @@ class Player(pg.sprite.Sprite):
 		if self.thruster_timer <= 0:
 			self.thruster_timer = 0.012
 
-			engine_left = (self.rect.centerx - 10, self.rect.centery + 42)
-			engine_right = (self.rect.centerx + 10, self.rect.centery + 42)
+			engine_left = (self.rect.centerx - 23, self.rect.centery + 75)
+			engine_right = (self.rect.centerx + 23, self.rect.centery + 75)
 			for engine_pos in [engine_left, engine_right]:
 				# hot core
 				for _ in range(8):
@@ -458,6 +478,9 @@ class Player(pg.sprite.Sprite):
 					)
 					self.game.effects.add(particle)
 					self.game.all_sprites.add(particle)
+
+		if self.shield_hit_timer > 0:
+			self.shield_hit_timer -= dt
 
 		if direction.length_squared() > 0:
 			direction = direction.normalize()

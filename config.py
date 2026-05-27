@@ -12,7 +12,7 @@ x_res = 1920
 y_res = 1080
 screen = pg.display.set_mode((x_res, y_res), pg.SRCALPHA, 32)
 FPS = 60
-DEBUG = True
+DEBUG = False
 OVERLAY_TIMER = 5000
 BOSS_SPAWN_DELAY = 30
 PLAYER_SPEED = 500
@@ -49,14 +49,14 @@ ROCK_IMAGES = [ROCK1, ROCK2, ROCK3, ROCK4, ROCK5, ROCK6]
 WIDTH = 1920
 HEIGHT = 1080
 BOSS_TIMER = 2000
-BOSS = [{"name": "Mr. Robot", "pos": (WIDTH // 2, -200), "lvl": 0, "boss_hp": 1, "boss_time": 500, "boss_image": pg.Surface((100,100))},
-		{"name": "Dark Crusader", "pos": (WIDTH // 2, -200), "lvl": 1, "boss_hp": 300, "boss_time": 3000, "boss_image": BOSS1},
+# {"name": "Mr. Robot", "pos": (WIDTH // 2, -200), "lvl": 0, "boss_hp": 1, "boss_time": 500, "boss_image": pg.Surface((100,100))},
+BOSS = [{"name": "Dark Crusader", "pos": (WIDTH // 2, -200), "lvl": 1, "boss_hp": 300, "boss_time": 3000, "boss_image": BOSS1},
 		{"name": "Eldritch Marauder", "pos": (WIDTH // 2, -400), "lvl": 2, "boss_hp": 400, "boss_time": 4000, "boss_image": BOSS2},
 		{"name": "Aural Alien", "lvl": 3, "pos": (WIDTH // 2, -300), "boss_hp": 500, "boss_time": 5000, "boss_image": BOSS3}]
 NEXTBOSS = False
 SHIELD = False
 BOSS_TIME = False
-SCALE = 0.3
+SCALE = 0.4
 HOME_DIR = os.path.dirname(__file__)
 MSG_FONT = pg.font.Font(f'{HOME_DIR}/assets/fonts/GoMonoNerdFontPropo-Bold.ttf', 60)
 GOTHIC_FONT = pg.font.Font(f'{HOME_DIR}/assets/fonts/VL-Gothic-Regular.ttf', 36)

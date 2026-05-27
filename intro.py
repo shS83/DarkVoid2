@@ -17,14 +17,14 @@ def alpha():
 	HOME_DIR = os.path.dirname(__file__)
 	screen.blit(pg.image.load(Path(HOME_DIR, "assets", "backgrounds", "stimu_wallpaper.png")), (0, 0))
 	pg.event.clear()
-	pg.mixer.music.load(Path(HOME_DIR, "assets", "Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3"))
+	pg.mixer.music.load(Path(HOME_DIR, "assets", "audio", "Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3"))
 	pg.mixer.music.play(-1)
 	pg.mixer.init(48000, -16, 2, 4096)
 	pg.mixer.music.set_volume(0.2)
 	pg.mixer.set_num_channels(32)
 	font_size = 200
-	fontti = pg.font.Font(Path(HOME_DIR, "assets", "VL-Gothic-Regular.ttf"), font_size)
-	textfont = pg.font.Font(Path(HOME_DIR, "assets", "GoMonoNerdFontPropo-Bold.ttf"), 200)
+	fontti = pg.font.Font(Path(HOME_DIR, "assets", "fonts", "VL-Gothic-Regular.ttf"), font_size)
+	textfont = pg.font.Font(Path(HOME_DIR, "assets", "fonts", "GoMonoNerdFontPropo-Bold.ttf"), 200)
 	fonts = ['arial black', 'constantia', 'warheliosconcbold', 'averiasansbold', 'goodtimes', 'prceltic', 'novaround', 'xfiles', fontti, textfont, 'urwgothic', 'notosansgothic']
 	pg.display.set_icon(fontti.render("シ", True, (0, 255, 0)))
 	font = pg.font.SysFont(fonts[1], 36)
@@ -42,7 +42,7 @@ def alpha():
 
 	pg.display.set_caption("Dark Void 2 - The Avoided")
 	INITEVENT = pg.USEREVENT + 1
-	pg.time.set_timer(INITEVENT, 5000, 20000)
+	pg.time.set_timer(INITEVENT, 50000, 20000)
 	surf = pg.surface.Surface((1920, 1080), pg.SRCALPHA, 32).convert_alpha()
 	surf.fill(
 		(0, 0, 0, 255)
@@ -57,7 +57,7 @@ def alpha():
 	f = 0
 	finished = True
 	in_logo = True
-	begin = asTrue
+	begin = True
 	LOGOEVENT = pg.USEREVENT + 2
 	FADEOUTEVENT = pg.USEREVENT + 3
 	INITGAME = pg.USEREVENT + 4
@@ -98,6 +98,16 @@ def alpha():
 				screen.blit(textfont.render("The AVOiDED", True, (255, 0, 0)), (x_res  // 2-500, y_res //  2 + 140))
 				screen.blit(font.render("press space to avoid...", True, (255, 200, 255)), (x_res / 2 // 2 - 100, y_res // 2 + 400))
 				pg.event.post(pg.event.Event(LOGOEVENT))
+				running = True
+				while running:
+					pg.display.flip()
+					dt = timer.tick(60) / 1000
+					for event in pg.event.get():
+						if event.type == pg.KEYDOWN:
+							if event.key == pg.K_SPACE:
+								running = False
+								pg.event.clear()
+								pg.event.post(pg.event.Event(INITGAME))
 
 			if event.type == LOGOEVENT:
 				if in_logo:
@@ -116,7 +126,7 @@ def alpha():
 						i -= 2
 						if i < 2:
 							pg.event.clear()
-							pg.event.post(pg.event.Event(INITGAME))
+				pg.event.post(pg.event.Event(FADEOUTEVENT))
 
 			if event.type == INITGAME:
 				finished = True
@@ -125,7 +135,8 @@ def alpha():
 		pg.display.flip()
 		dt = timer.tick(60), 1000
 
-Game().run()
+
 
 if __name__ == "__main__":
 	alpha()
+	Game().run()

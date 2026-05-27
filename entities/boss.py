@@ -33,9 +33,10 @@ class Boss(pg.sprite.Sprite):
 
 		elif isinstance(image, (str, Path)):
 			image = pg.image.load(image).convert_alpha()
-
-		self.image = pg.transform.rotate(pg.transform.smoothscale(image, (800, 800)), 180)
-
+		if self.name == "Dark Crusader":
+			self.image = pg.transform.rotate(pg.transform.smoothscale(image, (800, 800)), 180)
+		else:
+			self.image = pg.transform.rotate(pg.transform.smoothscale(image, (800, 800)), 0)
 		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_timer = 0
@@ -45,7 +46,7 @@ class Boss(pg.sprite.Sprite):
 
 		self.hitbox = self.rect.inflate(-56, -56)
 
-		self.target_y = 160
+		self.target_y = 250
 		self.speed = 120
 		self.entering = True
 
@@ -73,7 +74,7 @@ class Boss(pg.sprite.Sprite):
 				self.pos.y = self.target_y
 		else:
 			self.entering = False
-		rotozoom(self.image, 0, -self.pos.y / 100)
+
 		self.rect.center = self.pos
 		self.hitbox.center = self.rect.center
 
@@ -245,7 +246,7 @@ class Boss(pg.sprite.Sprite):
 			return
 
 		self.hp -= amount
-		self.flash_timer = 0.1
+		self.flash_timer = 0.005
 
 		if self.hp <= 0:
 			self.destroy()

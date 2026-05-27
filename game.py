@@ -154,7 +154,7 @@ class Game:
 					if not self.player.shield_active:
 						self.player.hit()
 					else:
-						self.play_sound(f"{c.HOME_DIR}/assets/ding.mp3").play()
+						self.play_sound(f"{c.HOME_DIR}/assets/audio/ding.mp3").play()
 					break
 
 			if not overlap:
@@ -189,7 +189,7 @@ class Game:
 					if not self.player.shield_active:
 						self.player.hit()
 					else:
-						pg.mixer.Sound(f"{c.HOME_DIR}/assets/ding.mp3").play()
+						pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/ding.mp3").play()
 					break
 
 			if not overlap:
@@ -198,20 +198,14 @@ class Game:
 				self.all_sprites.add(enemy)
 				return
 
-	def boss_spawn(self, boss_dict=None):
+	def boss_spawn(self, name="unknown", lvl=1, image=None, hp=1000, pos=None):
 		if self.boss is not None:
 			return
 
-		if boss_dict is None:
-			boss_dict = {}
-
 		c.BOSS_TIME = True
 
-		name = boss_dict.get("name", "Unnamed Boss")
-		pos = boss_dict.get("pos", (c.WIDTH // 2, -160))
-		image = boss_dict.get("boss_image", None)
-		hp = boss_dict.get("boss_hp", self.level.boss_hp)
-		lvl = boss_dict.get("lvl", self.level.stage)
+		if pos is None:
+			pos = (c.WIDTH // 2, -160)
 
 		self.boss = Boss(
 			self,
@@ -225,16 +219,14 @@ class Game:
 		self.enemies.add(self.boss)
 		self.all_sprites.add(self.boss)
 
-		self.boss_spawned_this_level = True
-
-		print(f"Boss spawned: {name} at {pos}, hp={hp}")
+		print(f"Boss spawned: {name}, lvl={lvl}, hp={hp}, pos={pos}")
 
 
 		if self.player.rect.colliderect(self.boss.rect) and not self.player.invincible_timer > 0:
 			if not self.player.shield_active:
 				self.player.hit()
 			else:
-				pg.mixer.Sound(f"{c.HOME_DIR}/assets/ding.mp3").play()
+				pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/ding.mp3").play()
 		return self.boss
 
 	def update(self, dt):
@@ -254,102 +246,75 @@ class Game:
 				self.enemy_spawn_delay = random.uniform(0.4, 3.0)
 				self.spawn_enemy()
 
-			if self.level_timer >= self.boss_spawn_delay:
-				print("bossi spawnautumassa")
-
-				if not c.BOSS:
-					print("No bosses left in c.BOSS")
-					return
-
-				boss_dict = c.BOSS.pop(0)
-
-				if boss_dict.get("name") == "Mr. Robot":
-					if c.BOSS:
-						boss_dict = c.BOSS.pop(0)
-
-				print(f"you're fighting {boss_dict.get('name')}")
-
-				self.level_timer = 0
-				self.boss_spawn(boss_dict)
-
 			self.asteroid_spawn_timer += dt
+
 			if self.asteroid_spawn_timer >= self.asteroid_spawn_delay:
 				self.asteroid_spawn_timer = 0
 				self.asteroid_spawn_delay = random.uniform(0.40, 3.2)
-			if len(self.asteroids) < self.level.max_asteroids:
-				self.spawn_asteroid()
-			if len(self.asteroids) < 2:
-				self.spawn_rocks()
 
-			for enemy in self.enemies:
-				for bullet in self.player_bullets:
-					if enemy.hitbox.colliderect(bullet.rect):
-						bullet.kill()
-						enemy.damage(1)
-						break
-
-			for asteroid in self.asteroids:
-				for bullet in self.player_bullets:
-					if asteroid.hitbox.colliderect(bullet.rect):
-						bullet.kill()
-						asteroid.damage(1)
-						break
-
-			for asteroid in self.asteroids:
-				if asteroid.hitbox.colliderect(self.player.rect) and not self.player.invincible_timer > 0:
-					self.player.hit()
-					if self.player.lives <= 0:
-						self.player.alive = False
-						self.game_over = True
-					break
-
-			if self.player.alive and self.player.invincible_timer <= 0:
-				for bullet in self.enemy_bullets:
-					distance = self.player.pos.distance_to(bullet.pos)
-
-					if distance < self.player.hitbox_radius + bullet.radius:
-						bullet.kill()
-						self.player.hit()
-						if self.player.lives <= 0:
-							self.player.alive = False
-							self.game_over = True
-						break
-
-			powerup_hits = pg.sprite.spritecollide(
-				self.player,
-				self.powerups,
-				True
-			)
-
-			for powerup in powerup_hits:
-				self.player.apply_powerup(powerup.kind)
+				if len(self.asteroids) < self.level.max_asteroids:
+					self.spawn_asteroid()
 
 			if (
 					self.level_timer >= self.boss_spawn_delay
-					and not self.boss_spawned_this_level
 					and self.boss is None
 			):
 				print("bossi spawnautumassa")
-				self.bosses.clear()
-				if self.level.next_boss_candidate is None:
-					print("nöössi")
 				boss_dict = c.BOSS.pop(0)
-				print(f"you're fighting {boss_dict.get("name")}")
-				self.boss_spawn(name=boss_dict.get("name", "unknown"), lvl=self.level.stage,
-								image=boss_dict.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png"), hp=self.level.boss_hp)
-			if not self.player.alive:
-				self.game_over = True
+				self.boss_spawn(
+					name=boss_dict.get("name", "unknown"),
+					lvl=self.level.stage,
+					image=boss_dict.get("boss_image"),
+					hp=boss_dict.get("boss_hp", self.level.boss_hp),
+					pos=boss_dict.get("pos", (c.WIDTH // 2, -160)),
+				)
 
-			if self.game_over:
-				self.game_over_scale += self.game_over_scale_dir * 0.4 * dt
-				self.text_alpha -= 0.3
-				self.game_over_backdrop_scale += 2.8 * dt
-				if self.game_over_backdrop_scale > 6:
-					self.game_over_backdrop_scale = 6
-				self.game_over_backdrop_alpha -= 50 * dt
-				if self.game_over_backdrop_alpha < 80:
-					self.game_over_backdrop_alpha = 80
-				return
+		# THIS MUST BE OUTSIDE THE if not c.BOSS_TIME BLOCK
+		self.handle_collisions()
+
+		if not self.player.alive:
+			self.game_over = True
+
+		if self.game_over:
+			self.game_over_scale += self.game_over_scale_dir * 0.4 * dt
+			self.text_alpha -= 0.3
+			self.game_over_backdrop_scale += 2.8 * dt
+
+			if self.game_over_backdrop_scale > 6:
+				self.game_over_backdrop_scale = 6
+
+			self.game_over_backdrop_alpha -= 50 * dt
+
+			if self.game_over_backdrop_alpha < 80:
+				self.game_over_backdrop_alpha = 80
+
+			return
+			# if (
+			# 		self.level_timer >= self.boss_spawn_delay
+			# 		and not self.boss_spawned_this_level
+			# 		and self.boss is None
+			# ):
+			# 	print("bossi spawnautumassa")
+			# 	self.bosses.clear()
+			# 	if self.level.next_boss_candidate is None:
+			# 		print("nöössi")
+			# 	boss_dict = c.BOSS.pop(0)
+			# 	print(f"you're fighting {boss_dict.get("name")}")
+			# 	self.boss_spawn(name=boss_dict.get("name", "unknown"), lvl=self.level.stage,
+			# 					image=boss_dict.get("image", f"{c.HOME_DIR}/assets/ships/bosses/foobarhead1.png"), hp=self.level.boss_hp)
+			# if not self.player.alive:
+			# 	self.game_over = True
+			#
+			# if self.game_over:
+			# 	self.game_over_scale += self.game_over_scale_dir * 0.4 * dt
+			# 	self.text_alpha -= 0.3
+			# 	self.game_over_backdrop_scale += 2.8 * dt
+			# 	if self.game_over_backdrop_scale > 6:
+			# 		self.game_over_backdrop_scale = 6
+			# 	self.game_over_backdrop_alpha -= 50 * dt
+			# 	if self.game_over_backdrop_alpha < 80:
+			# 		self.game_over_backdrop_alpha = 80
+			# 	return
 
 	def draw(self):
 		if c.Event != c.Event.PAUSE:
@@ -376,8 +341,112 @@ class Game:
 
 			pg.display.flip()
 
+	def handle_collisions(self):
+		# Player bullets vs enemies/bosses
+		for enemy in list(self.enemies):
+			enemy_hitbox = getattr(enemy, "hitbox", enemy.rect)
+
+			for bullet in list(self.player_bullets):
+				if enemy_hitbox.colliderect(bullet.rect):
+					bullet.kill()
+
+					damage = getattr(bullet, "damage", 1)
+
+					if hasattr(enemy, "damage"):
+						enemy.damage(damage)
+					else:
+						enemy.kill()
+
+					break
+
+		# Player bullets vs asteroids
+		for asteroid in list(self.asteroids):
+			asteroid_hitbox = getattr(asteroid, "hitbox", asteroid.rect)
+
+			for bullet in list(self.player_bullets):
+				if asteroid_hitbox.colliderect(bullet.rect):
+					bullet.kill()
+
+					if hasattr(asteroid, "damage"):
+						asteroid.damage(1)
+					else:
+						asteroid.kill()
+
+					break
+
+		# Enemy bullets vs player
+		if self.player.alive and self.player.invincible_timer <= 0:
+			for bullet in list(self.enemy_bullets):
+				bullet_pos = getattr(bullet, "pos", pg.Vector2(bullet.rect.center))
+				bullet_radius = getattr(
+					bullet,
+					"radius",
+					max(bullet.rect.width, bullet.rect.height) // 2
+				)
+
+				distance = self.player.pos.distance_to(bullet_pos)
+
+				if distance < self.player.hitbox_radius + bullet_radius:
+					bullet.kill()
+
+					if not self.player.shield_active:
+						self.player.hit()
+					else:
+						pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/ding.mp3").play()
+
+					if self.player.lives <= 0:
+						self.player.alive = False
+						self.game_over = True
+
+					break
+
+		# Enemy / boss body vs player
+		if self.player.alive and self.player.invincible_timer <= 0:
+			for enemy in list(self.enemies):
+				enemy_hitbox = getattr(enemy, "hitbox", enemy.rect)
+
+				if enemy_hitbox.colliderect(self.player.rect):
+					if not self.player.shield_active:
+						self.player.hit()
+					else:
+						pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/ding.mp3").play()
+
+					if self.player.lives <= 0:
+						self.player.alive = False
+						self.game_over = True
+
+					break
+
+			# Asteroids vs player
+			if self.player.alive and self.player.invincible_timer <= 0:
+				for asteroid in list(self.asteroids):
+					asteroid_hitbox = getattr(asteroid, "hitbox", asteroid.rect)
+
+					if asteroid_hitbox.colliderect(self.player.rect):
+						if not self.player.shield_active:
+							self.player.hit()
+						else:
+							pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/ding.mp3").play()
+
+						if self.player.lives <= 0:
+							self.player.alive = False
+							self.game_over = True
+
+						break
+
+			# Powerups vs player
+			powerup_hits = pg.sprite.spritecollide(
+				self.player,
+				self.powerups,
+				True
+			)
+
+			for powerup in powerup_hits:
+				self.player.apply_powerup(powerup.kind)
+
 		if c.event == c.Event.NEXTLEVEL:
-			self.level.next_boss_candidate = c.BOSS.pop(0)
+			if len(c.BOSS) == 5 - self.level.stage and not self.level.next_boss_candidates:
+				self.level.next_boss_candidate = c.BOSS.pop(0)
 			self.rotated_text = pg.Surface((400, 100), pg.SRCALPHA)
 			overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
 			overlay.fill((0, 0, 50, 25))
@@ -421,6 +490,7 @@ class Game:
 			self.next_level_angle += self.dt
 			self.screen.blit(rotated_text, rect)
 		pg.display.flip()
+
 
 		if self.game_over:
 			# Screen darkening
