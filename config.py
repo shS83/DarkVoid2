@@ -24,26 +24,26 @@ ENEMY_HP = 5
 PLAYER_BULLET_SPEED = 400
 PLAYER_HITBOX_RADIUS = 4
 
-BOSS1 = pg.image.load(Path(f'{HOME_DIR}', 'assets', 'ships', 'bosses', 'dark-crusader.png')).convert_alpha()
-BOSS2 =	pg.image.load(Path(f'{HOME_DIR}', 'assets', 'ships', 'bosses', 'boss-2.png')).convert_alpha()
-BOSS3 = pg.image.load(Path(f'{HOME_DIR}', 'assets', 'ships', 'bosses', 'foobarhead1.png')).convert_alpha()
-ROCK1 = pg.image.load(Path(f'{HOME_DIR}', 'assets', 'rocks', 'rock_1.png')).convert_alpha()
-ROCK2 = pg.image.load(Path(f'{HOME_DIR}', 'assets', 'rocks', 'rock_2.png')).convert_alpha()
-ROCK3 = pg.image.load(Path(f'{HOME_DIR}', 'assets', 'rocks', 'rock_3.png')).convert_alpha()
-ROCK4 = pg.image.load(Path(f'{HOME_DIR}', 'assets', 'rocks', 'rock_4.png')).convert_alpha()
-ROCK5 = pg.image.load(Path(f'{HOME_DIR}', 'assets', 'rocks', 'rock_5.png')).convert_alpha()
-ROCK6 = pg.image.load(Path(f'{HOME_DIR}', 'assets', 'rocks', 'rock_6.png')).convert_alpha()
-BEACH1 = pg.image.load(Path(f'{HOME_DIR}', 'assets', 'backgrounds', 'misc', 'beach_1.jpg')).convert()
-BEACH2 = pg.image.load(Path(f'{HOME_DIR}', 'assets', 'backgrounds', 'misc', 'beach_2.jpg')).convert()
-BEACH3 = pg.image.load(Path(f'{HOME_DIR}', 'assets', 'backgrounds', 'misc', 'beach_3.jpg')).convert()
-BEACH4 = pg.image.load(Path(f'{HOME_DIR}', 'assets', 'backgrounds', 'misc', 'beach_4.jpg')).convert()
-PALLO1 = pg.transform.scale(Path(pg.image.load(Path(f"{HOME_DIR}', 'assets', 'balls', 'metallipallo_1.png")).convert_alpha(), (64, 64)))
-PALLO2 = pg.transform.scale(Path(pg.image.load(Path(f"{HOME_DIR}', 'assets', 'balls', 'metallipallo_2.png")).convert_alpha(), (64, 64)))
-PALLO3 = pg.transform.scale(Path(pg.image.load(Path(f"{HOME_DIR}', 'assets', 'balls', 'metallipallo_3.png")).convert_alpha(), (64, 64)))
-PALLO4 = pg.transform.scale(Path(pg.image.load(Path(f"{HOME_DIR}', 'assets', 'balls', 'metallipallo_4.png")).convert_alpha(), (64, 64)))
-PALLO5 = pg.transform.scale(Path(pg.image.load(Path(f"{HOME_DIR}', 'assets', 'balls', 'metallipallo_5.png")).convert_alpha(), (64, 64)))
+BOSS1 = pg.image.load(Path(f"{HOME_DIR}", "assets", "ships", "bosses", "dark-crusader.png")).convert_alpha()
+BOSS2 =	pg.image.load(Path(f"{HOME_DIR}", "assets", "ships", "bosses", "boss-2.png")).convert_alpha()
+BOSS3 = pg.image.load(Path(f"{HOME_DIR}", "assets", "ships", "bosses", "foobarhead1.png")).convert_alpha()
+ROCK1 = pg.image.load(Path(f"{HOME_DIR}", "assets", "rocks", "rock_1.png")).convert_alpha()
+ROCK2 = pg.image.load(Path(f"{HOME_DIR}", "assets", "rocks", "rock_2.png")).convert_alpha()
+ROCK3 = pg.image.load(Path(f"{HOME_DIR}", "assets", "rocks", "rock_3.png")).convert_alpha()
+ROCK4 = pg.image.load(Path(f"{HOME_DIR}", "assets", "rocks", "rock_4.png")).convert_alpha()
+ROCK5 = pg.image.load(Path(f"{HOME_DIR}", "assets", "rocks", "rock_5.png")).convert_alpha()
+ROCK6 = pg.image.load(Path(f"{HOME_DIR}", "assets", "rocks", "rock_6.png")).convert_alpha()
+BEACH1 = pg.image.load(Path(f"{HOME_DIR}", "assets", "backgrounds", "misc", "beach_1.jpg")).convert()
+BEACH2 = pg.image.load(Path(f"{HOME_DIR}", "assets", "backgrounds", "misc", "beach_2.jpg")).convert()
+BEACH3 = pg.image.load(Path(f"{HOME_DIR}", "assets", "backgrounds", "misc", "beach_3.jpg")).convert()
+BEACH4 = pg.image.load(Path(f"{HOME_DIR}", "assets", "backgrounds", "misc", "beach_4.jpg")).convert()
+PALLO1 = pg.transform.scale(pg.image.load(Path(f"{HOME_DIR}", "assets", "balls", "metallipallo_1.png")).convert_alpha(), (64, 64))
+PALLO2 = pg.transform.scale(pg.image.load(Path(f"{HOME_DIR}", "assets", "balls", "metallipallo_2.png")).convert_alpha(), (64, 64))
+PALLO3 = pg.transform.scale(pg.image.load(Path(f"{HOME_DIR}", "assets", "balls", "metallipallo_3.png")).convert_alpha(), (64, 64))
+PALLO4 = pg.transform.scale(pg.image.load(Path(f"{HOME_DIR}", "assets", "balls", "metallipallo_4.png")).convert_alpha(), (64, 64))
+PALLO5 = pg.transform.scale(pg.image.load(Path(f"{HOME_DIR}", "assets", "balls", "metallipallo_5.png")).convert_alpha(), (64, 64))
 PALLOT = [PALLO1, PALLO2, PALLO3, PALLO4, PALLO5]
-DING = pg.mixer.Sound(Path(f'{HOME_DIR}', 'assets', 'audio', 'ding.mp3'))
+DING = pg.mixer.Sound(Path(f"{HOME_DIR}", "assets", "audio", "ding.mp3"))
 BEACHES=[BEACH1, BEACH2, BEACH3, BEACH4]
 BACKGROUND = BEACH3
 ROCK_IMAGES = [ROCK1, ROCK2, ROCK3, ROCK4, ROCK5, ROCK6]
@@ -55,7 +55,7 @@ BOSS = [{"name": "Dark Crusader", "pos": (WIDTH // 2, -200), "lvl": 1, "boss_hp"
 		{"name": "Eldritch Marauder", "pos": (WIDTH // 2, -400), "lvl": 2, "boss_hp": 400, "boss_time": 4000, "boss_image": BOSS2},
 		{"name": "Aural Alien", "lvl": 3, "pos": (WIDTH // 2, -300), "boss_hp": 500, "boss_time": 5000, "boss_image": BOSS3}]
 
-BOSS4 = pg.image.load(Path(f'{HOME_DIR}', 'assets', 'ships', 'bosses', 'stage4_boss_void_dreadnought_full.png')).convert_alpha()
+BOSS4 = pg.image.load(Path(f"{HOME_DIR}", "assets", "ships", "bosses", "stage4_boss_void_dreadnought_full.png")).convert_alpha()
 
 BOSS.append({
 	"name": "Void Dreadnought",
@@ -71,6 +71,6 @@ SHIELD = False
 BOSS_TIME = False
 SCALE = 0.4
 HOME_DIR = os.path.dirname(__file__)
-MSG_FONT = pg.font.Font(Path(f'{HOME_DIR}', 'assets1', 'fonts', 'GoMonoNerdFontPropo-Bold.ttf', 60))
-GOTHIC_FONT = pg.font.Font(Path(f'{HOME_DIR}', 'assets', 'fonts', 'VL-Gothic-Regular.ttf', 36))
+MSG_FONT = pg.font.Font(Path(f"{HOME_DIR}", "assets1", "fonts", "GoMonoNerdFontPropo-Bold.ttf", 60))
+GOTHIC_FONT = pg.font.Font(Path(f"{HOME_DIR}", "assets", "fonts", "VL-Gothic-Regular.ttf", 36))
 event = Event.DRUMROLL
