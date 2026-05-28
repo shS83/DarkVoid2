@@ -3,44 +3,45 @@ import pygame as pg
 import config as c
 from entities.glitter import Glitter
 
+
 class Shield(pg.sprite.Sprite):
-    def __init__(self, game, player):
-        super().__init__()
-        self.amount = 0
-        self.glitter_timer = 0.25
-        self.game = game
-        self.player = player
-        if self.amount < 1:
-            return
-        self.image = pg.transform.scale(
-            c.PALLO3,
-            (210, 210)
-        ).convert_alpha()
+	def __init__(self, game, player):
+		super().__init__()
 
-        self.image.set_alpha(100)
+		self.game = game
+		self.player = player
 
-        self.rect = self.image.get_rect(center=self.player.rect.center)
+		self.image = pg.transform.scale(
+			c.PALLO3,
+			(210, 210)
+		).convert_alpha()
 
-        self.life = 5.0
+		self.image.set_alpha(125)
+		self.rect = self.image.get_rect(center=self.player.rect.center)
 
-    def update(self, dt):
-        if self.glitter_timer <= 0:
-            self.glitter_timer = 0.005
-        self.life -= dt
-        self.glitter_timer -= dt
-        for _ in range(16):
-            glitter_pos = (
-                self.rect.centerx + random.randint(-100, 100),
-                self.rect.centery + random.randint(-100, 100),
-            )
+		self.life = 5.0
+		self.glitter_timer = 0.0
 
-            glitter = Glitter(self.game, glitter_pos)
-            self.game.effects.add(glitter)
-            self.game.all_sprites.add(glitter)
+	def update(self, dt):
+		self.life -= dt
+		self.glitter_timer -= dt
 
-        if self.life <= 0:
-            self.player.shield_active = False
-            self.kill()
-            return
+		if self.life <= 0:
+			self.player.shield_active = False
+			self.kill()
+			return
 
-        self.rect.center = self.player.rect.center
+		self.rect.center = self.player.rect.center
+
+		if self.glitter_timer <= 0:
+			self.glitter_timer = 0.04
+
+			for _ in range(3):
+				glitter_pos = (
+					self.rect.centerx + random.randint(-90, 90),
+					self.rect.centery + random.randint(-90, 90),
+				)
+
+				glitter = Glitter(self.game, glitter_pos)
+				self.game.effects.add(glitter)
+				self.game.all_sprites.add(glitter)

@@ -26,7 +26,7 @@ class HighScoreTable:
 		with open(self.path, "w", encoding="utf-8") as file:
 			json.dump(self.entries, file, indent=4)
 
-	def add_score(self, name, score, level=1, killed_by="Unknown"):
+	def add_score(self, name, score, level=1, killed_by="the Illithids"):
 		entry = {
 			"name": name,
 			"score": int(score),

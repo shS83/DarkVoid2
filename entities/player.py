@@ -355,6 +355,7 @@ class Player(pg.sprite.Sprite):
 			return
 
 		if self.shield_active:
+			print("Shield absorbed hit")
 			if self.shield_hit_timer <= 0:
 				self.shield_hit_timer = self.shield_hit_cooldown
 
@@ -421,14 +422,7 @@ class Player(pg.sprite.Sprite):
 				c.BOSS_TIME = False
 				c.BOSS_SPAWN_DELAY = 5.0
 			if keys[pg.K_F8]:
-				from entities.boss import Boss
-				self.game.boss = {}
-				self.game.boss = Boss(self.game, (random.randrange(0, 1920), -100))
-				c.BOSS_TIME = True
-				c.BOSS_SPAWN_DELAY = 0
-				#self.game.boss = self.game.boss_spawn(name="Bane", lvl=1, image=c.BOSS[1].get("boss_image"), hp=c.BOSS[1].get("hp"))
-				self.game.enemies.add(self.boss)
-				self.all_sprites.add(self.boss)
+				...
 			if keys[pg.K_F9]:
 				powerup = PowerUp(self.game, (random.randrange(0, 1920), 0), kind=random.choice(["health", "speed", "spread", "laser", "cannon", "shield"]))
 				self.game.powerups.add(powerup)
@@ -437,75 +431,72 @@ class Player(pg.sprite.Sprite):
 				self.alive = False
 			if keys[pg.K_F10]:
 				c.BOSS_TIME = True
-			if keys[pg.K_LALT]:
-				Shield.shield_active = True
-		if self.visible:
-			self.shield = Shield(self, self)
-			if self.power_timer > 0:
-				self.power_timer -= dt
 
-			if self.power_timer <= 0:
-				self.shoot_mode = "normal"
-				if self.shield_amount > 0:
-					self.shield = True
-				self.shield_active = False
-				self.speed = c.PLAYER_SPEED
-				self.fire_cooldown2 = 0.07
-			self.thruster_timer -= dt
+		if self.power_timer > 0:
+			self.power_timer -= dt
 
-			if self.thruster_timer <= 0:
-				self.thruster_timer = 0.008
+		if self.power_timer <= 0:
+			self.shoot_mode = "normal"
+			if self.shield_amount > 0:
+				self.shield = True
 
-				engine_left = (self.rect.centerx - 18, self.rect.centery + 45)
-				engine_left2 = (self.rect.centerx - 36, self.rect.centery + 45)
-				engine_right = (self.rect.centerx + 18, self.rect.centery + 45)
-				engine_right2 = (self.rect.centerx + 36, self.rect.centery + 45)
+			self.speed = c.PLAYER_SPEED
+			self.fire_cooldown2 = 0.07
+		self.thruster_timer -= dt
 
-				for engine_pos in [engine_left, engine_right, engine_left2, engine_right2]:
-					# hot core
-					for _ in range(8):
-						particle = ThrusterParticle(
-							self.game,
-							engine_pos,
-							direction=(0, 1),
-							color=(0, 0,255),
-							speed_range=(480, 720),
-							size_range=(1, 4),
-							life_range=(0.12, 0.36),
-							spread=6
-						)
-						self.game.effects.add(particle)
-						self.game.all_sprites.add(particle)
+		if self.thruster_timer <= 0:
+			self.thruster_timer = 0.008
 
-					# purple/blue outer flame
-					for _ in range(8):
-						particle = ThrusterParticle(
-							self.game,
-							engine_pos,
-							direction=(0, 1),
-							color=(100, 180, 255),
-							speed_range=(180, 380),
-							size_range=(2, 6),
-							life_range=(0.18, 0.38),
-							spread=6
-						)
-						self.game.effects.add(particle)
-						self.game.all_sprites.add(particle)
+			engine_left = (self.rect.centerx - 18, self.rect.centery + 45)
+			engine_left2 = (self.rect.centerx - 36, self.rect.centery + 45)
+			engine_right = (self.rect.centerx + 18, self.rect.centery + 45)
+			engine_right2 = (self.rect.centerx + 36, self.rect.centery + 45)
 
-					# orange sparks
-					if random.random() < 0.45:
-						particle = ThrusterParticle(
-							self.game,
-							engine_pos,
-							direction=(0, 1),
-							color=(255, 140, 140),
-							speed_range=(320, 700),
-							size_range=(2, 6),
-							life_range=(0.12, 0.42),
-							spread=15
-						)
-						self.game.effects.add(particle)
-						self.game.all_sprites.add(particle)
+			for engine_pos in [engine_left, engine_right, engine_left2, engine_right2]:
+				# hot core
+				for _ in range(8):
+					particle = ThrusterParticle(
+						self.game,
+						engine_pos,
+						direction=(0, 1),
+						color=(0, 0,255),
+						speed_range=(480, 720),
+						size_range=(1, 4),
+						life_range=(0.12, 0.36),
+						spread=6
+					)
+					self.game.effects.add(particle)
+					self.game.all_sprites.add(particle)
+
+				# purple/blue outer flame
+				for _ in range(8):
+					particle = ThrusterParticle(
+						self.game,
+						engine_pos,
+						direction=(0, 1),
+						color=(100, 180, 255),
+						speed_range=(180, 380),
+						size_range=(2, 6),
+						life_range=(0.18, 0.38),
+						spread=6
+					)
+					self.game.effects.add(particle)
+					self.game.all_sprites.add(particle)
+
+				# orange sparks
+				if random.random() < 0.45:
+					particle = ThrusterParticle(
+						self.game,
+						engine_pos,
+						direction=(0, 1),
+						color=(255, 140, 140),
+						speed_range=(320, 700),
+						size_range=(2, 6),
+						life_range=(0.12, 0.42),
+						spread=15
+					)
+					self.game.effects.add(particle)
+					self.game.all_sprites.add(particle)
 
 		if self.shield_hit_timer > 0:
 			self.shield_hit_timer -= dt

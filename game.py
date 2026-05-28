@@ -572,6 +572,8 @@ class Game:
 			for event in pg.event.get():
 				if event.type == pg.QUIT:
 					self.running = False
+				if event.type == pg.KEYDOWN and event.key == pg.K_F11:
+					self.player.alive = False
 				if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
 					self.highscore_name = "shS"
 					self.submit_highscore()
@@ -602,10 +604,17 @@ class Game:
 						if event.type == pg.KEYDOWN:
 							if event.key == pg.K_LSHIFT:
 								self.player.speed = self.player.focus_speed
-							if event.key == pg.K_z:
-								self.player.shield = True
+							if (
+									event.type == pg.KEYDOWN
+									and event.key == pg.K_LALT
+									and self.player.shield_amount > 0
+									and not self.player.shield_active
+							):
+								print("Shield activated. Charges left:", self.player.shield_amount)
 								self.player.shield_active = True
-								shield.amount -= 1
+								self.player.shield_amount -= 1
+
+								shield = Shield(self, self.player)
 
 								self.effects.add(shield)
 								self.all_sprites.add(shield)

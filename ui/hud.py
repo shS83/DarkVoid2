@@ -9,33 +9,14 @@ class HUD:
 		self.small_font = pg.font.Font(None, 22)
 		self.nerd_font = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 128)
 		self.medium_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 56)
-		self.small_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 24)
+		self.small_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 20)
+		self.tiny_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 16)
 
 	def draw(self, screen):
 		if not self.game.game_over and self.game.player.visible:
 			self.draw_score(screen)
 			self.draw_lives(screen)
 			self.draw_boss_bar(screen)
-
-	def submit_highscore(self):
-		if self.highscore_saved:
-			return
-
-		name = self.highscore_name.strip()
-
-		if not name:
-			name = "???"
-
-		self.highscores.add_score(
-			name=name,
-			score=self.score,
-			level=self.level.stage,
-			killed_by=self.killed_by or "the Illithids"
-		)
-
-		self.highscore_saved = True
-		self.entering_highscore = False
-		pg.key.stop_text_input()
 
 	def draw_score(self, screen):
 		text = self.small_nerd.render(f"SCORE {self.game.score}", True, (240, 240, 255))
@@ -171,7 +152,7 @@ class HUD:
 		screen.blit(overlay, (0, 0))
 
 		panel_width = 640
-		panel_height = 520
+		panel_height = 640
 
 		panel_x = (c.WIDTH - panel_width) // 2
 		panel_y = (c.HEIGHT - panel_height) // 2
@@ -192,21 +173,35 @@ class HUD:
 
 		y = panel_y + 120
 
-		for index, entry in enumerate(self.game.highscores.entries[:10], start=1):
+		for index, entry in enumerate(self.game.highscores.entries[:8], start=1):
 			name = entry.get("name", "???")
 			score = entry.get("score", 0)
 			level = entry.get("level", 1)
+			killed_by = entry.get("killed_by", "the Illithids")
 
-			line = f"{index:02}. {name:<12} {score:>8}  STAGE {level}"
+			main_line = f"{index:02}. {name:<12} {score:>8}  STAGE {level}"
 
 			color = (240, 240, 255)
 
 			if index == 1:
 				color = (255, 220, 120)
 
-			text = self.small_nerd.render(line, True, color)
+			text = self.small_nerd.render(main_line, True, color)
 			text_rect = text.get_rect(center=(c.WIDTH // 2, y))
 			screen.blit(text, text_rect)
+
+			y += 30
+
+			killer_line = f"killed by {killed_by}"
+
+			killer_text = self.tiny_nerd.render(
+				killer_line,
+				True,
+				(170, 150, 210)
+			)
+
+			killer_rect = killer_text.get_rect(center=(c.WIDTH // 2, y))
+			screen.blit(killer_text, killer_rect)
 
 			y += 30
 
