@@ -18,7 +18,7 @@ class Player(pg.sprite.Sprite):
 		super().__init__()
 		pg.mixer.init()
 		self.mixer = mixer
-		self.bullet = PlayerBullet(game, pos, velocity=(0, -800))
+		self.bullet = PlayerBullet(game, pos, velocity=(0, -1000))
 		self.game = game
 		self.shoot_mode = "normal"
 		self.power_timer = 0
@@ -27,9 +27,9 @@ class Player(pg.sprite.Sprite):
 		self.thruster_timer = 0
 		self.alive = True
 		self.fire_timer = 0
-		self.fire_cooldown = 0.01
-		self.fire_cooldown2 = 0.08
-		self.fire_cooldown3 = 0.35
+		self.fire_cooldown = 0.005
+		self.fire_cooldown2 = 0.04
+		self.fire_cooldown3 = 0.17
 		self.game = game
 		self.pauseswitch = -1
 		self.image1 = smoothscale_by(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "Proper_warship.png"))).convert_alpha(), c.SCALE)
@@ -37,7 +37,7 @@ class Player(pg.sprite.Sprite):
 		self.image3 = smoothscale_by(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "purplealus.png"))).convert_alpha(), c.SCALE)
 		self.image4 = smoothscale_by(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "turqoiseship.png"))).convert_alpha(), c.SCALE)
 		self.image5 = smoothscale_by(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "finnfighter.png"))).convert_alpha(), c.SCALE)
-		self.images = [self.image5]#self.image1, self.image2, self.image3, self.image4]
+		self.images = [self.image5] #self.image1, self.image2, self.image3, self.image4]
 		self.image = random.choice(self.images)
 		self.image = pg.transform.smoothscale_by(self.image, c.SCALE)
 		self.rect = self.image.get_rect(center=pos)
@@ -55,7 +55,7 @@ class Player(pg.sprite.Sprite):
 		self.shield = False
 		self.shield_active = False
 		self.shield_hit_timer = 0
-		self.shield_hit_cooldown = 0.12
+		self.shield_hit_cooldown = 0.06
 		self.shield_image = pg.transform.scale(random.choice([c.PALLO1, c.PALLO2, c.PALLO3]), (160, 160))
 		self.shield_image_rect = self.shield_image.get_rect(center=pos)
 		self.shield_amount = 0
@@ -68,7 +68,7 @@ class Player(pg.sprite.Sprite):
 		self.vulcan_counter = 0
 
 		self.vulcan_sound_timer = 0
-		self.vulcan_sound_delay = 0.07
+		self.vulcan_sound_delay = 1
 
 		self.minigun_sound = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "m61continued.ogg"))
 		self.minigun_sound.set_volume(1.0)
@@ -78,10 +78,10 @@ class Player(pg.sprite.Sprite):
 
 		# Copy only the alpha channel shape from original image
 		alpha_mask = image.copy()
-		alpha_mask.fill((255, 255, 255, 255), special_flags=pg.BLEND_RGBA_MULT)
+		alpha_mask.fill((255, 255, 255, 200), special_flags=pg.BLEND_RGBA_MULT)
 
 		flash.blit(alpha_mask, (0, 0))
-		flash.fill((255, 255, 255, 255), special_flags=pg.BLEND_RGB_MAX)
+		flash.fill((255, 255, 255, 200), special_flags=pg.BLEND_RGB_MAX)
 
 		return flash
 
@@ -244,20 +244,20 @@ class Player(pg.sprite.Sprite):
 			self.shoot_mode = "spread"
 			self.power_timer = 12.0
 		if kind == "speed":
-			self.speed = 700
+			self.speed = 900
 			self.power_timer = 12.0
 		if kind == "laser":
-			self.fire_cooldown2 = 0.01
+			self.fire_cooldown2 = 0.001
 			self.power_timer = 12.0
 		if kind == "health":
 			self.lives += 3
 		if kind == "cannon":
 			self.power_timer = 12.0
-			self.fire_cooldown = 0.01
+			self.fire_cooldown = 0.001
 		if kind == "shield":
 			self.power_timer = 12.0
 			self.shield = True
-			self.shield_amount = self.game.level.player_shield_amount
+			self.shield_amount += self.game.level.player_shield_amount
 
 	def shoot_vulcan(self, dt):
 		if self.vulcan_timer > 0:
@@ -416,7 +416,6 @@ class Player(pg.sprite.Sprite):
 			c.BOSS_TIME = True
 			c.BOSS_SPAWN_DELAY = 0
 			#self.game.boss = self.game.boss_spawn(name="Bane", lvl=1, image=c.BOSS[1].get("boss_image"), hp=c.BOSS[1].get("hp"))
-			self.game.boss_group.add(self.boss)
 			self.game.enemies.add(self.boss)
 			self.all_sprites.add(self.boss)
 		if keys[pg.K_F9]:
@@ -436,15 +435,18 @@ class Player(pg.sprite.Sprite):
 			self.shield = False
 			self.shield_active = False
 			self.speed = c.PLAYER_SPEED
-			self.fire_cooldown2 = 0.08
+			self.fire_cooldown2 = 0.07
 		self.thruster_timer -= dt
 
 		if self.thruster_timer <= 0:
-			self.thruster_timer = 0.012
+			self.thruster_timer = 0.008
 
-			engine_left = (self.rect.centerx - 20, self.rect.centery + 70)
-			engine_right = (self.rect.centerx + 20, self.rect.centery + 70)
-			for engine_pos in [engine_left, engine_right]:
+			engine_left = (self.rect.centerx - 18, self.rect.centery + 65)
+			engine_left2 = (self.rect.centerx - 36, self.rect.centery + 65)
+			engine_right = (self.rect.centerx + 18, self.rect.centery + 65)
+			engine_right2 = (self.rect.centerx + 36, self.rect.centery + 65)
+
+			for engine_pos in [engine_left, engine_right, engine_left2, engine_right2]:
 				# hot core
 				for _ in range(8):
 					particle = ThrusterParticle(
@@ -452,10 +454,10 @@ class Player(pg.sprite.Sprite):
 						engine_pos,
 						direction=(0, 1),
 						color=(0, 0,255),
-						speed_range=(280, 520),
-						size_range=(1, 5),
-						life_range=(0.12, 0.46),
-						spread=12
+						speed_range=(480, 720),
+						size_range=(1, 4),
+						life_range=(0.12, 0.36),
+						spread=6
 					)
 					self.game.effects.add(particle)
 					self.game.all_sprites.add(particle)
@@ -470,7 +472,7 @@ class Player(pg.sprite.Sprite):
 						speed_range=(180, 380),
 						size_range=(2, 6),
 						life_range=(0.18, 0.38),
-						spread=15
+						spread=6
 					)
 					self.game.effects.add(particle)
 					self.game.all_sprites.add(particle)
