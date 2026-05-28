@@ -105,6 +105,7 @@ class Game:
 		self.game_over_timer = 0
 		self.gameoversound_played = False
 		self.nerd_font = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 128)
+		self.medium_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 56)
 		self.small_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 28)
 		self.game_over_text = self.nerd_font.render("YOU DIED", True, (255, 40, 40))
 		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 90))
@@ -361,6 +362,7 @@ class Game:
 				mixer.Sound(gameover).set_volume(0.4)
 				gameover.play()
 				gameover_played = True
+				mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav")).play()
 			white_rect = pg.Rect(0, 30, c.WIDTH, 240)
 			pg.draw.rect(banner, (255, 255, 255, alpha), white_rect)
 
@@ -368,13 +370,12 @@ class Game:
 			stage_text.set_alpha(alpha)
 			stage_rect = stage_text.get_rect(center=(c.WIDTH // 2, banner_height // 2))
 			banner.blit(stage_text, stage_rect)
-			mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav")).play()
 			self.screen.blit(banner, (0, c.HEIGHT // 2 - banner_height // 2))
 			self.player.visible = False
 			self.all_sprites.remove(self.player)
 			if not gameover_played and not self.score_saved:
 				self.start_highscore_entry()
-			if gameover_played and not self.player.visible:
+			if not self.player.visible:
 				self.hud.draw_highscores(self.screen)
 		else:
 			fade = min(1, self.stage_banner_timer / 0.35)
@@ -409,6 +410,7 @@ class Game:
 			print(mixer.Sound.get_volume(gameover))
 			mixer.Sound(gameover).set_volume(0.4)
 			gameover.play()
+			mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav")).play()
 
 		if self.game_over and not self.score_saved:
 			self.start_highscore_entry()

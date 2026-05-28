@@ -167,8 +167,8 @@ class HUD:
 		overlay.fill((0, 0, 0, 185))
 		screen.blit(overlay, (0, 0))
 
-		panel_width = 520
-		panel_height = 440
+		panel_width = 640
+		panel_height = 520
 
 		panel_x = (c.WIDTH - panel_width) // 2
 		panel_y = (c.HEIGHT - panel_height) // 2
