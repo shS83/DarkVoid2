@@ -14,9 +14,9 @@ class Level:
 		self.asteroid_spawn_delay = 15
 		self.enemy_bullet_cooldown = 0.3
 		self.max_enemies = 6
-		self.player_shield_amount = 5
+		self.player_shield_amount = 3
 		self.enemy_hp = 5
-		self.asteroid_hp = 2
+		self.asteroid_hp = 3
 		self.boss = None
 		self.next_boss_candidate = None
 		self.boss_timer = 2000
@@ -27,19 +27,18 @@ class Level:
 
 	def up(self):
 		#self.next_boss_candidate = self.boss_tree.pop(0)
-		self.player_shield_amount += 1
+		if self.player_shield_amount >= 0:
+			self.player_shield_amount += 1
 		self.enemy_bullet_cooldown -= 0.03
 		self.stage += 1
 		self.lives += 2
-		self.max_enemies += 1
 		self.asteroids += 1
-		self.asteroid_hp += 1
-		self.enemy_hp += 1
+		self.enemy_hp += 2
 		self.enemy_bullet_cooldown -= 0.05
-		self.max_asteroids += 1
+		self.max_asteroids += 2
 		self.max_enemies += 2
 		self.asteroid_speed += 0.20
-		self.asteroid_hp += 0.20
+		self.asteroid_hp += 3
 		self.boss_timer += 1000
 		self.boss_hp += 100
 

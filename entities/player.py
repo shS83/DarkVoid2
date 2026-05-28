@@ -2,6 +2,7 @@ import math
 import pygame as pg
 from pathlib import Path
 import config as c
+from entities.shield import Shield
 from entities.vulcan import VulcanBullet, MuzzleFlash, VulcanSpark, ShellCasing
 from pygame import mixer
 from entities.bullet import PlayerBullet
@@ -50,7 +51,12 @@ class Player(pg.sprite.Sprite):
 		self.focus_speed = c.PLAYER_FOCUS_SPEED
 		self.fire_cooldown = c.PLAYER_FIRE_COOLDOWN
 		self.bullet_speed = c.PLAYER_BULLET_SPEED
-		self.hitbox_radius = c.PLAYER_HITBOX_RADIUS
+		self.rect = self.image.get_rect(center=pos)
+		self.hitbox = self.rect.inflate(-96, -96)
+		self.hitbox_radius = self.hitbox.width // 2
+		self.hitbox_template = self.base_image.get_bounding_rect(min_alpha=24).inflate(-18, -18)
+		print(self.hitbox_radius)
+		c.PLAYER_HITBOX_RADIUS = self.hitbox_radius
 		self.particles = pg.sprite.Group()
 		self.all_sprites = pg.sprite.LayeredUpdates()
 		self.shield = False
@@ -392,51 +398,56 @@ class Player(pg.sprite.Sprite):
 				self.shoot_vulcan(dt)
 				self.vulcan_timer -= dt
 				self.vulcan_sound_timer -= dt
-		if keys[pg.K_ESCAPE]:
-			pg.quit()
+			if keys[pg.K_ESCAPE]:
+				pg.quit()
 		# For debugging
-		if keys[pg.K_F1]:
-			self.game.level.stage = 5
-			self.game.draw_stage_banner()
-		if keys[pg.K_F2]:
-			self.game.show_hitboxes = not self.game.show_hitboxes
-		if keys[pg.K_F3]:
-			self.game.show_collisions = not self.game.show_collisions
-		if keys[pg.K_F4]:
-			self.game.show_powerups = not self.game.show_powerups
-		if keys[pg.K_F5]:
-			self.game.show_enemies = not self.game.show_enemies
-		if keys[pg.K_F6]:
-			self.game.boss.destroy()
-		if keys[pg.K_F7]:
-			print(*self.game.bosses)
-			self.game.bosses.clear()
-			c.BOSS_TIME = False
-			c.BOSS_SPAWN_DELAY = 5.0
-		if keys[pg.K_F8]:
-			from entities.boss import Boss
-			self.game.boss = {}
-			self.game.boss = Boss(self.game, (random.randrange(0, 1920), -100))
-			c.BOSS_TIME = True
-			c.BOSS_SPAWN_DELAY = 0
-			#self.game.boss = self.game.boss_spawn(name="Bane", lvl=1, image=c.BOSS[1].get("boss_image"), hp=c.BOSS[1].get("hp"))
-			self.game.enemies.add(self.boss)
-			self.all_sprites.add(self.boss)
-		if keys[pg.K_F9]:
-			powerup = PowerUp(self.game, (random.randrange(0, 1920), 0), kind=random.choice(["health", "speed", "spread", "laser", "cannon", "shield"]))
-			self.game.powerups.add(powerup)
-			self.game.all_sprites.add(powerup)
-		if keys[pg.K_F11]:
-			self.alive = False
-		if keys[pg.K_F10]:
-			c.BOSS_TIME = True
+		if c.DEBUG:
+			if keys[pg.K_F1]:
+				self.game.level.stage = 5
+				self.game.draw_stage_banner()
+			if keys[pg.K_F2]:
+				c.DEBUG = not c.DEBUG
+			if keys[pg.K_F3]:
+				...
+			if keys[pg.K_F4]:
+				...
+			if keys[pg.K_F5]:
+				...
+			if keys[pg.K_F6]:
+				self.game.boss.destroy()
+			if keys[pg.K_F7]:
+				print(*self.game.bosses)
+				self.game.bosses.clear()
+				c.BOSS_TIME = False
+				c.BOSS_SPAWN_DELAY = 5.0
+			if keys[pg.K_F8]:
+				from entities.boss import Boss
+				self.game.boss = {}
+				self.game.boss = Boss(self.game, (random.randrange(0, 1920), -100))
+				c.BOSS_TIME = True
+				c.BOSS_SPAWN_DELAY = 0
+				#self.game.boss = self.game.boss_spawn(name="Bane", lvl=1, image=c.BOSS[1].get("boss_image"), hp=c.BOSS[1].get("hp"))
+				self.game.enemies.add(self.boss)
+				self.all_sprites.add(self.boss)
+			if keys[pg.K_F9]:
+				powerup = PowerUp(self.game, (random.randrange(0, 1920), 0), kind=random.choice(["health", "speed", "spread", "laser", "cannon", "shield"]))
+				self.game.powerups.add(powerup)
+				self.game.all_sprites.add(powerup)
+			if keys[pg.K_F11]:
+				self.alive = False
+			if keys[pg.K_F10]:
+				c.BOSS_TIME = True
+			if keys[pg.K_LALT]:
+				Shield.shield_active = True
 		if self.visible:
+			self.shield = Shield(self, self)
 			if self.power_timer > 0:
 				self.power_timer -= dt
 
 			if self.power_timer <= 0:
 				self.shoot_mode = "normal"
-				self.shield = False
+				if self.shield_amount > 0:
+					self.shield = True
 				self.shield_active = False
 				self.speed = c.PLAYER_SPEED
 				self.fire_cooldown2 = 0.07
@@ -516,7 +527,10 @@ class Player(pg.sprite.Sprite):
 		else:
 			self.image = self.base_image
 			self.image.set_alpha(255)
-
+		self.rect.center = self.pos
+		self.hitbox = self.hitbox_template.copy()
+		self.hitbox.x += self.rect.x
+		self.hitbox.y += self.rect.y
 		self.pos += direction * self.speed * dt
 
 		self.pos.x = max(32, min(c.WIDTH - 32, self.pos.x))

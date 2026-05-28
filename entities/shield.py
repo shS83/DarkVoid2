@@ -6,10 +6,12 @@ from entities.glitter import Glitter
 class Shield(pg.sprite.Sprite):
     def __init__(self, game, player):
         super().__init__()
+        self.amount = 0
         self.glitter_timer = 0.25
         self.game = game
         self.player = player
-
+        if self.amount < 1:
+            return
         self.image = pg.transform.scale(
             c.PALLO3,
             (210, 210)

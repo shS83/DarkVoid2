@@ -39,7 +39,6 @@ class Game:
 		self.level.stage = 1
 		c.event = Event.INITIATION
 		c.HOME_DIR = Path(__file__).parent.absolute()
-		print(c.HOME_DIR)
 		self.bosses=[]
 		self.highscores = HighScoreTable(
 			Path(c.HOME_DIR, "highscores.json")
@@ -104,6 +103,8 @@ class Game:
 		self.game_over = False
 		self.game_over_timer = 0
 		self.gameoversound_played = False
+		self.show_highscores = False
+		self.victory = False
 		self.nerd_font = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 128)
 		self.medium_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 56)
 		self.small_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 28)
@@ -276,6 +277,9 @@ class Game:
 
 		if self.game_over:
 			self.game_over_timer += dt
+
+		if not self.player.alive:
+			self.end_game(victory=False)
 			return
 
 		if not c.BOSS_TIME and self.boss is None:
@@ -317,9 +321,10 @@ class Game:
 		# THIS MUST BE OUTSIDE THE if not c.BOSS_TIME BLOCK
 		self.handle_collisions()
 
-		if not self.player.alive:
+		if not self.player.alive and self.player.visible:
 			self.game_over = True
-			self.start_highscore_entry()
+			self.player.alive = False
+			self.end_game(victory=False)
 
 	def draw(self):
 		self.screen.blit(self.background, (0, 0))
@@ -327,12 +332,17 @@ class Game:
 		self.all_sprites.draw(self.screen)
 		self.hud.draw(self.screen)
 
-		if self.boss is not None and c.DEBUG:
-			pg.draw.rect(self.screen, (255, 0, 0), self.boss.hitbox, 3)
+		if c.DEBUG:
+			if self.boss is not None:
+				pg.draw.rect(self.screen, (255, 0, 0), self.boss.hitbox, 3)
+			pg.draw.rect(self.screen, (255, 0, 0), self.player.hitbox, 3)
 
 
 		self.draw_stage_banner()
 		self.draw_game_over()
+
+		if self.show_highscores:
+			self.hud.draw_highscores(self.screen)
 
 		if c.event == Event.PAUSE:
 			pausesurface = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
@@ -356,16 +366,15 @@ class Game:
 			banner_height = 300
 			banner = pg.Surface((c.WIDTH, banner_height), pg.SRCALPHA)
 			banner.fill((0, 255, 0, alpha))
-			if not gameover_played:
+			if not self.gameoversound_played:
 				mixer.set_num_channels(2)
 				gameover = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav"))
 				mixer.Sound(gameover).set_volume(0.4)
 				gameover.play()
-				gameover_played = True
 				mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav")).play()
+				self.gameoversound_played = True
 			white_rect = pg.Rect(0, 30, c.WIDTH, 240)
 			pg.draw.rect(banner, (255, 255, 255, alpha), white_rect)
-
 			stage_text = self.stage_font.render(f"YOU CONQUERED SPACE", True, (0, 0, 0))
 			stage_text.set_alpha(alpha)
 			stage_rect = stage_text.get_rect(center=(c.WIDTH // 2, banner_height // 2))
@@ -373,7 +382,8 @@ class Game:
 			self.screen.blit(banner, (0, c.HEIGHT // 2 - banner_height // 2))
 			self.player.visible = False
 			self.all_sprites.remove(self.player)
-			if not gameover_played and not self.score_saved:
+			self.end_game(victory=True)
+			if not self.player.visible and not self.score_saved:
 				self.start_highscore_entry()
 			if not self.player.visible:
 				self.hud.draw_highscores(self.screen)
@@ -395,7 +405,7 @@ class Game:
 			self.screen.blit(banner, (0, c.HEIGHT // 2 - banner_height // 2))
 
 	def draw_game_over(self):
-		gameover_played = False
+
 		if not self.game_over:
 			return
 
@@ -407,7 +417,6 @@ class Game:
 			self.gameoversound_played = True
 			mixer.set_num_channels(2)
 			gameover = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav"))
-			print(mixer.Sound.get_volume(gameover))
 			mixer.Sound(gameover).set_volume(0.4)
 			gameover.play()
 			mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav")).play()
@@ -441,7 +450,6 @@ class Game:
 						asteroid.damage(1)
 					else:
 						asteroid.kill()
-
 					break
 
 		# Player bullets vs enemies and bosses
@@ -515,6 +523,16 @@ class Game:
 		for powerup in powerup_hits:
 			self.player.apply_powerup(powerup.kind)
 
+	def end_game(self, victory=False):
+		if self.game_over and self.show_highscores:
+			return
+
+		self.victory = victory
+		self.game_over = True
+		self.show_highscores = True
+
+		self.start_highscore_entry()
+
 	def start_highscore_entry(self):
 		if self.score_saved or self.entering_highscore:
 			return
@@ -555,6 +573,8 @@ class Game:
 				if event.type == pg.QUIT:
 					self.running = False
 				if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+					self.highscore_name = "shS"
+					self.submit_highscore()
 					self.running = False
 				if event.type == pg.KEYDOWN and event.key == pg.K_PAUSE:
 					if c.event == Event.PAUSE:
@@ -575,30 +595,20 @@ class Game:
 						elif event.key == pg.K_RETURN:
 							self.submit_highscore()
 
-						elif event.key == pg.K_ESCAPE:
-							self.highscore_name = "shS"
-							self.submit_highscore()
+						if c.DEBUG:
+							if self.player.visible:
+								if event.type == pg.KEYDOWN and event.key == pg.K_F2:
+									self.boss_spawn(c.BOSS.pop(0))
+						if event.type == pg.KEYDOWN:
+							if event.key == pg.K_LSHIFT:
+								self.player.speed = self.player.focus_speed
+							if event.key == pg.K_z:
+								self.player.shield = True
+								self.player.shield_active = True
+								shield.amount -= 1
 
-					continue
-
-				if self.player.visible:
-					if event.type == pg.KEYDOWN and event.key == pg.K_F2:
-						self.boss_spawn(c.BOSS.pop(0))
-					if event.type == pg.KEYDOWN and event.key == pg.K_LSHIFT:
-						self.player.speed = self.player.focus_speed
-					if (
-							self.player.shield
-							and self.player.shield_amount > 0
-							and not self.player.shield_active
-							and event.type == pg.KEYDOWN
-							and event.key == pg.K_LALT
-					):
-						self.player.shield_active = True
-						shield = Shield(self, self.player)
-
-						self.effects.add(shield)
-						self.all_sprites.add(shield)
-						self.player.shield_amount -= 1
+								self.effects.add(shield)
+								self.all_sprites.add(shield)
 
 					if event.type == pg.KEYUP and event.key == pg.K_LSHIFT:
 						self.player.speed = c.PLAYER_SPEED

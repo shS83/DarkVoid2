@@ -29,9 +29,8 @@ PLAYER_FOCUS_SPEED = 180
 PLAYER_FIRE_COOLDOWN = 0.08
 ENEMY_BULLET_SPEED = 180
 ENEMY_BULLET_COOLDOWN = 0.01
-ENEMY_HP = 5
 PLAYER_BULLET_SPEED = 400
-PLAYER_HITBOX_RADIUS = 4
+PLAYER_HITBOX_RADIUS = 24
 
 BOSS1 = pg.image.load(
     resource_path(Path(HOME_DIR, "assets", "ships", "bosses", "dark-crusader.png"))
@@ -162,7 +161,7 @@ BOSS.append(
 NEXTBOSS = False
 SHIELD = False
 BOSS_TIME = False
-SCALE = 0.4
+SCALE = 0.35
 HOME_DIR = os.path.dirname(__file__)
 MSG_FONT = pg.font.Font(
     resource_path(Path(HOME_DIR, "assets", "fonts", "GoMonoNerdFontPropo-Bold.ttf")), 60

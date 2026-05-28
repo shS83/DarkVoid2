@@ -52,31 +52,31 @@ class HUD:
 		text4 = ""
 		text5 = ""
 		if self.game.player.shield:
-			text4 = self.small_nerd.render(f"SHIELD ACTIVE", True, (255, 200, 255))
+			text4 = self.small_nerd.render(f"SHIELD ACTIVE", True, (100, 100, 255))
 			text5 = self.small_nerd.render(f"SHIELDS LEFT", True, (255, 200, 255))
 		if self.game.player.shield:
 			for i in range(self.game.player.shield_amount):
 				screen.blit(
                     pg.transform.scale(self.game.player.shield_image, (20, 20)),
-                    (16 + i * 24, 175),
+                    (16 + i * 24, 195),
 			)
 
-		screen.blit(text, (16, 14))
-		screen.blit(text2, (16, 60))
-		screen.blit(text3, (16, 170))
+		screen.blit(text, (16, 50))
+		screen.blit(text2, (16, 26))
+		screen.blit(text3, (16, 14))
 
 		if self.game.player.shield_active:
-			screen.blit(text4, (16, 210))
+			screen.blit(text4, (16, 220))
 		if self.game.player.shield:
-			screen.blit(text5, (16, 145))
+			screen.blit(text5, (16, 160))
 
 	def draw_lives(self, screen):
 		label = self.small_nerd.render("ENERGY", True, (220, 220, 255))
-		screen.blit(label, (16, 90))
+		screen.blit(label, (16, 85))
 
 		for i in range(self.game.player.lives):
 			x = 16 + i * 24
-			y = 135
+			y = 130
 
 			pg.draw.polygon(
 			screen,
@@ -190,7 +190,7 @@ class HUD:
 		title_rect = title.get_rect(center=(c.WIDTH // 2, panel_y + 42))
 		screen.blit(title, title_rect)
 
-		y = panel_y + 90
+		y = panel_y + 120
 
 		for index, entry in enumerate(self.game.highscores.entries[:10], start=1):
 			name = entry.get("name", "???")
@@ -240,6 +240,6 @@ class HUD:
 		pg.draw.rect(screen, (0, 0, 0), box, border_radius=8)
 		pg.draw.rect(screen, (120, 220, 255), box, width=2, border_radius=8)
 
-		name_text = self.medium_nerd.render(name, True, (120, 220, 255))
+		name_text = self.small_nerd.render(name, True, (120, 220, 255))
 		name_rect = name_text.get_rect(center=box.center)
 		screen.blit(name_text, name_rect)
