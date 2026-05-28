@@ -200,6 +200,7 @@ class Player(pg.sprite.Sprite):
 			self.game.all_sprites.add(bullet)
 
 	def hit(self, killer=None):
+		self.killer=killer
 		if self.invincible_timer > 0 or not self.alive:
 			return
 
@@ -220,7 +221,7 @@ class Player(pg.sprite.Sprite):
 		if self.lives <= 0:
 			self.die(killer=killer)
 
-	def die(self, killer=None):
+	def die(self, killer):
 		if not self.alive:
 			return
 

@@ -11,6 +11,7 @@ class Meteor(pg.sprite.Sprite):
 	def __init__(self, game, pos):
 		super().__init__()
 		self.level = level.stage
+		self.hp = level.asteroid_hp
 		self.game = game
 		self.pos = pg.Vector2(pos)
 		self.pos.y = -100

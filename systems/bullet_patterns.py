@@ -10,6 +10,7 @@ class Enemy(pg.sprite.Sprite):
 		self.image = pg.Surface((46, 46), pg.SRCALPHA)
 		pg.draw.polygon(self.image, (230, 80, 100), [(23, 46), (46, 0), (23, 12), (0, 0)])
 		self.rect = self.image.get_rect(center=pos)
+		self.hitbox = self.rect.inflate(-10, -10)
 		self.pos = pg.Vector2(pos)
 		self.hp = hp
 		self.shoot_timer = 1.0

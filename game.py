@@ -1,4 +1,6 @@
 import random
+from errno import EOWNERDEAD
+
 from systems.highscores import HighScoreTable
 from icecream import ic
 from pygame import mixer
@@ -101,6 +103,7 @@ class Game:
 		self.boss_dict = {}
 		self.game_over = False
 		self.game_over_timer = 0
+		self.gameoversound_played = False
 		self.nerd_font = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 128)
 		self.small_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 28)
 		self.game_over_text = self.nerd_font.render("YOU DIED", True, (255, 40, 40))
@@ -108,6 +111,11 @@ class Game:
 		self.all_sprites.add(self.player)
 		self.player_bullets = pg.sprite.Group()
 		self.stars = pg.sprite.Group()
+		self.killed_by = None
+		self.entering_highscore = False
+		self.highscore_name = ""
+		self.highscore_saved = False
+		self.max_name_length = 12
 
 		for _ in range(200):
 			self.stars.add(Star())
@@ -133,6 +141,12 @@ class Game:
 		if self.player.lives <= 0 or not self.player.alive:
 			self.player.alive = False
 			self.game_over = True
+
+			if self.highscores.is_high_score(self.score):
+				self.entering_highscore = True
+				self.highscore_name = ""
+			else:
+				self.highscore_saved = True
 
 	def bullet_hits_target(self, bullet, target):
 		target_hitbox = getattr(target, "hitbox", target.rect)
@@ -392,12 +406,14 @@ class Game:
 		overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
 		overlay.fill((0, 0, 0, overlay_alpha))
 		self.screen.blit(overlay, (0, 0))
-		if not gameover_played:
+		if not self.gameoversound_played:
+			self.gameoversound_played = True
 			mixer.set_num_channels(1)
 			gameover = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav"))
 			print(mixer.Sound.get_volume(gameover))
 			mixer.Sound(gameover).set_volume(0.4)
 			gameover.play()
+
 		if self.game_over and not self.score_saved:
 			self.score_saved = True
 
@@ -421,21 +437,6 @@ class Game:
 		self.screen.blit(small_text, small_text_rect)
 
 	def handle_collisions(self):
-		# Player bullets vs enemies/bosses
-		for enemy in list(self.enemies):
-			for bullet in list(self.player_bullets):
-				if self.bullet_hits_target(bullet, enemy):
-					bullet.kill()
-
-					damage = getattr(bullet, "damage", 1)
-
-					if hasattr(enemy, "damage"):
-						enemy.damage(damage)
-					else:
-						enemy.kill()
-
-					break
-
 		# Player bullets vs asteroids
 		for asteroid in list(self.asteroids):
 			asteroid_hitbox = getattr(asteroid, "hitbox", asteroid.rect)
@@ -448,6 +449,24 @@ class Game:
 						asteroid.damage(1)
 					else:
 						asteroid.kill()
+
+					break
+
+		# Player bullets vs enemies and bosses
+		for enemy in list(self.enemies):
+			enemy_hitbox = getattr(enemy, "hitbox", enemy.rect)
+
+			for bullet in list(self.player_bullets):
+				if enemy_hitbox.colliderect(bullet.rect):
+					damage = getattr(bullet, "damage", 1)
+
+					if not getattr(bullet, "piercing", False):
+						bullet.kill()
+
+					if hasattr(enemy, "damage"):
+						enemy.damage(damage)
+					else:
+						enemy.kill()
 
 					break
 
@@ -464,8 +483,17 @@ class Game:
 				distance = self.player.pos.distance_to(bullet_pos)
 
 				if distance < self.player.hitbox_radius + bullet_radius:
-					self.damage_player(killer=bullet.owner)
 					bullet.kill()
+
+					lives_before = self.player.lives
+					self.player.receive_hit()
+
+					if lives_before > 0 and self.player.lives <= 0:
+						killer_name = getattr(bullet, "owner", "the Illithids")
+						self.killed_by = killer_name
+						self.player.alive = False
+						self.game_over = True
+
 					break
 
 		# Enemy / boss body vs player
@@ -474,27 +502,45 @@ class Game:
 				enemy_hitbox = getattr(enemy, "hitbox", enemy.rect)
 
 				if enemy_hitbox.colliderect(self.player.rect):
-					self.damage_player(killer=f"a crash with {enemy.name}")
+					lives_before = self.player.lives
+					self.player.receive_hit()
+
+					if lives_before > 0 and self.player.lives <= 0:
+						enemy_name = getattr(enemy, "name", "the Illithids")
+						self.killed_by = f"You were rammed by {enemy_name}"
+						self.player.alive = False
+						self.game_over = True
+
 					break
 
-			# Asteroids vs player
-			if self.player.alive and self.player.invincible_timer <= 0:
-				for asteroid in list(self.asteroids):
-					asteroid_hitbox = getattr(asteroid, "hitbox", asteroid.rect)
+		# Powerups vs player
+		powerup_hits = pg.sprite.spritecollide(
+			self.player,
+			self.powerups,
+			True
+		)
 
-					if asteroid_hitbox.colliderect(self.player.rect):
-						self.damage_player(killer="Some random pile of sand")
-						break
+		for powerup in powerup_hits:
+			self.player.apply_powerup(powerup.kind)
 
-			# Powerups vs player
-			powerup_hits = pg.sprite.spritecollide(
-				self.player,
-				self.powerups,
-				True
-			)
+	def submit_highscore(self):
+		if self.highscore_saved:
+			return
 
-			for powerup in powerup_hits:
-				self.player.apply_powerup(powerup.kind)
+		name = self.highscore_name.strip()
+
+		if not name:
+			name = "???"
+
+		self.highscores.add_score(
+			name=name,
+			score=self.score,
+			level=self.level.stage,
+			killed_by=self.killed_by or "the Illithids"
+		)
+
+		self.highscore_saved = True
+		self.entering_highscore = False
 
 	def run(self):
 		while self.running:
@@ -511,6 +557,24 @@ class Game:
 						c.event = Event.PLAYING
 					elif c.event != Event.PAUSE:
 						c.event = Event.PAUSE
+				if self.entering_highscore:
+					if event.type == pg.TEXTINPUT:
+						if len(self.highscore_name) < self.max_name_length:
+							if event.text.isprintable():
+								self.highscore_name += event.text.upper()
+
+					elif event.type == pg.KEYDOWN:
+						if event.key == pg.K_BACKSPACE:
+							self.highscore_name = self.highscore_name[:-1]
+
+						elif event.key == pg.K_RETURN:
+							self.submit_highscore()
+
+						elif event.key == pg.K_ESCAPE:
+							self.highscore_name = "SHS"
+							self.submit_highscore()
+
+					continue
 
 				if self.player.visible:
 					if event.type == pg.KEYDOWN and event.key == pg.K_F2:
@@ -537,7 +601,6 @@ class Game:
 			if c.event != Event.PAUSE:
 				self.update(dt)
 			self.draw()
-
 
 	pg.quit()
 	mixer.quit()

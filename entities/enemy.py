@@ -229,7 +229,7 @@ class Enemy(pg.sprite.Sprite):
 			direction = direction.normalize()
 
 		if self.weapon_type == "normal":
-			bullet = EnemyBullet(self.game,  self.rect.center, direction * 240, owner=self.name)
+			bullet = EnemyBullet(self.game,  self.rect.center, direction * 240, owner = self.name)
 
 		if self.weapon_type == "blue_laser":
 			direction = self.game.player.pos - self.pos
@@ -243,7 +243,7 @@ class Enemy(pg.sprite.Sprite):
 				self.game,
 				self.rect.center,
 				direction * 520,
-				owner=self.name
+				owner = self.name
 			)
 
 		if self.weapon_type == "red_pellet":
@@ -280,7 +280,7 @@ class Enemy(pg.sprite.Sprite):
 		explosion = Explosion(self.game, self.rect.center)
 		self.game.effects.add(explosion)
 		self.game.all_sprites.add(explosion)
-		for _ in range(1000):
+		for _ in range(500):
 			particle = Particle(self.game, self.rect.center)
 			self.game.effects.add(particle)
 			self.game.all_sprites.add(particle)

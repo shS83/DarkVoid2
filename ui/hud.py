@@ -12,8 +12,29 @@ class HUD:
 		self.draw_score(screen)
 		self.draw_lives(screen)
 		self.draw_boss_bar(screen)
+		self.draw_highscore_input(screen)
 		if self.game.game_over or not self.game.player.visible:
 			self.draw_highscores(screen)
+
+	def submit_highscore(self):
+		if self.highscore_saved:
+			return
+
+		name = self.highscore_name.strip()
+
+		if not name:
+			name = "???"
+
+		self.highscores.add_score(
+			name=name,
+			score=self.score,
+			level=self.level.stage,
+			killed_by=self.killed_by or "the Illithids"
+		)
+
+		self.highscore_saved = True
+		self.entering_highscore = False
+		pg.key.stop_text_input()
 
 	def draw_score(self, screen):
 		text = self.font.render(f"SCORE {self.game.score}", True, (240, 240, 255))
@@ -143,33 +164,68 @@ class HUD:
 		)
 		screen.blit(glow, (x - 10, y - 10), special_flags=pg.BLEND_RGBA_ADD)
 
-def draw_highscores(self, screen):
-	x = c.WIDTH - 210
-	y = 20
+	def draw_highscores(self, screen):
+		x = c.WIDTH - 210
+		y = 20
 
-	title = self.small_font.render("HIGH SCORES", True, (240, 220, 255))
-	screen.blit(title, (x, y))
+		title = self.small_font.render("HIGH SCORES", True, (240, 220, 255))
+		screen.blit(title, (x, y))
 
-	y += 26
-	if self.game.killed_by:
-		killer_text = self.small_font.render(
-			self.game.killed_by,
-			True,
-			(230, 180, 255)
-		)
+		y += 26
+		if self.game.killed_by:
+			killer_text = self.small_font.render(
+				self.game.killed_by,
+				True,
+				(230, 180, 255)
+			)
 
-		killer_rect = killer_text.get_rect(
-			center=(c.WIDTH // 2, c.HEIGHT // 2 + 70)
-		)
+			killer_rect = killer_text.get_rect(
+				center=(c.WIDTH // 2, c.HEIGHT // 2 + 70)
+			)
 
-		screen.blit(killer_text, killer_rect)
+			screen.blit(killer_text, killer_rect)
 
-	for index, entry in enumerate(self.game.highscores.entries[:8], start=1):
-		text = self.small_font.render(
-			f"{index}. {entry['name']} {entry['score']}",
-			True,
-			(210, 210, 240)
-		)
+		for index, entry in enumerate(self.game.highscores.entries[:8], start=1):
+			text = self.small_font.render(
+				f"{index}. {entry['name']} {entry['score']}",
+				True,
+				(210, 210, 240)
+			)
 
-		screen.blit(text, (x, y))
-		y += 22
+			screen.blit(text, (x, y))
+			y += 22
+
+	def draw_highscore_input(self, screen):
+		if not self.game.entering_highscore:
+			return
+
+		box_width = 360
+		box_height = 90
+
+		x = (c.WIDTH - box_width) // 2
+		y = c.HEIGHT // 2 + 100
+
+		box = pg.Rect(x, y, box_width, box_height)
+
+		overlay = pg.Surface((box_width, box_height), pg.SRCALPHA)
+		overlay.fill((0, 0, 0, 190))
+		screen.blit(overlay, box.topleft)
+
+		pg.draw.rect(screen, (180, 180, 240), box, width=2, border_radius=8)
+
+		title = self.small_font.render("NEW HIGH SCORE", True, (255, 230, 120))
+		title_rect = title.get_rect(center=(c.WIDTH // 2, y + 18))
+		screen.blit(title, title_rect)
+
+		prompt = self.small_font.render("ENTER NAME:", True, (230, 230, 255))
+		prompt_rect = prompt.get_rect(center=(c.WIDTH // 2, y + 42))
+		screen.blit(prompt, prompt_rect)
+
+		name = self.game.highscore_name
+
+		if int(pg.time.get_ticks() / 400) % 2 == 0:
+			name += "_"
+
+		name_text = self.font.render(name, True, (120, 220, 255))
+		name_rect = name_text.get_rect(center=(c.WIDTH // 2, y + 68))
+		screen.blit(name_text, name_rect)
