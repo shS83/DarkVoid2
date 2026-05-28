@@ -52,7 +52,7 @@ class Enemy(pg.sprite.Sprite):
 			{
 				"name": "Boyscout",
 				"image": self.image1,
-				"weapon": "red_pellet",
+				"weapon": "normal",
 				"hp": 8,
 				"shoot_timer": 0.8,
 				"shoot_delay": 1.0
@@ -76,7 +76,7 @@ class Enemy(pg.sprite.Sprite):
 			{
 				"name": "robotector",
 				"image": self.image10,
-				"weapon": "red_pellet",
+				"weapon": "normal",
 				"hp": 10,
 				"shoot_timer": 0.6,
 				"shoot_delay": 0.8
@@ -220,6 +220,7 @@ class Enemy(pg.sprite.Sprite):
 			self.kill()
 
 	def shoot(self):
+		bullet = None
 		direction = self.game.player.pos - self.pos
 
 		if direction.length_squared() == 0:
@@ -244,7 +245,8 @@ class Enemy(pg.sprite.Sprite):
 				direction * 520,
 				owner=self.name
 			)
-		else:
+
+		if self.weapon_type == "red_pellet":
 			bullet = RedPellet(
 				self.game,
 				self.rect.center,

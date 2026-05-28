@@ -13,7 +13,7 @@ class Level:
 		self.asteroid_spawn_timer = 0
 		self.asteroid_spawn_delay = 15
 		self.enemy_bullet_cooldown = 0.3
-		self.max_enemies = 4
+		self.max_enemies = 6
 		self.player_shield_amount = 5
 		self.enemy_hp = 5
 		self.asteroid_hp = 2

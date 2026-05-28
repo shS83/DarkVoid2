@@ -1,5 +1,5 @@
 import random
-
+from systems.highscores import HighScoreTable
 from icecream import ic
 from pygame import mixer
 import pygame as pg
@@ -9,7 +9,6 @@ from entities.enemy import Enemy
 from entities.star import Star
 from ui.hud import HUD
 from entities.asteroid import Meteor
-# from core.hs_module import HighScore
 from entities.level import Level
 from entities.events import Event
 from pathlib import Path
@@ -40,6 +39,10 @@ class Game:
 		c.HOME_DIR = Path(__file__).parent.absolute()
 		print(c.HOME_DIR)
 		self.bosses=[]
+		self.highscores = HighScoreTable(
+			Path(c.HOME_DIR, "highscores.json")
+		)
+		self.score_saved = False
 		self.screen = pg.display.set_mode((c.WIDTH, c.HEIGHT), pg.SRCALPHA, 32)
 		self.clock = pg.time.Clock()
 		self.dt = self.clock.tick(60) / 1000
@@ -91,6 +94,7 @@ class Game:
 		self.game_over_font = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "JetBrainsMonoNerdFont-SemiBold.ttf"), 96)
 		self.stage_font = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "JetBrainsMonoNerdFont-SemiBold.ttf"), 96)
 		self.stage_banner_duration = 2.4
+		self.final_banner_timer = 20
 		self.stage_banner_timer = self.stage_banner_duration
 		self.stage_banner_stage = self.level.stage
 		self.boss_hp = 300
@@ -326,26 +330,61 @@ class Game:
 		pg.display.flip()
 
 	def draw_stage_banner(self):
+		gameover_played = False
 		if self.stage_banner_timer <= 0:
 			return
+		if self.level.stage == 5:
+			fade = min(1, self.final_banner_timer / 0.35)
+			alpha = int(230 * fade)
+			banner_height = 300
+			banner = pg.Surface((c.WIDTH, banner_height), pg.SRCALPHA)
+			banner.fill((0, 255, 0, alpha))
+			if not gameover_played:
+				mixer.set_num_channels(1)
+				gameover = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav"))
+				mixer.Sound(gameover).set_volume(0.4)
+				gameover.play()
 
-		fade = min(1, self.stage_banner_timer / 0.35)
-		alpha = int(230 * fade)
-		banner_height = 140
-		banner = pg.Surface((c.WIDTH, banner_height), pg.SRCALPHA)
-		banner.fill((95, 95, 220, alpha))
+				gameover_played = True
+			white_rect = pg.Rect(0, 30, c.WIDTH, 240)
+			pg.draw.rect(banner, (255, 255, 255, alpha), white_rect)
 
-		white_rect = pg.Rect(0, 10, c.WIDTH, 120)
-		pg.draw.rect(banner, (255, 255, 255, alpha), white_rect)
+			stage_text = self.stage_font.render(f"YOU CONQUERED SPACE", True, (0, 0, 0))
+			stage_text.set_alpha(alpha)
+			stage_rect = stage_text.get_rect(center=(c.WIDTH // 2, banner_height // 2))
+			banner.blit(stage_text, stage_rect)
+			mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav")).play()
+			self.screen.blit(banner, (0, c.HEIGHT // 2 - banner_height // 2))
+			self.player.visible = False
+			self.all_sprites.remove(self.player)
+			if self.game_over and not self.score_saved:
+				self.score_saved = True
 
-		stage_text = self.stage_font.render(f"STAGE {self.level.stage}", True, (0, 0, 0))
-		stage_text.set_alpha(alpha)
-		stage_rect = stage_text.get_rect(center=(c.WIDTH // 2, banner_height // 2))
-		banner.blit(stage_text, stage_rect)
+				self.highscores.add_score(
+					name="shS",
+					score=self.score,
+					level=self.level.stage,
+					killed_by=self.killed_by or "Unknown"
+				)
+		else:
+			fade = min(1, self.stage_banner_timer / 0.35)
+			alpha = int(230 * fade)
+			banner_height = 140
+			banner = pg.Surface((c.WIDTH, banner_height), pg.SRCALPHA)
+			banner.fill((95, 95, 220, alpha))
 
-		self.screen.blit(banner, (0, c.HEIGHT // 2 - banner_height // 2))
+			white_rect = pg.Rect(0, 10, c.WIDTH, 120)
+			pg.draw.rect(banner, (255, 255, 255, alpha), white_rect)
+
+			stage_text = self.stage_font.render(f"STAGE {self.level.stage}", True, (0, 0, 0))
+			stage_text.set_alpha(alpha)
+			stage_rect = stage_text.get_rect(center=(c.WIDTH // 2, banner_height // 2))
+			banner.blit(stage_text, stage_rect)
+
+			self.screen.blit(banner, (0, c.HEIGHT // 2 - banner_height // 2))
 
 	def draw_game_over(self):
+		gameover_played = False
 		if not self.game_over:
 			return
 
@@ -353,7 +392,21 @@ class Game:
 		overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
 		overlay.fill((0, 0, 0, overlay_alpha))
 		self.screen.blit(overlay, (0, 0))
+		if not gameover_played:
+			mixer.set_num_channels(1)
+			gameover = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav"))
+			print(mixer.Sound.get_volume(gameover))
+			mixer.Sound(gameover).set_volume(0.4)
+			gameover.play()
+		if self.game_over and not self.score_saved:
+			self.score_saved = True
 
+			self.highscores.add_score(
+				name="shS",
+				score=self.score,
+				level=self.level.stage,
+				killed_by=self.killed_by or "Unknown"
+			)
 		banner_height = 180
 		banner = pg.Surface((c.WIDTH, banner_height), pg.SRCALPHA)
 		banner.fill((0, 0, 0, 220))
@@ -458,26 +511,28 @@ class Game:
 						c.event = Event.PLAYING
 					elif c.event != Event.PAUSE:
 						c.event = Event.PAUSE
-				if event.type == pg.KEYDOWN and event.key == pg.K_F1:
-					self.boss_spawn(c.BOSS.pop(0))
-				if event.type == pg.KEYDOWN and event.key == pg.K_LSHIFT:
-					self.player.speed = self.player.focus_speed
-				if (
-						self.player.shield
-						and self.player.shield_amount > 0
-						and not self.player.shield_active
-						and event.type == pg.KEYDOWN
-						and event.key == pg.K_LALT
-				):
-					self.player.shield_active = True
-					shield = Shield(self, self.player)
 
-					self.effects.add(shield)
-					self.all_sprites.add(shield)
-					self.player.shield_amount -= 1
+				if self.player.visible:
+					if event.type == pg.KEYDOWN and event.key == pg.K_F2:
+						self.boss_spawn(c.BOSS.pop(0))
+					if event.type == pg.KEYDOWN and event.key == pg.K_LSHIFT:
+						self.player.speed = self.player.focus_speed
+					if (
+							self.player.shield
+							and self.player.shield_amount > 0
+							and not self.player.shield_active
+							and event.type == pg.KEYDOWN
+							and event.key == pg.K_LALT
+					):
+						self.player.shield_active = True
+						shield = Shield(self, self.player)
 
-				if event.type == pg.KEYUP and event.key == pg.K_LSHIFT:
-					self.player.speed = c.PLAYER_SPEED
+						self.effects.add(shield)
+						self.all_sprites.add(shield)
+						self.player.shield_amount -= 1
+
+					if event.type == pg.KEYUP and event.key == pg.K_LSHIFT:
+						self.player.speed = c.PLAYER_SPEED
 
 			if c.event != Event.PAUSE:
 				self.update(dt)

@@ -12,6 +12,8 @@ class HUD:
 		self.draw_score(screen)
 		self.draw_lives(screen)
 		self.draw_boss_bar(screen)
+		if self.game.game_over or not self.game.player.visible:
+			self.draw_highscores(screen)
 
 	def draw_score(self, screen):
 		text = self.font.render(f"SCORE {self.game.score}", True, (240, 240, 255))
@@ -140,3 +142,34 @@ class HUD:
 			border_radius=10
 		)
 		screen.blit(glow, (x - 10, y - 10), special_flags=pg.BLEND_RGBA_ADD)
+
+def draw_highscores(self, screen):
+	x = c.WIDTH - 210
+	y = 20
+
+	title = self.small_font.render("HIGH SCORES", True, (240, 220, 255))
+	screen.blit(title, (x, y))
+
+	y += 26
+	if self.game.killed_by:
+		killer_text = self.small_font.render(
+			self.game.killed_by,
+			True,
+			(230, 180, 255)
+		)
+
+		killer_rect = killer_text.get_rect(
+			center=(c.WIDTH // 2, c.HEIGHT // 2 + 70)
+		)
+
+		screen.blit(killer_text, killer_rect)
+
+	for index, entry in enumerate(self.game.highscores.entries[:8], start=1):
+		text = self.small_font.render(
+			f"{index}. {entry['name']} {entry['score']}",
+			True,
+			(210, 210, 240)
+		)
+
+		screen.blit(text, (x, y))
+		y += 22

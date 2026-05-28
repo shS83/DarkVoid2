@@ -27,6 +27,7 @@ class Player(pg.sprite.Sprite):
 		self.thruster_timer = 0
 		self.alive = True
 		self.fire_timer = 0
+		self.killed_by = None
 		self.fire_cooldown = 0.005
 		self.fire_cooldown2 = 0.04
 		self.fire_cooldown3 = 0.17
@@ -66,12 +67,11 @@ class Player(pg.sprite.Sprite):
 		self.killer = "the Illithids"
 		self.vulcan_side = -1
 		self.vulcan_counter = 0
-
 		self.vulcan_sound_timer = 0
 		self.vulcan_sound_delay = 1
-
 		self.minigun_sound = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "m61continued.ogg"))
 		self.minigun_sound.set_volume(1.0)
+		self.visible = True
 
 	def make_flash_image(self, image):
 		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
@@ -360,41 +360,43 @@ class Player(pg.sprite.Sprite):
 
 		self.hit(killer=killer)
 	def update(self, dt):
-		keys = pg.key.get_pressed()
-		mouse = pg.mouse.get_pressed()
-		mx, my = pg.mouse.get_pos()
-		direction = pg.Vector2(0, 0)
-		self.fire_timer -= dt
-		if keys[pg.K_LEFT] or keys[pg.K_a]:
-			direction.x -= 1
-		if keys[pg.K_RIGHT] or keys[pg.K_d]:
-			direction.x += 1
-		if keys[pg.K_UP] or keys[pg.K_w]:
-			direction.y -= 1
-		if keys[pg.K_DOWN] or keys[pg.K_s]:
-			direction.y += 1
-		if keys[pg.K_LCTRL]:
-			self.shoot_railgun()
-		if keys[pg.K_SPACE] or mouse[0] == 1:
-			if self.shoot_mode == "spread":
-				self.shoot_spread()
-			elif self.shoot_mode == "cannon":
+		if self.visible == True:
+			keys = pg.key.get_pressed()
+			mouse = pg.mouse.get_pressed()
+			mx, my = pg.mouse.get_pos()
+			direction = pg.Vector2(0, 0)
+			self.fire_timer -= dt
+			if keys[pg.K_LEFT] or keys[pg.K_a]:
+				direction.x -= 1
+			if keys[pg.K_RIGHT] or keys[pg.K_d]:
+				direction.x += 1
+			if keys[pg.K_UP] or keys[pg.K_w]:
+				direction.y -= 1
+			if keys[pg.K_DOWN] or keys[pg.K_s]:
+				direction.y += 1
+			if keys[pg.K_LCTRL]:
 				self.shoot_railgun()
-			else:
-				self.shoot_normal()
-		if keys[pg.K_LSHIFT]:
-			self.speed = c.PLAYER_FOCUS_SPEED
-		if not keys[pg.K_LSHIFT]:
-			self.speed = c.PLAYER_SPEED
-		if mouse[2] == 1 or mouse[1] == 1:
-			self.shoot_vulcan(dt)
-			self.vulcan_timer -= dt
-			self.vulcan_sound_timer -= dt
+			if keys[pg.K_SPACE] or mouse[0] == 1:
+				if self.shoot_mode == "spread":
+					self.shoot_spread()
+				elif self.shoot_mode == "cannon":
+					self.shoot_railgun()
+				else:
+					self.shoot_normal()
+			if keys[pg.K_LSHIFT]:
+				self.speed = c.PLAYER_FOCUS_SPEED
+			if not keys[pg.K_LSHIFT]:
+				self.speed = c.PLAYER_SPEED
+			if mouse[2] == 1 or mouse[1] == 1:
+				self.shoot_vulcan(dt)
+				self.vulcan_timer -= dt
+				self.vulcan_sound_timer -= dt
 		if keys[pg.K_ESCAPE]:
 			pg.quit()
 		# For debugging
 		if keys[pg.K_F1]:
-			...
+			self.game.level.stage = 5
+			self.game.draw_stage_banner()
 		if keys[pg.K_F2]:
 			self.game.show_hitboxes = not self.game.show_hitboxes
 		if keys[pg.K_F3]:
@@ -427,71 +429,71 @@ class Player(pg.sprite.Sprite):
 			self.alive = False
 		if keys[pg.K_F10]:
 			c.BOSS_TIME = True
+		if self.visible:
+			if self.power_timer > 0:
+				self.power_timer -= dt
 
-		if self.power_timer > 0:
-			self.power_timer -= dt
+			if self.power_timer <= 0:
+				self.shoot_mode = "normal"
+				self.shield = False
+				self.shield_active = False
+				self.speed = c.PLAYER_SPEED
+				self.fire_cooldown2 = 0.07
+			self.thruster_timer -= dt
 
-		if self.power_timer <= 0:
-			self.shoot_mode = "normal"
-			self.shield = False
-			self.shield_active = False
-			self.speed = c.PLAYER_SPEED
-			self.fire_cooldown2 = 0.07
-		self.thruster_timer -= dt
+			if self.thruster_timer <= 0:
+				self.thruster_timer = 0.008
 
-		if self.thruster_timer <= 0:
-			self.thruster_timer = 0.008
+				engine_left = (self.rect.centerx - 18, self.rect.centery + 65)
+				engine_left2 = (self.rect.centerx - 36, self.rect.centery + 65)
+				engine_right = (self.rect.centerx + 18, self.rect.centery + 65)
+				engine_right2 = (self.rect.centerx + 36, self.rect.centery + 65)
 
-			engine_left = (self.rect.centerx - 18, self.rect.centery + 65)
-			engine_left2 = (self.rect.centerx - 36, self.rect.centery + 65)
-			engine_right = (self.rect.centerx + 18, self.rect.centery + 65)
-			engine_right2 = (self.rect.centerx + 36, self.rect.centery + 65)
+				for engine_pos in [engine_left, engine_right, engine_left2, engine_right2]:
+					# hot core
+					for _ in range(8):
+						particle = ThrusterParticle(
+							self.game,
+							engine_pos,
+							direction=(0, 1),
+							color=(0, 0,255),
+							speed_range=(480, 720),
+							size_range=(1, 4),
+							life_range=(0.12, 0.36),
+							spread=6
+						)
+						self.game.effects.add(particle)
+						self.game.all_sprites.add(particle)
 
-			for engine_pos in [engine_left, engine_right, engine_left2, engine_right2]:
-				# hot core
-				for _ in range(8):
-					particle = ThrusterParticle(
-						self.game,
-						engine_pos,
-						direction=(0, 1),
-						color=(0, 0,255),
-						speed_range=(480, 720),
-						size_range=(1, 4),
-						life_range=(0.12, 0.36),
-						spread=6
-					)
-					self.game.effects.add(particle)
-					self.game.all_sprites.add(particle)
+					# purple/blue outer flame
+					for _ in range(8):
+						particle = ThrusterParticle(
+							self.game,
+							engine_pos,
+							direction=(0, 1),
+							color=(100, 180, 255),
+							speed_range=(180, 380),
+							size_range=(2, 6),
+							life_range=(0.18, 0.38),
+							spread=6
+						)
+						self.game.effects.add(particle)
+						self.game.all_sprites.add(particle)
 
-				# purple/blue outer flame
-				for _ in range(8):
-					particle = ThrusterParticle(
-						self.game,
-						engine_pos,
-						direction=(0, 1),
-						color=(100, 180, 255),
-						speed_range=(180, 380),
-						size_range=(2, 6),
-						life_range=(0.18, 0.38),
-						spread=6
-					)
-					self.game.effects.add(particle)
-					self.game.all_sprites.add(particle)
-
-				# orange sparks
-				if random.random() < 0.45:
-					particle = ThrusterParticle(
-						self.game,
-						engine_pos,
-						direction=(0, 1),
-						color=(255, 140, 140),
-						speed_range=(320, 700),
-						size_range=(2, 6),
-						life_range=(0.12, 0.42),
-						spread=15
-					)
-					self.game.effects.add(particle)
-					self.game.all_sprites.add(particle)
+					# orange sparks
+					if random.random() < 0.45:
+						particle = ThrusterParticle(
+							self.game,
+							engine_pos,
+							direction=(0, 1),
+							color=(255, 140, 140),
+							speed_range=(320, 700),
+							size_range=(2, 6),
+							life_range=(0.12, 0.42),
+							spread=15
+						)
+						self.game.effects.add(particle)
+						self.game.all_sprites.add(particle)
 
 		if self.shield_hit_timer > 0:
 			self.shield_hit_timer -= dt
