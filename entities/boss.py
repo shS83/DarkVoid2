@@ -24,6 +24,7 @@ class Boss(pg.sprite.Sprite):
 		self.name = name
 		self.lvl = lvl
 		self.hp = hp
+		self.max_hp = hp
 
 		if image is None:
 			image = pg.image.load(

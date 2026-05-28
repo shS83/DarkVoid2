@@ -12,7 +12,7 @@ class PowerUp(pg.sprite.Sprite):
 		self.kind = kind or random.choice(["spread", "health", "speed", "laser", "cannon", "shield"])
 		self.pos = pg.Vector2(pos)
 
-		path = Path(c.HOME_DIR, "assets", "powerups", f"powerup-{self.kind}.png")
+		path = c.resource_path(Path(c.HOME_DIR, "assets", "powerups", f"powerup-{self.kind}.png"))
 		self.image = pg.image.load(path).convert_alpha()
 		self.image = pg.transform.scale(self.image, (46, 46))
 		self.size = random.randint(4, 8)

@@ -22,7 +22,7 @@ def mixing():
 	         "Jahzzar - Forest Pan.mp3", "Jahzzar - Pink Fluid.mp3", "Lightning Traveler - Celestial Drift.mp3",
 	         "Lightning Traveler - Eclipse Horizon.mp3", "Lightning Traveler - Event Horizon.mp3",
 	         "Lightning Traveler - Lunar Echo.mp3", "Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3"]
-	mixer.music.load(Path(c.HOME_DIR, "assets", "audio", f"{random.choice(tunes)}"))
+	mixer.music.load(c.resource_path(Path(c.HOME_DIR, "assets", "audio", random.choice(tunes))))
 	mixer.music.play(-1)
 	mixer.init(48000, -16, 2, 4096)
 	mixer.music.set_volume(0.2)
@@ -69,25 +69,25 @@ class Game:
 		self.asteroid_spawn_delay = random.uniform(5, 20)
 		self.rock_images = []
 		for i in range(1, 5):
-			img = pg.image.load(Path(c.HOME_DIR, "assets", "rocks", f"rock_{i}.png")).convert_alpha()
+			img = pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "rocks", f"rock_{i}.png"))).convert_alpha()
 			self.rock_images.append(img)
 		for i in range(1, 32):
-			img = pg.image.load(Path(c.HOME_DIR, "assets", "explosions", f"exp_{i}.png")).convert_alpha()
+			img = pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "explosions", f"exp_{i}.png"))).convert_alpha()
 			img = pg.transform.scale(img, (320, 320))
 			self.explosion_frames.append(img)
 		for i in range(1, 32):
-			img = pg.image.load(Path(c.HOME_DIR, "assets", "explosions", f"exp_{i}.png")).convert_alpha()
+			img = pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "explosions", f"exp_{i}.png"))).convert_alpha()
 			img = pg.transform.scale(img, (640, 640))
 			self.boss_explosion_frames.append(img)
-		self.background = pg.image.load(Path(c.HOME_DIR, "assets", "backgrounds", "space_background.png")).convert()
+		self.background = pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "backgrounds", "space_background.png"))).convert()
 		self.background = pg.transform.scale(self.background, (c.WIDTH, c.HEIGHT))
 		self.direction = 1
 		self.px = c.WIDTH // 2
 		self.py = -42
 		self.dt = 0
 		self.all_sprites = pg.sprite.LayeredUpdates()
-		self.game_over_font = pg.font.Font(f'{c.HOME_DIR}/assets/fonts/JetBrainsMonoNerdFont-SemiBold.ttf', 96)
-		self.stage_font = pg.font.Font(f'{c.HOME_DIR}/assets/fonts/JetBrainsMonoNerdFont-SemiBold.ttf', 96)
+		self.game_over_font = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "JetBrainsMonoNerdFont-SemiBold.ttf"), 96)
+		self.stage_font = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "JetBrainsMonoNerdFont-SemiBold.ttf"), 96)
 		self.stage_banner_duration = 2.4
 		self.stage_banner_timer = self.stage_banner_duration
 		self.stage_banner_stage = self.level.stage
@@ -328,7 +328,7 @@ class Game:
 		alpha = int(230 * fade)
 		banner_height = 140
 		banner = pg.Surface((c.WIDTH, banner_height), pg.SRCALPHA)
-		banner.fill((20, 95, 220, alpha))
+		banner.fill((95, 95, 220, alpha))
 
 		white_rect = pg.Rect(0, 10, c.WIDTH, 120)
 		pg.draw.rect(banner, (255, 255, 255, alpha), white_rect)
@@ -450,6 +450,8 @@ class Game:
 						c.event = Event.PLAYING
 					elif c.event != Event.PAUSE:
 						c.event = Event.PAUSE
+				if event.type == pg.KEYDOWN and event.key == pg.K_F1:
+					self.boss_spawn(c.BOSS.pop(0))
 				if event.type == pg.KEYDOWN and event.key == pg.K_LSHIFT:
 					self.player.speed = self.player.focus_speed
 				if (

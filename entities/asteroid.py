@@ -68,7 +68,7 @@ class Meteor(pg.sprite.Sprite):
 		explosion = Explosion(self.game, self.rect.center)
 		self.game.effects.add(explosion)
 		self.game.all_sprites.add(explosion)
-		for _ in range(5000):
+		for _ in range(1000):
 			particle = Particle(self.game, self.rect.center)
 			self.game.effects.add(particle)
 			self.game.all_sprites.add(particle)

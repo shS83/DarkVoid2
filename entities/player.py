@@ -32,11 +32,11 @@ class Player(pg.sprite.Sprite):
 		self.fire_cooldown3 = 0.35
 		self.game = game
 		self.pauseswitch = -1
-		self.image1 = smoothscale_by(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "Proper_warship.png")).convert_alpha(), c.SCALE)
-		self.image2 = smoothscale_by(rotate(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "lilac-thrusters.png")).convert_alpha(), 180), c.SCALE)
-		self.image3 = smoothscale_by(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "purplealus.png")).convert_alpha(), c.SCALE)
-		self.image4 = smoothscale_by(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "turqoiseship.png")).convert_alpha(), c.SCALE)
-		self.image5 = smoothscale_by(pg.image.load(Path(c.HOME_DIR, "assets", "ships", "finnfighter.png")).convert_alpha(), c.SCALE)
+		self.image1 = smoothscale_by(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "Proper_warship.png"))).convert_alpha(), c.SCALE)
+		self.image2 = smoothscale_by(rotate(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "lilac-thrusters.png"))).convert_alpha(), 180), c.SCALE)
+		self.image3 = smoothscale_by(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "purplealus.png"))).convert_alpha(), c.SCALE)
+		self.image4 = smoothscale_by(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "turqoiseship.png"))).convert_alpha(), c.SCALE)
+		self.image5 = smoothscale_by(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "finnfighter.png"))).convert_alpha(), c.SCALE)
 		self.images = [self.image5]#self.image1, self.image2, self.image3, self.image4]
 		self.image = random.choice(self.images)
 		self.image = pg.transform.smoothscale_by(self.image, c.SCALE)
@@ -59,7 +59,7 @@ class Player(pg.sprite.Sprite):
 		self.shield_image = pg.transform.scale(random.choice([c.PALLO1, c.PALLO2, c.PALLO3]), (160, 160))
 		self.shield_image_rect = self.shield_image.get_rect(center=pos)
 		self.shield_amount = 0
-		self.shield_sound = pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/ding.mp3")
+		self.shield_sound = pg.mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "ding.mp3"))
 		self.shield_sound.set_volume(0.7)
 		self.vulcan_timer = 0
 		self.vulcan_cooldown = 0.028
@@ -70,8 +70,7 @@ class Player(pg.sprite.Sprite):
 		self.vulcan_sound_timer = 0
 		self.vulcan_sound_delay = 0.07
 
-
-		self.minigun_sound = mixer.Sound(f"{c.HOME_DIR}/assets/audio/gundam-vulcan-machine-gun-sound.mp3")
+		self.minigun_sound = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "m61continued.ogg"))
 		self.minigun_sound.set_volume(1.0)
 
 	def make_flash_image(self, image):
@@ -149,12 +148,15 @@ class Player(pg.sprite.Sprite):
 		self.game.play_sound(self.minigun_sound, 0.2)
 
 	def shoot_railgun(self):
-		self.image = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser-red.png")), (30, 120))
-		self.image2 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser-red.png")), (30, 120))
-		self.image3 = pg.transform.scale(pg.image.load(Path(c.HOME_DIR, "assets", "laser-red.png")), (30, 120))
-		self.image.blit(self.image, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
-		self.image2.blit(self.image2, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
-		self.image3.blit(self.image3, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
+		self.image = pg.transform.scale(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "laser-red.png"))), size=(30, 120))
+		self.image2 = pg.transform.scale(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "laser-red.png"))), size=(30, 120))
+		self.image3 = pg.transform.scale(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "laser-red.png"))), size=(30, 120))
+		if self.image is not None:
+			self.image.blit(self.image, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
+		if self.image2 is not None:
+			self.image2.blit(self.image2, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
+		if self.image3 is not None:
+			self.image3.blit(self.image3, (0,0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD)
 		self.bullet = PlayerBullet(self.game, self.rect.midtop, self.image, velocity=(0, -2000))
 
 		if self.fire_timer > 0:
@@ -162,7 +164,7 @@ class Player(pg.sprite.Sprite):
 		if self.rect.y - self.bullet.rect.y < 0:
 			self.bullet.kill()
 
-		pg.mixer.Sound(f'{c.HOME_DIR}/assets/audio/lasercont.wav').play()
+		pg.mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "lasercont.wav")).play()
 		self.fire_timer = self.fire_cooldown
 		self.game.player_bullets.add(self.bullet)
 		self.game.all_sprites.add(self.bullet)
@@ -173,7 +175,7 @@ class Player(pg.sprite.Sprite):
 			return
 		if self.rect.y - bullet.rect.y < 0:
 			bullet.kill()
-		pg.mixer.Sound(f'{c.HOME_DIR}/assets/audio/lasersound2.wav').play()
+		pg.mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "lasersound2.wav")).play()
 		self.fire_timer = self.fire_cooldown2
 		self.game.player_bullets.add(bullet)
 		self.game.all_sprites.add(bullet)
@@ -188,7 +190,7 @@ class Player(pg.sprite.Sprite):
 		]
 		if self.fire_timer > 0:
 			return
-		pg.mixer.Sound(f'{c.HOME_DIR}/assets/audio/lasersound.wav').play()
+		pg.mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "lasersound.wav")).play()
 		self.fire_timer = self.fire_cooldown
 		for pos, velocity in bullet_data:
 			if self.pos.y + 20 < 0:
@@ -202,11 +204,11 @@ class Player(pg.sprite.Sprite):
 			return
 
 		if self.shield_active:
-			pg.mixer.Sound(f"{c.HOME_DIR}/assets/audio/ding.mp3").play()
+			pg.mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "ding.mp3")).play()
 			return
 
 		self.flash_timer = 0.05
-		pg.mixer.Sound(f'{c.HOME_DIR}/assets/audio/clink.wav').play()
+		pg.mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "clink.wav")).play()
 		self.lives -= 1
 		self.invincible_timer = 2.0
 
@@ -391,7 +393,7 @@ class Player(pg.sprite.Sprite):
 			pg.quit()
 		# For debugging
 		if keys[pg.K_F1]:
-			self.game.debug = not self.game.debug
+			...
 		if keys[pg.K_F2]:
 			self.game.show_hitboxes = not self.game.show_hitboxes
 		if keys[pg.K_F3]:
