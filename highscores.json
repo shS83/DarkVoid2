@@ -3,7 +3,7 @@
         "name": "shS",
         "score": 6900,
         "level": 2,
-        "killed_by": "You were killed by the Illithids"
+        "killed_by": "Illithids"
     },
     {
         "name": "dDs",
@@ -18,6 +18,12 @@
         "killed_by": "John Dark Void"
     },
     {
+        "name": "???",
+        "score": 300,
+        "level": 1,
+        "killed_by": "the Lilac Thruster"
+    },
+    {
         "name": "shS",
         "score": 50,
         "level": 1,
@@ -27,7 +33,7 @@
         "name": "shS",
         "score": 0,
         "level": 1,
-        "killed_by": "You were killed by Blackhawk"
+        "killed_by": "Blackhawk"
     },
     {
         "name": "shS",

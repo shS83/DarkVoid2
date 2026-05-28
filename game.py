@@ -499,7 +499,7 @@ class Game:
 
 					if lives_before > 0 and self.player.lives <= 0:
 						enemy_name = getattr(enemy, "name", "the Illithids")
-						self.killed_by = f"You were rammed by {enemy_name}"
+						self.killed_by = enemy_name
 						self.player.alive = False
 						self.game_over = True
 

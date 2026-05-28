@@ -1,12 +1,15 @@
 import pygame as pg
 import config as c
-
+from pathlib import Path
 
 class HUD:
 	def __init__(self, game):
 		self.game = game
 		self.font = pg.font.Font(None, 32)
 		self.small_font = pg.font.Font(None, 22)
+		self.nerd_font = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 128)
+		self.medium_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 56)
+		self.small_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 24)
 
 	def draw(self, screen):
 		if not self.game.game_over and self.game.player.visible:
@@ -35,7 +38,7 @@ class HUD:
 		pg.key.stop_text_input()
 
 	def draw_score(self, screen):
-		text = self.font.render(f"SCORE {self.game.score}", True, (240, 240, 255))
+		text = self.small_nerd.render(f"SCORE {self.game.score}", True, (240, 240, 255))
 		first_text = ""
 
 		text2 = self.small_font.render(
@@ -43,14 +46,14 @@ class HUD:
 			True,
 			(255, 50, 50),
 		)
-		text3 = self.font.render(
+		text3 = self.small_nerd.render(
 			f"STAGE {self.game.level.stage}", True, (255, 200, 255)
 		)
 		text4 = ""
 		text5 = ""
 		if self.game.player.shield:
-			text4 = self.font.render(f"SHIELD ACTIVE", True, (255, 200, 255))
-			text5 = self.font.render(f"SHIELDS LEFT", True, (255, 200, 255))
+			text4 = self.small_nerd.render(f"SHIELD ACTIVE", True, (255, 200, 255))
+			text5 = self.small_nerd.render(f"SHIELDS LEFT", True, (255, 200, 255))
 		if self.game.player.shield:
 			for i in range(self.game.player.shield_amount):
 				screen.blit(
@@ -59,8 +62,8 @@ class HUD:
 			)
 
 		screen.blit(text, (16, 14))
-		screen.blit(text2, (16, 40))
-		screen.blit(text3, (16, 120))
+		screen.blit(text2, (16, 60))
+		screen.blit(text3, (16, 170))
 
 		if self.game.player.shield_active:
 			screen.blit(text4, (16, 210))
@@ -68,12 +71,12 @@ class HUD:
 			screen.blit(text5, (16, 145))
 
 	def draw_lives(self, screen):
-		label = self.small_font.render("ENERGY", True, (220, 220, 255))
-		screen.blit(label, (16, 60))
+		label = self.small_nerd.render("ENERGY", True, (220, 220, 255))
+		screen.blit(label, (16, 90))
 
 		for i in range(self.game.player.lives):
 			x = 16 + i * 24
-			y = 78
+			y = 135
 
 			pg.draw.polygon(
 			screen,
@@ -142,7 +145,7 @@ class HUD:
 
 		# Boss name text
 		if hasattr(boss, "name"):
-			name_text = self.small_font.render(f"{boss.name}", True, (240, 240, 255))
+			name_text = self.small_nerd.render(f"{boss.name}", True, (240, 240, 255))
 			name_rect = name_text.get_rect(midbottom=(c.WIDTH // 2, y - 4))
 			screen.blit(name_text, name_rect)
 
@@ -183,7 +186,7 @@ class HUD:
 		pg.draw.rect(screen, (190, 160, 255), panel_rect, width=3, border_radius=14)
 		pg.draw.rect(screen, (80, 30, 130), panel_rect.inflate(-10, -10), width=1, border_radius=10)
 
-		title = self.font.render("HIGH SCORES", True, (255, 230, 150))
+		title = self.medium_nerd.render("HIGH SCORES", True, (255, 230, 150))
 		title_rect = title.get_rect(center=(c.WIDTH // 2, panel_y + 42))
 		screen.blit(title, title_rect)
 
@@ -201,7 +204,7 @@ class HUD:
 			if index == 1:
 				color = (255, 220, 120)
 
-			text = self.small_font.render(line, True, color)
+			text = self.small_nerd.render(line, True, color)
 			text_rect = text.get_rect(center=(c.WIDTH // 2, y))
 			screen.blit(text, text_rect)
 
@@ -210,12 +213,12 @@ class HUD:
 		if self.game.entering_highscore:
 			self.draw_highscore_input(screen, panel_y + panel_height - 90)
 		else:
-			hint = self.small_font.render("PRESS ESC TO QUIT", True, (170, 170, 210))
+			hint = self.small_nerd.render("PRESS ESC TO QUIT", True, (170, 170, 210))
 			hint_rect = hint.get_rect(center=(c.WIDTH // 2, panel_y + panel_height - 32))
 			screen.blit(hint, hint_rect)
 
 	def draw_highscore_input(self, screen, y):
-		prompt = self.small_font.render("ENTER YOUR NAME", True, (255, 230, 120))
+		prompt = self.small_nerd.render("ENTER YOUR NAME", True, (255, 230, 120))
 		prompt_rect = prompt.get_rect(center=(c.WIDTH // 2, y))
 		screen.blit(prompt, prompt_rect)
 
@@ -237,6 +240,6 @@ class HUD:
 		pg.draw.rect(screen, (0, 0, 0), box, border_radius=8)
 		pg.draw.rect(screen, (120, 220, 255), box, width=2, border_radius=8)
 
-		name_text = self.font.render(name, True, (120, 220, 255))
+		name_text = self.medium_nerd.render(name, True, (120, 220, 255))
 		name_rect = name_text.get_rect(center=box.center)
 		screen.blit(name_text, name_rect)
