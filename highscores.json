@@ -6,6 +6,12 @@
         "killed_by": "You were killed by the Illithids"
     },
     {
+        "name": "dDs",
+        "score": 1100,
+        "level": 1,
+        "killed_by": "The Wasp"
+    },
+    {
         "name": "shS",
         "score": 50,
         "level": 1,

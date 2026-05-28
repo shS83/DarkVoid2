@@ -9,12 +9,10 @@ class HUD:
 		self.small_font = pg.font.Font(None, 22)
 
 	def draw(self, screen):
-		self.draw_score(screen)
-		self.draw_lives(screen)
-		self.draw_boss_bar(screen)
-		self.draw_highscore_input(screen)
-		if self.game.game_over or not self.game.player.visible:
-			self.draw_highscores(screen)
+		if not self.game.game_over and self.game.player.visible:
+			self.draw_score(screen)
+			self.draw_lives(screen)
+			self.draw_boss_bar(screen)
 
 	def submit_highscore(self):
 		if self.highscore_saved:
@@ -165,60 +163,60 @@ class HUD:
 		screen.blit(glow, (x - 10, y - 10), special_flags=pg.BLEND_RGBA_ADD)
 
 	def draw_highscores(self, screen):
-		x = c.WIDTH - 210
-		y = 20
+		overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
+		overlay.fill((0, 0, 0, 185))
+		screen.blit(overlay, (0, 0))
 
-		title = self.small_font.render("HIGH SCORES", True, (240, 220, 255))
-		screen.blit(title, (x, y))
+		panel_width = 520
+		panel_height = 440
 
-		y += 26
-		if self.game.killed_by:
-			killer_text = self.small_font.render(
-				self.game.killed_by,
-				True,
-				(230, 180, 255)
-			)
+		panel_x = (c.WIDTH - panel_width) // 2
+		panel_y = (c.HEIGHT - panel_height) // 2
 
-			killer_rect = killer_text.get_rect(
-				center=(c.WIDTH // 2, c.HEIGHT // 2 + 70)
-			)
+		panel = pg.Surface((panel_width, panel_height), pg.SRCALPHA)
+		panel.fill((10, 8, 20, 225))
 
-			screen.blit(killer_text, killer_rect)
+		panel_rect = pg.Rect(panel_x, panel_y, panel_width, panel_height)
 
-		for index, entry in enumerate(self.game.highscores.entries[:8], start=1):
-			text = self.small_font.render(
-				f"{index}. {entry['name']} {entry['score']}",
-				True,
-				(210, 210, 240)
-			)
+		screen.blit(panel, panel_rect.topleft)
 
-			screen.blit(text, (x, y))
-			y += 22
+		pg.draw.rect(screen, (190, 160, 255), panel_rect, width=3, border_radius=14)
+		pg.draw.rect(screen, (80, 30, 130), panel_rect.inflate(-10, -10), width=1, border_radius=10)
 
-	def draw_highscore_input(self, screen):
-		if not self.game.entering_highscore:
-			return
-
-		box_width = 360
-		box_height = 90
-
-		x = (c.WIDTH - box_width) // 2
-		y = c.HEIGHT // 2 + 100
-
-		box = pg.Rect(x, y, box_width, box_height)
-
-		overlay = pg.Surface((box_width, box_height), pg.SRCALPHA)
-		overlay.fill((0, 0, 0, 190))
-		screen.blit(overlay, box.topleft)
-
-		pg.draw.rect(screen, (180, 180, 240), box, width=2, border_radius=8)
-
-		title = self.small_font.render("NEW HIGH SCORE", True, (255, 230, 120))
-		title_rect = title.get_rect(center=(c.WIDTH // 2, y + 18))
+		title = self.font.render("HIGH SCORES", True, (255, 230, 150))
+		title_rect = title.get_rect(center=(c.WIDTH // 2, panel_y + 42))
 		screen.blit(title, title_rect)
 
-		prompt = self.small_font.render("ENTER NAME:", True, (230, 230, 255))
-		prompt_rect = prompt.get_rect(center=(c.WIDTH // 2, y + 42))
+		y = panel_y + 90
+
+		for index, entry in enumerate(self.game.highscores.entries[:10], start=1):
+			name = entry.get("name", "???")
+			score = entry.get("score", 0)
+			level = entry.get("level", 1)
+
+			line = f"{index:02}. {name:<12} {score:>8}  STAGE {level}"
+
+			color = (240, 240, 255)
+
+			if index == 1:
+				color = (255, 220, 120)
+
+			text = self.small_font.render(line, True, color)
+			text_rect = text.get_rect(center=(c.WIDTH // 2, y))
+			screen.blit(text, text_rect)
+
+			y += 30
+
+		if self.game.entering_highscore:
+			self.draw_highscore_input(screen, panel_y + panel_height - 90)
+		else:
+			hint = self.small_font.render("PRESS ESC TO QUIT", True, (170, 170, 210))
+			hint_rect = hint.get_rect(center=(c.WIDTH // 2, panel_y + panel_height - 32))
+			screen.blit(hint, hint_rect)
+
+	def draw_highscore_input(self, screen, y):
+		prompt = self.small_font.render("ENTER YOUR NAME", True, (255, 230, 120))
+		prompt_rect = prompt.get_rect(center=(c.WIDTH // 2, y))
 		screen.blit(prompt, prompt_rect)
 
 		name = self.game.highscore_name
@@ -226,6 +224,19 @@ class HUD:
 		if int(pg.time.get_ticks() / 400) % 2 == 0:
 			name += "_"
 
+		box_width = 280
+		box_height = 42
+
+		box = pg.Rect(
+			(c.WIDTH - box_width) // 2,
+			y + 24,
+			box_width,
+			box_height
+		)
+
+		pg.draw.rect(screen, (0, 0, 0), box, border_radius=8)
+		pg.draw.rect(screen, (120, 220, 255), box, width=2, border_radius=8)
+
 		name_text = self.font.render(name, True, (120, 220, 255))
-		name_rect = name_text.get_rect(center=(c.WIDTH // 2, y + 68))
+		name_rect = name_text.get_rect(center=box.center)
 		screen.blit(name_text, name_rect)

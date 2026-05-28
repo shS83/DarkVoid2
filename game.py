@@ -318,6 +318,7 @@ class Game:
 
 		if not self.player.alive:
 			self.game_over = True
+			self.start_highscore_entry()
 
 	def draw(self):
 		self.screen.blit(self.background, (0, 0))
@@ -327,6 +328,7 @@ class Game:
 
 		if self.boss is not None and c.DEBUG:
 			pg.draw.rect(self.screen, (255, 0, 0), self.boss.hitbox, 3)
+
 
 		self.draw_stage_banner()
 		self.draw_game_over()
@@ -354,11 +356,10 @@ class Game:
 			banner = pg.Surface((c.WIDTH, banner_height), pg.SRCALPHA)
 			banner.fill((0, 255, 0, alpha))
 			if not gameover_played:
-				mixer.set_num_channels(1)
+				mixer.set_num_channels(2)
 				gameover = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav"))
 				mixer.Sound(gameover).set_volume(0.4)
 				gameover.play()
-
 				gameover_played = True
 			white_rect = pg.Rect(0, 30, c.WIDTH, 240)
 			pg.draw.rect(banner, (255, 255, 255, alpha), white_rect)
@@ -371,15 +372,10 @@ class Game:
 			self.screen.blit(banner, (0, c.HEIGHT // 2 - banner_height // 2))
 			self.player.visible = False
 			self.all_sprites.remove(self.player)
-			if self.game_over and not self.score_saved:
-				self.score_saved = True
-
-				self.highscores.add_score(
-					name="shS",
-					score=self.score,
-					level=self.level.stage,
-					killed_by=self.killed_by or "Unknown"
-				)
+			if not gameover_played and not self.score_saved:
+				self.start_highscore_entry()
+			if gameover_played and not self.player.visible:
+				self.hud.draw_highscores(self.screen)
 		else:
 			fade = min(1, self.stage_banner_timer / 0.35)
 			alpha = int(230 * fade)
@@ -408,21 +404,15 @@ class Game:
 		self.screen.blit(overlay, (0, 0))
 		if not self.gameoversound_played:
 			self.gameoversound_played = True
-			mixer.set_num_channels(1)
+			mixer.set_num_channels(2)
 			gameover = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav"))
 			print(mixer.Sound.get_volume(gameover))
 			mixer.Sound(gameover).set_volume(0.4)
 			gameover.play()
 
 		if self.game_over and not self.score_saved:
-			self.score_saved = True
+			self.start_highscore_entry()
 
-			self.highscores.add_score(
-				name="shS",
-				score=self.score,
-				level=self.level.stage,
-				killed_by=self.killed_by or "Unknown"
-			)
 		banner_height = 180
 		banner = pg.Surface((c.WIDTH, banner_height), pg.SRCALPHA)
 		banner.fill((0, 0, 0, 220))
@@ -432,7 +422,7 @@ class Game:
 		text = pg.transform.smoothscale_by(self.game_over_text, scale)
 		text_rect = text.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2))
 		self.screen.blit(text, text_rect)
-		small_text = self.small_nerd.render(f"You were humiliated by {self.player.killer}", True, (255, 255, 255))
+		small_text = self.small_nerd.render(f"You were humiliated by {self.player.killer or game.killed_by}", True, (255, 255, 255))
 		small_text_rect = small_text.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2 + 100))
 		self.screen.blit(small_text, small_text_rect)
 
@@ -523,6 +513,17 @@ class Game:
 		for powerup in powerup_hits:
 			self.player.apply_powerup(powerup.kind)
 
+	def start_highscore_entry(self):
+		if self.score_saved or self.entering_highscore:
+			return
+
+		if self.highscores.is_high_score(self.score):
+			self.entering_highscore = True
+			self.highscore_name = ""
+			pg.key.start_text_input()
+		else:
+			self.score_saved = True
+
 	def submit_highscore(self):
 		if self.highscore_saved:
 			return
@@ -541,6 +542,8 @@ class Game:
 
 		self.highscore_saved = True
 		self.entering_highscore = False
+		self.score_saved = True
+		pg.key.stop_text_input()
 
 	def run(self):
 		while self.running:
@@ -561,7 +564,7 @@ class Game:
 					if event.type == pg.TEXTINPUT:
 						if len(self.highscore_name) < self.max_name_length:
 							if event.text.isprintable():
-								self.highscore_name += event.text.upper()
+								self.highscore_name += event.text
 
 					elif event.type == pg.KEYDOWN:
 						if event.key == pg.K_BACKSPACE:
@@ -571,7 +574,7 @@ class Game:
 							self.submit_highscore()
 
 						elif event.key == pg.K_ESCAPE:
-							self.highscore_name = "SHS"
+							self.highscore_name = "shS"
 							self.submit_highscore()
 
 					continue
