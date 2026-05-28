@@ -1,6 +1,12 @@
 [
     {
         "name": "shS",
+        "score": 30500,
+        "level": 5,
+        "killed_by": "the Illithids"
+    },
+    {
+        "name": "shS",
         "score": 7200,
         "level": 2,
         "killed_by": "Fred Grunt"
@@ -52,11 +58,5 @@
         "score": 700,
         "level": 1,
         "killed_by": "John Dark Void"
-    },
-    {
-        "name": "???",
-        "score": 300,
-        "level": 1,
-        "killed_by": "the Lilac Thruster"
     }
 ]

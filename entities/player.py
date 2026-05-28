@@ -456,10 +456,10 @@ class Player(pg.sprite.Sprite):
 			if self.thruster_timer <= 0:
 				self.thruster_timer = 0.008
 
-				engine_left = (self.rect.centerx - 18, self.rect.centery + 65)
-				engine_left2 = (self.rect.centerx - 36, self.rect.centery + 65)
-				engine_right = (self.rect.centerx + 18, self.rect.centery + 65)
-				engine_right2 = (self.rect.centerx + 36, self.rect.centery + 65)
+				engine_left = (self.rect.centerx - 18, self.rect.centery + 45)
+				engine_left2 = (self.rect.centerx - 36, self.rect.centery + 45)
+				engine_right = (self.rect.centerx + 18, self.rect.centery + 45)
+				engine_right2 = (self.rect.centerx + 36, self.rect.centery + 45)
 
 				for engine_pos in [engine_left, engine_right, engine_left2, engine_right2]:
 					# hot core
