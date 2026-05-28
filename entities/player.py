@@ -63,7 +63,7 @@ class Player(pg.sprite.Sprite):
 		self.shield_sound.set_volume(0.7)
 		self.vulcan_timer = 0
 		self.vulcan_cooldown = 0.028
-
+		self.killer = "the Illithids"
 		self.vulcan_side = -1
 		self.vulcan_counter = 0
 
@@ -199,7 +199,7 @@ class Player(pg.sprite.Sprite):
 			self.game.player_bullets.add(bullet)
 			self.game.all_sprites.add(bullet)
 
-	def hit(self):
+	def hit(self, killer=None):
 		if self.invincible_timer > 0 or not self.alive:
 			return
 
@@ -218,9 +218,9 @@ class Player(pg.sprite.Sprite):
 			self.game.all_sprites.add(particle)
 
 		if self.lives <= 0:
-			self.die()
+			self.die(killer=killer)
 
-	def die(self):
+	def die(self, killer=None):
 		if not self.alive:
 			return
 
@@ -237,6 +237,7 @@ class Player(pg.sprite.Sprite):
 
 		self.alive = False
 		self.game.game_over = True
+		self.killer = killer
 		self.kill()
 
 	def apply_powerup(self, kind):
@@ -342,7 +343,7 @@ class Player(pg.sprite.Sprite):
 		else:
 			self.minigun_sound.play()
 
-	def receive_hit(self):
+	def receive_hit(self, killer=None):
 		if self.invincible_timer > 0:
 			return
 
@@ -357,7 +358,7 @@ class Player(pg.sprite.Sprite):
 
 			return
 
-		self.hit()
+		self.hit(killer=killer)
 	def update(self, dt):
 		keys = pg.key.get_pressed()
 		mouse = pg.mouse.get_pressed()

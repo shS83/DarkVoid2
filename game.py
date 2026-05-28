@@ -1,4 +1,6 @@
 import random
+
+from icecream import ic
 from pygame import mixer
 import pygame as pg
 from entities.player import Player
@@ -95,7 +97,9 @@ class Game:
 		self.boss_dict = {}
 		self.game_over = False
 		self.game_over_timer = 0
-		self.game_over_text = self.game_over_font.render("YOU DIED", True, (255, 40, 40))
+		self.nerd_font = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 128)
+		self.small_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 28)
+		self.game_over_text = self.nerd_font.render("YOU DIED", True, (255, 40, 40))
 		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 90))
 		self.all_sprites.add(self.player)
 		self.player_bullets = pg.sprite.Group()
@@ -112,14 +116,15 @@ class Game:
 			sound.set_volume(volume)
 			channel.play(sound)
 
-	def damage_player(self):
+	def damage_player(self, killer="Hermaeus Mora"):
 		if not self.player.alive:
+			self.player.killer = killer
 			return
 
 		if hasattr(self.player, "receive_hit"):
-			self.player.receive_hit()
+			self.player.receive_hit(killer=self.player.killer)
 		else:
-			self.player.hit()
+			self.player.hit(killer=self.player.killer)
 
 		if self.player.lives <= 0 or not self.player.alive:
 			self.player.alive = False
@@ -169,7 +174,7 @@ class Game:
 				if test_rect.colliderect(asteroid.rect.inflate(20, 20)):
 					overlap = True
 				if self.player.rect.colliderect(asteroid.rect) and not self.player.invincible_timer > 0:
-					self.damage_player()
+					self.damage_player(killer="The Rock")
 					break
 
 			if not overlap:
@@ -201,11 +206,11 @@ class Game:
 				if test_rect.colliderect(enemy.rect.inflate(20, 20)):
 					overlap = True
 				if self.player.rect.colliderect(enemy.rect) and not self.player.invincible_timer > 0:
-					self.damage_player()
+					self.damage_player(killer=f"Collision with {enemy.name}")
 					break
 
 			if not overlap:
-				enemy = Enemy(self, (x, y))
+				enemy = Enemy(self, (x, y), boss=False)
 				self.enemies.add(enemy)
 				self.all_sprites.add(enemy)
 				return
@@ -235,7 +240,7 @@ class Game:
 
 
 		if self.player.rect.colliderect(self.boss.rect) and not self.player.invincible_timer > 0:
-			self.damage_player()
+			self.damage_player(killer=self.boss.name)
 		return self.boss
 
 	def update(self, dt):
@@ -358,6 +363,9 @@ class Game:
 		text = pg.transform.smoothscale_by(self.game_over_text, scale)
 		text_rect = text.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2))
 		self.screen.blit(text, text_rect)
+		small_text = self.small_nerd.render(f"You were humiliated by {self.player.killer}", True, (255, 255, 255))
+		small_text_rect = small_text.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2 + 100))
+		self.screen.blit(small_text, small_text_rect)
 
 	def handle_collisions(self):
 		# Player bullets vs enemies/bosses
@@ -403,8 +411,8 @@ class Game:
 				distance = self.player.pos.distance_to(bullet_pos)
 
 				if distance < self.player.hitbox_radius + bullet_radius:
+					self.damage_player(killer=bullet.owner)
 					bullet.kill()
-					self.damage_player()
 					break
 
 		# Enemy / boss body vs player
@@ -413,7 +421,7 @@ class Game:
 				enemy_hitbox = getattr(enemy, "hitbox", enemy.rect)
 
 				if enemy_hitbox.colliderect(self.player.rect):
-					self.damage_player()
+					self.damage_player(killer=f"a crash with {enemy.name}")
 					break
 
 			# Asteroids vs player
@@ -422,7 +430,7 @@ class Game:
 					asteroid_hitbox = getattr(asteroid, "hitbox", asteroid.rect)
 
 					if asteroid_hitbox.colliderect(self.player.rect):
-						self.damage_player()
+						self.damage_player(killer="Some random pile of sand")
 						break
 
 			# Powerups vs player

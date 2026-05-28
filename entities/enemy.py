@@ -5,18 +5,149 @@ import random
 from pathlib import Path
 from entities.explosion import Explosion
 from entities.particle import Particle
-from entities.bullet import EnemyBullet
+from entities.bullet import EnemyBullet, RedPellet, BlueLaser
 from entities.thruster_particle import ThrusterParticle
 from entities.powerup import PowerUp
 
 
 class Enemy(pg.sprite.Sprite):
-	def __init__(self, game, pos, boss=False):
+	def __init__(self, game, pos, weapon_type:str = "normal" or "red_pellet" or "blue_laser", hp=5, shoot_delay=1.0, shoot_timer=1.4, name="Fred Grunt", image=pg.image.load(Path(c.HOME_DIR, "assets", "ships", "redhawk.png")), boss=False):
 		super().__init__()
+		self.image1 = rotozoom(
+			pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "purplealus.png"))).convert_alpha(), 180,
+			c.SCALE)
+		self.image2 = rotozoom(
+			pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "redhawk.png"))).convert_alpha(), 180,
+			c.SCALE)
+		self.image3 = rotozoom(
+			pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "turqoiseship.png"))).convert_alpha(),
+			180, c.SCALE)
+		self.image4 = rotozoom(
+			pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "redalus.png"))).convert_alpha(), 180,
+			c.SCALE)
+		self.image5 = rotozoom(
+			pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "grayship.png"))).convert_alpha(), 180,
+			c.SCALE)
+		self.image6 = rotozoom(
+			pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "bluehawk.png"))).convert_alpha(), 180,
+			c.SCALE)
+		self.image7 = rotozoom(
+			pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "blackhawk.png"))).convert_alpha(), 180,
+			c.SCALE)
+		self.image8 = rotozoom(
+			pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "orangeship.png"))).convert_alpha(), 180,
+			c.SCALE)
+		self.image9 = rotozoom(
+			pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "lilac-thrusters.png"))).convert_alpha(),
+			180, c.SCALE)
+		self.image10 = rotozoom(
+			pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "robotector.png"))).convert_alpha(), 180,
+			c.SCALE)
+		self.image11 = rotozoom(
+			pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "vihree-alus.png"))).convert_alpha(), 180,
+			c.SCALE)
+		self.images = [self.image1, self.image2, self.image3, self.image4, self.image5, self.image6, self.image7,
+		               self.image8, self.image9, self.image10, self.image11]
+		enemy_data = random.choice([
+			{
+				"name": "Boyscout",
+				"image": self.image1,
+				"weapon": "red_pellet",
+				"hp": 8,
+				"shoot_timer": 0.8,
+				"shoot_delay": 1.0
+			},
+			{
+				"name": "Turbo",
+				"image": self.image2,
+				"weapon": "red_pellet",
+				"hp": 8,
+				"shoot_timer": 0.8,
+				"shoot_delay": 1.0
+			},
+			{
+				"name": "Redhawk",
+				"image": self.image4,
+				"weapon": "red_pellet",
+				"hp": 8,
+				"shoot_timer": 0.8,
+				"shoot_delay": 1.0
+			},
+			{
+				"name": "robotector",
+				"image": self.image10,
+				"weapon": "red_pellet",
+				"hp": 10,
+				"shoot_timer": 0.6,
+				"shoot_delay": 0.8
+			},
+
+			{
+				"name": "Bluehawk",
+				"image": self.image6,
+				"weapon": "blue_laser",
+				"hp": 7,
+				"shoot_timer": 0.8,
+				"shoot_delay": 2.0
+			},
+			{
+				"name": "John Dark Void",
+				"image": self.image3,
+				"weapon": "blue_laser",
+				"hp": 7,
+				"shoot_timer": 0.8,
+				"shoot_delay": 2.0
+			},
+			{
+				"name": "the Lilac Thruster",
+				"image": self.image9,
+				"weapon": "blue_laser",
+				"hp": 7,
+				"shoot_timer": 0.8,
+				"shoot_delay": 2.0
+			},
+			{
+				"name": "Some Drone",
+				"image": self.image5,
+				"weapon": "normal",
+				"hp": 5,
+				"shoot_timer": 1.0,
+				"shoot_delay": 1.4
+			},
+			{
+				"name": "Blackhawk",
+				"image": self.image7,
+				"weapon": "normal",
+				"hp": 5,
+				"shoot_timer": 1.0,
+				"shoot_delay": 1.4
+			},
+			{
+				"name": "The Wasp",
+				"image": self.image8,
+				"weapon": "red_pellet",
+				"hp": 7,
+				"shoot_timer": 0.8,
+				"shoot_delay": 1.2
+			},
+			{
+				"name": "Swamp Thing",
+				"image": self.image11,
+				"weapon": "red_pellet",
+				"hp": 9,
+				"shoot_timer": 1.0,
+				"shoot_delay": 1.4
+			},
+
+		])
+		self.weapon_type = enemy_data.get("weapon", "normal")
 		self.game = game
+		self.image = enemy_data.get("image", pg.image.load(Path(c.HOME_DIR, "assets", "ships", "lilac-thrusters.png")).convert_alpha())
+		self.name = enemy_data.get("name", "Jane Doe")
 		self.thruster_timer = 0
-		self.shoot_timer = 1.0
-		self.shoot_delay = 1.4
+		self.hp = enemy_data.get("hp", 5)
+		self.shoot_timer = enemy_data.get("shoot_timer", 1.0)
+		self.shoot_delay = enemy_data.get("shoot_delay", 1.4)
 		if c.BOSS_TIME:
 			self.boss_time = True
 		else:
@@ -24,17 +155,7 @@ class Enemy(pg.sprite.Sprite):
 		if self.boss_time:
 			self.boss = rotozoom(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships","bosses", "dark-crusader.png"))).convert_alpha(), 180, 1)
 		self.boss_hp = 150
-		self.image1 = rotozoom(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships","purplealus.png"))).convert_alpha(), 180, c.SCALE)
-		self.image2 = rotozoom(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships","redhawk.png"))).convert_alpha(), 180, c.SCALE)
-		self.image3 = rotozoom(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships","turqoiseship.png"))).convert_alpha(), 180, c.SCALE)
-		self.image4 = rotozoom(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships","redalus.png"))).convert_alpha(), 180, c.SCALE)
-		self.image5 = rotozoom(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships","grayship.png"))).convert_alpha(), 180, c.SCALE)
-		self.image6 = rotozoom(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships","bluehawk.png"))).convert_alpha(), 180, c.SCALE)
-		self.image7 = rotozoom(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships","blackhawk.png"))).convert_alpha(), 180, c.SCALE)
-		self.image8 = rotozoom(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships","orangeship.png"))).convert_alpha(), 180, c.SCALE)
-		self.image9 = rotozoom(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "lilac-thrusters.png"))).convert_alpha(), 180, c.SCALE)
-		self.image10 = rotozoom(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships","robotector.png"))).convert_alpha(), 180, c.SCALE)
-		self.images = [self.image1, self.image2, self.image3, self.image4, self.image5, self.image6, self.image7, self.image8, self.image9, self.image10]
+
 		if self.boss_time:
 			self.image = self.boss
 			self.base_image = self.boss.copy()
@@ -58,10 +179,10 @@ class Enemy(pg.sprite.Sprite):
 
 		# Copy only the alpha channel shape from original image
 		alpha_mask = image.copy()
-		alpha_mask.fill((255, 255, 255, 255), special_flags=pg.BLEND_RGBA_MULT)
+		alpha_mask.fill((255, 255, 255, 200), special_flags=pg.BLEND_RGBA_MULT)
 
 		flash.blit(alpha_mask, (0, 0))
-		flash.fill((255, 255, 255, 255), special_flags=pg.BLEND_RGB_MAX)
+		flash.fill((255, 255, 255, 200), special_flags=pg.BLEND_RGB_MAX)
 
 		return flash
 
@@ -106,11 +227,30 @@ class Enemy(pg.sprite.Sprite):
 		else:
 			direction = direction.normalize()
 
-		bullet = EnemyBullet(
-			self.game,
-			self.rect.center,
-			direction * c.ENEMY_BULLET_SPEED
-		)
+		if self.weapon_type == "normal":
+			bullet = EnemyBullet(self.game,  self.rect.center, direction * 240, owner=self.name)
+
+		if self.weapon_type == "blue_laser":
+			direction = self.game.player.pos - self.pos
+
+			if direction.length_squared() == 0:
+				direction = pg.Vector2(0, 1)
+			else:
+				direction = direction.normalize()
+
+			bullet = BlueLaser(
+				self.game,
+				self.rect.center,
+				direction * 520,
+				owner=self.name
+			)
+		else:
+			bullet = RedPellet(
+				self.game,
+				self.rect.center,
+				direction * 240,
+				owner = self.name
+			)
 
 		self.game.enemy_bullets.add(bullet)
 		self.game.all_sprites.add(bullet)
