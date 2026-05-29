@@ -118,6 +118,13 @@ class Game:
 		self.highscore_name = ""
 		self.highscore_saved = False
 		self.max_name_length = 12
+		self.ending_active = False
+		self.ending_timer = 0
+		self.highscore_delay = 5
+
+		self.show_highscores = False
+		self.entering_highscore = False
+		self.highscore_sequence_started = False
 
 		for _ in range(200):
 			self.stars.add(Star())
@@ -303,6 +310,17 @@ class Game:
 
 				if len(self.asteroids) < self.level.max_asteroids:
 					self.spawn_asteroid()
+
+			if self.ending_active:
+				self.ending_timer += dt
+
+				if (
+						self.ending_timer >= self.highscore_delay
+						and not self.highscore_sequence_started
+				):
+					self.highscore_sequence_started = True
+					self.show_highscores = True
+					self.start_highscore_entry()
 
 			if (
 					self.level_timer >= self.boss_spawn_delay
@@ -524,14 +542,17 @@ class Game:
 			self.player.apply_powerup(powerup.kind)
 
 	def end_game(self, victory=False):
-		if self.game_over and self.show_highscores:
+		if self.ending_active:
 			return
 
 		self.victory = victory
 		self.game_over = True
-		self.show_highscores = True
+		self.ending_active = True
+		self.ending_timer = 0
 
-		self.start_highscore_entry()
+		self.show_highscores = False
+		self.entering_highscore = False
+		self.highscore_sequence_started = False
 
 	def start_highscore_entry(self):
 		if self.score_saved or self.entering_highscore:
