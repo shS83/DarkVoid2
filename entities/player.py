@@ -2,7 +2,6 @@ import math
 import pygame as pg
 from pathlib import Path
 import config as c
-from entities.shield import Shield
 from entities.vulcan import VulcanBullet, MuzzleFlash, VulcanSpark, ShellCasing
 from pygame import mixer
 from entities.bullet import PlayerBullet
@@ -12,7 +11,6 @@ from entities.thruster_particle import ThrusterParticle
 from pygame.transform import rotate, smoothscale_by
 import random
 from entities.powerup import PowerUp
-
 
 class Player(pg.sprite.Sprite):
 	def __init__(self, game, pos):
@@ -70,7 +68,7 @@ class Player(pg.sprite.Sprite):
 		self.shield_sound.set_volume(0.7)
 		self.vulcan_timer = 0
 		self.vulcan_cooldown = 0.028
-		self.killer = "the Illithids"
+		self.killer = "No-one"
 		self.vulcan_side = -1
 		self.vulcan_counter = 0
 		self.vulcan_sound_timer = 0
@@ -252,7 +250,7 @@ class Player(pg.sprite.Sprite):
 			self.shoot_mode = "spread"
 			self.power_timer = 12.0
 		if kind == "speed":
-			self.speed = 900
+			self.speed = 1200
 			self.power_timer = 12.0
 		if kind == "laser":
 			self.fire_cooldown2 = 0.001
@@ -367,6 +365,7 @@ class Player(pg.sprite.Sprite):
 			return
 
 		self.hit(killer=killer)
+
 	def update(self, dt):
 		if self.visible == True:
 			keys = pg.key.get_pressed()
@@ -404,8 +403,10 @@ class Player(pg.sprite.Sprite):
 		# For debugging
 		if c.DEBUG:
 			if keys[pg.K_F1]:
+				self.ending_active = True
 				self.game.level.stage = 5
-				self.game.draw_stage_banner()
+				self.game.end_game(victory=True)
+				self.game.draw_ending_banner()
 			if keys[pg.K_F2]:
 				c.DEBUG = not c.DEBUG
 			if keys[pg.K_F3]:

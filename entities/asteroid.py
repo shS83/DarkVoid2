@@ -33,9 +33,26 @@ class Meteor(pg.sprite.Sprite):
 
 		self.rotation = random.uniform(0, 360)
 		self.rotation_speed = random.uniform(-75, 75)
-
 		self.hitbox = self.rect.inflate(-40, -40)
 		self.hp = level.asteroid_hp
+		self.base_image = self.image.copy()
+		self.mask = pg.mask.from_surface(self.base_image)
+		self.hitbox_template = self.base_image.get_bounding_rect(min_alpha=24).inflate(-18, -18)
+		self.flash_image = self.make_flash_image(self.base_image)
+		self.flash_timer = 0
+
+	@staticmethod
+	def make_flash_image(self, image):
+		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
+
+		# Copy only the alpha channel shape from original image
+		alpha_mask = image.copy()
+		alpha_mask.fill((255, 255, 255, 200), special_flags=pg.BLEND_RGBA_MULT)
+
+		flash.blit(alpha_mask, (0, 0))
+		flash.fill((255, 255, 255, 200), special_flags=pg.BLEND_RGB_MAX)
+
+		return flash
 
 	def update(self, dt):
 		self.pos += self.velocity * dt
