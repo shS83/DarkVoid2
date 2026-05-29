@@ -87,18 +87,18 @@ class Player(pg.sprite.Sprite):
 		self.shield_sound = pg.mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "ding.mp3"))
 		self.shield_sound.set_volume(0.7)
 		self.vulcan_timer = 0
-		self.vulcan_overheat = 0
-		self.vulcan_overheat_max = 3.0
-		self.vulcan_overheat_timer = 0
-		self.vulcan_overheat_cooldown = 0
-		self.vulcan_overheat_cooldown_max = 1.5
+		self.vulcan_heat = 0.0
+		self.vulcan_heat_max = 3.0
+		self.vulcan_overheated = False
+		self.vulcan_heat_rate = 0.65
+		self.vulcan_cool_rate = 0.35
+		self.vulcan_recover_threshold = 0.25
 		self.vulcan_cooldown = 0.028
 		self.killer = "No-one"
 		self.vulcan_side = -1
 		self.vulcan_counter = 0
 		self.vulcan_sound_timer = 0
 		self.vulcan_sound_delay = 1
-		self.vulcan_cooling = False
 		self.minigun_sound = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "m61continued.ogg"))
 		self.minigun_sound.set_volume(1.0)
 		self.visible = True
@@ -286,34 +286,26 @@ class Player(pg.sprite.Sprite):
 			self.shield_amount += self.game.level.player_shield_amount
 
 	def shoot_vulcan(self, dt):
-		if self.vulcan_overheat > self.vulcan_overheat_max:
-			self.vulcan_overheat = self.vulcan_overheat_max
-			self.vulcan_overheat_cooldown = self.vulcan_overheat_cooldown_max
-			self.vulcan_cooling = True
+		if not self.vulcan_overheated:
+			print("vulcan status ok")
+		elif self.vulcan_heat >= self.vulcan_heat_max:
+			self.vulcan_overheated = True
+			self.vulcan_heat -= self.vulcan_cool_rate
 			return
-		if 0 > self.vulcan_overheat_cooldown <= self.vulcan_overheat_cooldown_max and self.vulcan_cooling:
-			self.vulcan_overheat_cooldown -= dt
+		if self.vulcan_overheated:
+			self.vulcan_heat -= self.vulcan_cool_rate
 			return
-		if self.vulcan_overheat_cooldown <= 0 and self.vulcan_cooling:
-			self.vulcan_overheat_cooldown = 0
-			self.vulcan_overheat = 0
-			self.vulcan_cooling = False
-		if self.vulcan_overheat_cooldown < 0:
-			self.vulcan_overheat_cooldown = 0
-			self.vulcan_cooling = False
-		if self.vulcan_overheat_cooldown <= 0 and not self.vulcan_cooling and self.vulcan_overheat < self.vulcan_overheat_max:
-				print("vulcan status ok")
+		if self.vulcan_heat <= 0:
+			self.vulcan_overheated = False
+			self.vulcan_heat = 0
+		elif self.vulcan_timer > 0:
+			return
 
-		if self.vulcan_timer > 0:
-			return
 		self.vulcan_timer -= dt
-		self.vulcan_overheat += dt
+		self.vulcan_heat += dt
 
-		ic(self.vulcan_overheat)
-
-		# self.vulcan_timer = self.vulcan_cooldown
 		self.vulcan_counter += 1
-		ic(f"Ammo spent: {self.vulcan_counter}")
+		# ic(f"Ammo spent: {self.vulcan_counter}")
 		muzzle = self.get_vulcan_muzzle()
 		direction = self.get_mouse_aim_direction(muzzle)
 
@@ -414,11 +406,14 @@ class Player(pg.sprite.Sprite):
 			self.update_intro(dt)
 			return
 
-		if self.vulcan_cooling:
-			self.vulcan_overheat_cooldown -= dt
-			ic(self.vulcan_overheat_cooldown)
-		elif self.vulcan_overheat_cooldown <= 0:
-			self.vulcan_cooling = False
+		if self.vulcan_heat >= self.vulcan_heat_max:
+			self.vulcan_overheated = True
+		if self.vulcan_overheated:
+			self.vulcan_heat -= self.vulcan_cool_rate
+		if self.vulcan_heat < 0:
+			self.vulcan_overheated = False
+			self.vulcan_heat = 0
+		ic(self.vulcan_heat)
 
 		if self.visible == True:
 			keys = pg.key.get_pressed()

@@ -48,10 +48,13 @@ class HUD:
 		bar_width = 300
 		bar_height = 24
 
-		overheat = self.game.player.vulcan_overheat
-		if not self.game.player.vulcan_cooling:
+		max_heat = self.game.player.vulcan_heat_max
+		cooling_rate = self.game.player.vulcan_cool_rate
+		heat = self.game.player.vulcan_heat
+
+		if not self.game.player.vulcan_overheated:
 			text_surf = self.small_nerd.render(
-				f"VULCAN OVERHEAT {overheat:.1f}",
+				f"VULCAN OVERHEAT {heat:.1f}",
 				True,
 				(255, 255, 255)
 			)
@@ -59,32 +62,29 @@ class HUD:
 				center=(bar_x + bar_width // 2, bar_y - 16)
 			)
 			screen.blit(text_surf, text_rect)
-		cooldown = self.game.player.vulcan_overheat_cooldown
-		cooldown_max = self.game.player.vulcan_overheat_cooldown_max
-		# You should adjust this to your actual max overheat value
-		max_overheat = self.game.player.vulcan_overheat_max
 
-		overheat_ratio = overheat / max_overheat
+		# You should adjust this to your actual max overheat value
+		max_overheat = self.game.player.vulcan_heat_max
+
+		overheat_ratio = heat / max_overheat
 		overheat_ratio = max(0, min(1, overheat_ratio))
-		cooldown_ratio = cooldown / cooldown_max
+		cooldown_ratio = heat / max_overheat
 		cooldown_ratio = max(0, min(1, cooldown_ratio))
 		fill_color = self.overheat_color(overheat_ratio)
+		overheat = False
 
-		if max_overheat <= 0 or overheat <= 0:
-			overheat = 0
+		if heat <= 0:
+			overheat = False
+			heat = 0
 			max_overheat = 3
-			return
+		elif heat >= max_overheat:
+			overheat = True
+			heat = max_overheat
 
-		if cooldown > 0 and self.game.player.vulcan_cooling:
-			cooldown_max = self.game.player.vulcan_overheat_cooldown_max
-			cooldown = self.game.player.vulcan_overheat_cooldown
-			cooldown_ratio = cooldown / cooldown_max
-			cooldown_ratio = max(0, min(1, cooldown_ratio))
-
-		if self.game.player.vulcan_cooling:
+		if overheat:
 
 			text_surf = self.small_nerd.render(
-				f"VULCAN COOLDOWN {cooldown:.1f}",
+				f"VULCAN COOLDOWN {heat:.1f}",
 				True,
 				(255, 255, 255)
 			)
@@ -110,8 +110,10 @@ class HUD:
 			)
 
 			screen.blit(text_surf, text_rect)
-		elif not self.game.player.vulcan_cooling:
-			overheat_ratio = overheat / max_overheat
+
+		elif not self.game.player.vulcan_overheated:
+
+			overheat_ratio = heat / max_overheat
 			overheat_ratio = max(0, min(1, overheat_ratio))
 
 			back_rect = pg.Rect(bar_x, bar_y, bar_width, bar_height)
@@ -141,7 +143,7 @@ class HUD:
 			)
 
 			text_surf = self.small_nerd.render(
-				f"VULCAN OVERHEAT {overheat:.1f}",
+				f"VULCAN OVERHEAT {heat:.1f}",
 				True,
 				(255, 255, 255)
 			)
