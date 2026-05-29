@@ -505,7 +505,7 @@ class Game:
 		text = pg.transform.smoothscale_by(self.game_over_text, scale)
 		text_rect = text.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2))
 		self.screen.blit(text, text_rect)
-		small_text = self.small_nerd.render(f"You were humiliated by {self.player.killer or game.killed_by}", True, (255, 255, 255))
+		small_text = self.small_nerd.render(f"You were humiliated by {self.player.killer or self.killed_by}", True, (255, 255, 255))
 		small_text_rect = small_text.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2 + 100))
 		self.screen.blit(small_text, small_text_rect)
 
