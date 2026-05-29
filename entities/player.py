@@ -93,7 +93,7 @@ class Player(pg.sprite.Sprite):
 		self.vulcan_heat_rate = 0.65
 		self.vulcan_cool_rate = 0.35
 		self.vulcan_recover_threshold = 0.25
-		self.vulcan_cooldown = 0.028
+		self.vulcan_cooldown = 0.05
 		self.killer = "No-one"
 		self.vulcan_side = -1
 		self.vulcan_counter = 0
@@ -286,24 +286,16 @@ class Player(pg.sprite.Sprite):
 			self.shield_amount += self.game.level.player_shield_amount
 
 	def shoot_vulcan(self, dt):
-		if not self.vulcan_overheated:
-			print("vulcan status ok")
-		elif self.vulcan_heat >= self.vulcan_heat_max:
-			self.vulcan_overheated = True
-			self.vulcan_heat -= self.vulcan_cool_rate
-			return
-		if self.vulcan_overheated:
-			self.vulcan_heat -= self.vulcan_cool_rate
-			return
-		if self.vulcan_heat <= 0:
-			self.vulcan_overheated = False
-			self.vulcan_heat = 0
-		elif self.vulcan_timer > 0:
-			return
-
 		self.vulcan_timer -= dt
-		self.vulcan_heat += dt
 
+		if self.vulcan_timer > 0:
+			return
+
+		if self.vulcan_overheated:
+			return
+
+		self.vulcan_timer = self.vulcan_cooldown
+		self.vulcan_heat += dt
 		self.vulcan_counter += 1
 		# ic(f"Ammo spent: {self.vulcan_counter}")
 		muzzle = self.get_vulcan_muzzle()
@@ -401,6 +393,23 @@ class Player(pg.sprite.Sprite):
 
 		self.hit(killer=killer)
 
+	def update_vulcan_heat(self, dt, firing):
+		if firing and not self.vulcan_overheated:
+			self.vulcan_heat += self.vulcan_heat_rate * dt
+
+			if self.vulcan_heat >= self.vulcan_heat_max:
+				self.vulcan_heat = self.vulcan_heat_max
+				self.vulcan_overheated = True
+
+		else:
+			self.vulcan_heat -= self.vulcan_cool_rate * dt
+
+			if self.vulcan_heat < 0:
+				self.vulcan_heat = 0
+
+			if self.vulcan_overheated and self.vulcan_heat <= self.vulcan_recover_threshold:
+				self.vulcan_overheated = False
+
 	def update(self, dt):
 		if self.intro_active:
 			self.update_intro(dt)
@@ -408,12 +417,6 @@ class Player(pg.sprite.Sprite):
 
 		if self.vulcan_heat >= self.vulcan_heat_max:
 			self.vulcan_overheated = True
-		if self.vulcan_overheated:
-			self.vulcan_heat -= self.vulcan_cool_rate
-		if self.vulcan_heat < 0:
-			self.vulcan_overheated = False
-			self.vulcan_heat = 0
-		ic(self.vulcan_heat)
 
 		if self.visible == True:
 			keys = pg.key.get_pressed()
@@ -442,8 +445,13 @@ class Player(pg.sprite.Sprite):
 				self.speed = c.PLAYER_FOCUS_SPEED
 			if not keys[pg.K_LSHIFT]:
 				self.speed = c.PLAYER_SPEED
-			if mouse[2] == 1 or mouse[1] == 1:
+			firing_vulcan = mouse[2] or mouse[1]
+
+			self.update_vulcan_heat(dt, firing_vulcan)
+
+			if firing_vulcan and not self.vulcan_overheated:
 				self.shoot_vulcan(dt)
+
 				self.vulcan_timer -= dt
 				self.vulcan_sound_timer -= dt
 			if keys[pg.K_ESCAPE]:
@@ -466,10 +474,7 @@ class Player(pg.sprite.Sprite):
 			if keys[pg.K_F6]:
 				self.game.boss.destroy()
 			if keys[pg.K_F7]:
-				print(*self.game.bosses)
-				self.game.bosses.clear()
-				c.BOSS_TIME = False
-				c.BOSS_SPAWN_DELAY = 5.0
+				...
 			if keys[pg.K_F8]:
 				...
 			if keys[pg.K_F9]:

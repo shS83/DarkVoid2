@@ -51,26 +51,23 @@ class HUD:
 		max_heat = self.game.player.vulcan_heat_max
 		cooling_rate = self.game.player.vulcan_cool_rate
 		heat = self.game.player.vulcan_heat
-
-		if not self.game.player.vulcan_overheated:
-			text_surf = self.small_nerd.render(
-				f"VULCAN OVERHEAT {heat:.1f}",
-				True,
-				(255, 255, 255)
-			)
-			text_rect = text_surf.get_rect(
-				center=(bar_x + bar_width // 2, bar_y - 16)
-			)
-			screen.blit(text_surf, text_rect)
+		#
+		# if not self.game.player.vulcan_overheated:
+		# 	text_surf = self.small_nerd.render(
+		# 		f"VULCAN OVERHEAT {heat:.1f}",
+		# 		True,
+		# 		(255, 255, 255)
+		# 	)
+		# 	text_rect = text_surf.get_rect(
+		# 		center=(bar_x + bar_width // 2, bar_y - 16)
+		# 	)
+		# 	screen.blit(text_surf, text_rect)
 
 		# You should adjust this to your actual max overheat value
 		max_overheat = self.game.player.vulcan_heat_max
-
-		overheat_ratio = heat / max_overheat
-		overheat_ratio = max(0, min(1, overheat_ratio))
-		cooldown_ratio = heat / max_overheat
-		cooldown_ratio = max(0, min(1, cooldown_ratio))
-		fill_color = self.overheat_color(overheat_ratio)
+		heat_ratio = self.game.player.vulcan_heat / self.game.player.vulcan_heat_max
+		heat_ratio = max(0, min(1, heat_ratio))
+		fill_color = self.overheat_color(heat_ratio)
 		overheat = False
 
 		if heat <= 0:
@@ -81,88 +78,67 @@ class HUD:
 			overheat = True
 			heat = max_overheat
 
-		if overheat:
+		if self.game.player.vulcan_overheated:
+			label = "VULCAN OVERHEATED"
+		elif heat_ratio > 0:
+			label = f"VULCAN HEAT {heat_ratio * 100:.0f}%"
+		else:
+			label = "VULCAN READY"
 
-			text_surf = self.small_nerd.render(
-				f"VULCAN COOLDOWN {heat:.1f}",
-				True,
-				(255, 255, 255)
-			)
+		text_surf = self.small_nerd.render(
+			f"{label} {heat:.1f}",
+			True,
+			(255, 255, 255)
+		)
 
-			fill_width = int(bar_width * cooldown_ratio)
+		fill_width = int(bar_width * heat_ratio)
 
-			fill_rect = pg.Rect(
-				bar_x + 3,
-				bar_y + 3,
-				max(0, fill_width - 6),
-				bar_height - 6
-			)
+		fill_rect = pg.Rect(
+			bar_x + 3,
+			bar_y + 3,
+			max(0, fill_width - 6),
+			bar_height - 6
+		)
 
-			pg.draw.rect(
-				screen,
-				fill_color,
-				fill_rect,
-				border_radius=1
-			)
+		pg.draw.rect(
+			screen,
+			fill_color,
+			fill_rect,
+			border_radius=1
+		)
 
-			text_rect = text_surf.get_rect(
-				center=(bar_x + bar_width // 2, bar_y - 16)
-			)
+		text_rect = text_surf.get_rect(
+			center=(bar_x + bar_width // 2, bar_y - 16)
+		)
 
-			screen.blit(text_surf, text_rect)
+		screen.blit(text_surf, text_rect)
 
-		elif not self.game.player.vulcan_overheated:
+		back_rect = pg.Rect(bar_x, bar_y, bar_width, bar_height)
+		fill_width = int(bar_width * heat_ratio)
 
-			overheat_ratio = heat / max_overheat
-			overheat_ratio = max(0, min(1, overheat_ratio))
-
-			back_rect = pg.Rect(bar_x, bar_y, bar_width, bar_height)
-
-			fill_width = int(bar_width * overheat_ratio)
-
-			fill_rect = pg.Rect(
-				bar_x + 3,
-				bar_y + 3,
-				max(0, fill_width - 6),
-				bar_height - 6
-			)
-
-			pg.draw.rect(
-				screen,
-				fill_color,
-				fill_rect,
-				border_radius=1
-			)
-
-			pg.draw.rect(
-				screen,
-				(220, 220, 255),
-				back_rect,
-				width=2,
-				border_radius=1
-			)
-
-			text_surf = self.small_nerd.render(
-				f"VULCAN OVERHEAT {heat:.1f}",
-				True,
-				(255, 255, 255)
-			)
-
-			pg.draw.rect(
-				screen,
-				fill_color,
-				fill_rect,
-				border_radius=1
-			)
-
-			text_rect = text_surf.get_rect(
-				center=(bar_x + bar_width // 2, bar_y - 16)
-			)
-			screen.blit(text_surf, text_rect)
+		fill_rect = pg.Rect(
+			bar_x + 3,
+			bar_y + 3,
+			max(0, fill_width - 6),
+			bar_height - 6
+		)
 
 
-			#pg.draw.rect(screen, (255, 0, 0, 255),
-			 #            (c.WIDTH - 300, 50, round(abs(50 * self.game.player.vulcan_cooldown)), ), border_radius=5)
+		pg.draw.rect(
+			screen,
+			(220, 220, 255),
+			back_rect,
+			width=2,
+			border_radius=1
+		)
+
+		pg.draw.rect(
+			screen,
+			fill_color,
+			fill_rect,
+			border_radius=1
+		)
+
 
 
 	def draw_score(self, screen):
