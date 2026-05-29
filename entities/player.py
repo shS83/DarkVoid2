@@ -1,9 +1,6 @@
 import math
 import pygame as pg
 from pathlib import Path
-
-from icecream import ic
-
 import config as c
 from entities.vulcan import VulcanBullet, MuzzleFlash, VulcanSpark, ShellCasing
 from pygame import mixer
@@ -14,6 +11,8 @@ from entities.thruster_particle import ThrusterParticle
 from pygame.transform import rotate, smoothscale_by
 import random
 from entities.powerup import PowerUp
+
+
 
 class Player(pg.sprite.Sprite):
 	def __init__(self, game, pos):
@@ -466,7 +465,8 @@ class Player(pg.sprite.Sprite):
 			if keys[pg.K_F2]:
 				c.DEBUG = not c.DEBUG
 			if keys[pg.K_F3]:
-				...
+				self.game.player.alive = False
+				self.game.draw_game_over()
 			if keys[pg.K_F4]:
 				...
 			if keys[pg.K_F5]:
