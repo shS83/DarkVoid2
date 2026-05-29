@@ -13,6 +13,12 @@
     },
     {
         "name": "shS",
+        "score": 24200,
+        "level": 4,
+        "killed_by": "Fred Grunt"
+    },
+    {
+        "name": "shS",
         "score": 8500,
         "level": 2,
         "killed_by": "John Dark Void"
@@ -52,11 +58,5 @@
         "score": 6900,
         "level": 2,
         "killed_by": "Illithids"
-    },
-    {
-        "name": "shS",
-        "score": 6700,
-        "level": 2,
-        "killed_by": "the Illithids"
     }
 ]

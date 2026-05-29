@@ -1,6 +1,7 @@
 import pygame as pg
 import config as c
 from pathlib import Path
+from pygame import gfxdraw
 
 class HUD:
 	def __init__(self, game):
@@ -11,12 +12,156 @@ class HUD:
 		self.medium_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 56)
 		self.small_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 20)
 		self.tiny_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 16)
+		self.vulcan_rect = pg.Surface((300, 50), pg.SRCALPHA, 32)
 
 	def draw(self, screen):
 		if not self.game.game_over and self.game.player.visible:
 			self.draw_score(screen)
 			self.draw_lives(screen)
 			self.draw_boss_bar(screen)
+			self.draw_vulcan_overheat(screen)
+
+	def overheat_color(self, ratio):
+		ratio = max(0, min(1, ratio))
+
+		if ratio < 0.5:
+			# green -> yellow
+			t = ratio / 0.5
+
+			r = int(80 + (255 - 80) * t)
+			g = 220
+			b = 60
+
+		else:
+			# yellow -> red
+			t = (ratio - 0.5) / 0.5
+
+			r = 255
+			g = int(220 + (40 - 220) * t)
+			b = int(60 + (40 - 60) * t)
+
+		return (r, g, b)
+
+	def draw_vulcan_overheat(self, screen):
+		bar_x = c.WIDTH - 330
+		bar_y = 50
+		bar_width = 300
+		bar_height = 24
+
+		overheat = self.game.player.vulcan_overheat
+		if not self.game.player.vulcan_cooling:
+			text_surf = self.small_nerd.render(
+				f"VULCAN OVERHEAT {overheat:.1f}",
+				True,
+				(255, 255, 255)
+			)
+			text_rect = text_surf.get_rect(
+				center=(bar_x + bar_width // 2, bar_y - 16)
+			)
+			screen.blit(text_surf, text_rect)
+		cooldown = self.game.player.vulcan_overheat_cooldown
+		cooldown_max = self.game.player.vulcan_overheat_cooldown_max
+		# You should adjust this to your actual max overheat value
+		max_overheat = self.game.player.vulcan_overheat_max
+
+		overheat_ratio = overheat / max_overheat
+		overheat_ratio = max(0, min(1, overheat_ratio))
+		cooldown_ratio = cooldown / cooldown_max
+		cooldown_ratio = max(0, min(1, cooldown_ratio))
+		fill_color = self.overheat_color(overheat_ratio)
+
+		if max_overheat <= 0 or overheat <= 0:
+			overheat = 0
+			max_overheat = 3
+			return
+
+		if cooldown > 0 and self.game.player.vulcan_cooling:
+			cooldown_max = self.game.player.vulcan_overheat_cooldown_max
+			cooldown = self.game.player.vulcan_overheat_cooldown
+			cooldown_ratio = cooldown / cooldown_max
+			cooldown_ratio = max(0, min(1, cooldown_ratio))
+
+		if self.game.player.vulcan_cooling:
+
+			text_surf = self.small_nerd.render(
+				f"VULCAN COOLDOWN {cooldown:.1f}",
+				True,
+				(255, 255, 255)
+			)
+
+			fill_width = int(bar_width * cooldown_ratio)
+
+			fill_rect = pg.Rect(
+				bar_x + 3,
+				bar_y + 3,
+				max(0, fill_width - 6),
+				bar_height - 6
+			)
+
+			pg.draw.rect(
+				screen,
+				fill_color,
+				fill_rect,
+				border_radius=1
+			)
+
+			text_rect = text_surf.get_rect(
+				center=(bar_x + bar_width // 2, bar_y - 16)
+			)
+
+			screen.blit(text_surf, text_rect)
+		elif not self.game.player.vulcan_cooling:
+			overheat_ratio = overheat / max_overheat
+			overheat_ratio = max(0, min(1, overheat_ratio))
+
+			back_rect = pg.Rect(bar_x, bar_y, bar_width, bar_height)
+
+			fill_width = int(bar_width * overheat_ratio)
+
+			fill_rect = pg.Rect(
+				bar_x + 3,
+				bar_y + 3,
+				max(0, fill_width - 6),
+				bar_height - 6
+			)
+
+			pg.draw.rect(
+				screen,
+				fill_color,
+				fill_rect,
+				border_radius=1
+			)
+
+			pg.draw.rect(
+				screen,
+				(220, 220, 255),
+				back_rect,
+				width=2,
+				border_radius=1
+			)
+
+			text_surf = self.small_nerd.render(
+				f"VULCAN OVERHEAT {overheat:.1f}",
+				True,
+				(255, 255, 255)
+			)
+
+			pg.draw.rect(
+				screen,
+				fill_color,
+				fill_rect,
+				border_radius=1
+			)
+
+			text_rect = text_surf.get_rect(
+				center=(bar_x + bar_width // 2, bar_y - 16)
+			)
+			screen.blit(text_surf, text_rect)
+
+
+			#pg.draw.rect(screen, (255, 0, 0, 255),
+			 #            (c.WIDTH - 300, 50, round(abs(50 * self.game.player.vulcan_cooldown)), ), border_radius=5)
+
 
 	def draw_score(self, screen):
 		text = self.small_nerd.render(f"SCORE {self.game.score}", True, (240, 240, 255))

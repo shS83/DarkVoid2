@@ -277,6 +277,8 @@ class Game:
 	def update(self, dt):
 		self.stars.update(dt)
 		self.all_sprites.update(dt)
+		if self.player.intro_active:
+			return
 
 		if self.level.stage != self.stage_banner_stage:
 			self.stage_banner_stage = self.level.stage
@@ -394,6 +396,10 @@ class Game:
 			return
 		if not self.level.stage == 5:
 			self.draw_game_over()
+			return
+		if not self.player.alive and not self.victory:
+			self.draw_game_over()
+			return
 
 		overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
 
@@ -410,15 +416,19 @@ class Game:
 		banner_y = c.HEIGHT // 2 - banner_height // 2
 
 		banner = pg.Surface((banner_width, banner_height), pg.SRCALPHA)
+		frame_color = (120, 255, 120)
+		main_color = (220, 255, 255)
+		sub_color = (180, 230, 255)
 
 		if self.victory:
 			banner.fill((20, 60, 90, 210))
-			frame_color = (120, 255, 120)
-			main_color = (220, 255, 255)
-			sub_color = (180, 230, 255)
 			main_text = "MISSION COMPLETE"
 			sub_text = "DARK VOID HAS BEEN SILENCED"
 			self.killed_by = "No-one"
+		else:
+			main_text = "YOU DIED"
+			sub_text = f"YOU HAVE BEEN HUMILIATED BY {self.killed_by or self.player.killed_by}"
+			self.draw_game_over()
 
 		self.screen.blit(banner, (0, banner_y))
 

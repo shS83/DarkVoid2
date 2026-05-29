@@ -121,7 +121,7 @@ class Boss(pg.sprite.Sprite):
 			self.phase_index = len(self.phases) - 1
 
 	def fire_bullet(self, pos, velocity):
-		bullet = EnemyBullet(self.game, pos, velocity)
+		bullet = EnemyBullet(self.game, pos, velocity, owner=self.name)
 		self.game.enemy_bullets.add(bullet)
 		self.game.all_sprites.add(bullet)
 

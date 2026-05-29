@@ -21,7 +21,6 @@ x_res = 1920
 y_res = 1080
 screen = pg.display.set_mode((x_res, y_res), pg.SRCALPHA, 32)
 FPS = 60
-DEBUG = True
 OVERLAY_TIMER = 5000
 BOSS_SPAWN_DELAY = 30
 PLAYER_SPEED = 500
@@ -158,10 +157,15 @@ BOSS.append(
     }
 )
 
+DEBUG = False
 NEXTBOSS = False
 SHIELD = False
 BOSS_TIME = False
 SCALE = 0.35
+PLAYER_SCALE = 0.12
+PLAYER_INTRO_SCALE = 0.65
+PLAYER_INTRO_RISE_TIME = 2.45
+PLAYER_INTRO_SCALE_TIME = 2.10
 HOME_DIR = os.path.dirname(__file__)
 MSG_FONT = pg.font.Font(
     resource_path(Path(HOME_DIR, "assets", "fonts", "GoMonoNerdFontPropo-Bold.ttf")), 60

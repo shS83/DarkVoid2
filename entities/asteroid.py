@@ -42,7 +42,7 @@ class Meteor(pg.sprite.Sprite):
 		self.flash_timer = 0
 
 	@staticmethod
-	def make_flash_image(self, image):
+	def make_flash_image(image):
 		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
 
 		# Copy only the alpha channel shape from original image
@@ -66,6 +66,12 @@ class Meteor(pg.sprite.Sprite):
 			1
 		)
 
+		if self.flash_timer > 0:
+			self.flash_timer -= dt
+			self.image = self.flash_image
+		else:
+			self.image = self.base_image
+
 		self.rect = self.image.get_rect(center=center)
 		self.hitbox = self.rect.inflate(-40, -40)
 
@@ -74,6 +80,7 @@ class Meteor(pg.sprite.Sprite):
 
 	def damage(self, amount):
 		self.hp -= amount
+		self.flash_timer = 0.05
 
 		if self.hp <= 0:
 			self.destroy()

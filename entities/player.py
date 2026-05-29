@@ -1,6 +1,9 @@
 import math
 import pygame as pg
 from pathlib import Path
+
+from icecream import ic
+
 import config as c
 from entities.vulcan import VulcanBullet, MuzzleFlash, VulcanSpark, ShellCasing
 from pygame import mixer
@@ -32,14 +35,32 @@ class Player(pg.sprite.Sprite):
 		self.fire_cooldown3 = 0.17
 		self.game = game
 		self.pauseswitch = -1
-		self.image1 = smoothscale_by(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "Proper_warship.png"))).convert_alpha(), c.SCALE)
-		self.image2 = smoothscale_by(rotate(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "lilac-thrusters.png"))).convert_alpha(), 180), c.SCALE)
-		self.image3 = smoothscale_by(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "purplealus.png"))).convert_alpha(), c.SCALE)
-		self.image4 = smoothscale_by(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "turqoiseship.png"))).convert_alpha(), c.SCALE)
-		self.image5 = smoothscale_by(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "finnfighter.png"))).convert_alpha(), c.SCALE)
-		self.images = [self.image5] #self.image1, self.image2, self.image3, self.image4]
-		self.image = random.choice(self.images)
-		self.image = pg.transform.smoothscale_by(self.image, c.SCALE)
+		self.original_image = pg.image.load(
+			Path(c.HOME_DIR, "assets", "ships", "finnfighter.png")
+		).convert_alpha()
+
+		self.final_scale = c.PLAYER_SCALE
+		self.intro_scale = c.PLAYER_INTRO_SCALE
+		self.current_scale = self.intro_scale
+
+		self.target_pos = pg.Vector2(pos[0], pos[1] - 150)
+		self.spawn_pos = pg.Vector2(pos[0], c.HEIGHT + 220)
+		self.pos = self.spawn_pos.copy()
+
+		self.intro_active = True
+		self.intro_done = False
+		self.intro_phase = "rise"
+		self.intro_timer = 0
+
+		self.rebuild_visuals(self.current_scale, self.pos)
+		self.image1 = pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "Proper_warship.png"))).convert_alpha()
+		self.image2 = rotate(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "lilac-thrusters.png"))).convert_alpha(), 180)
+		self.image3 = pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "purplealus.png"))).convert_alpha()
+		self.image4 = pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "turqoiseship.png"))).convert_alpha()
+		self.image5 = pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships", "finnfighter.png"))).convert_alpha()
+		# self.images = [self.image5] #self.image1, self.image2, self.image3, self.image4]
+		self.image = smoothscale_by(self.original_image, self.current_scale)
+		# self.image = pg.transform.smoothscale_by(self.image, self.current_scale)
 		self.rect = self.image.get_rect(center=pos)
 		self.pos = pg.Vector2(self.rect.center)
 		self.base_image = self.image.copy()
@@ -53,7 +74,6 @@ class Player(pg.sprite.Sprite):
 		self.hitbox = self.rect.inflate(-96, -96)
 		self.hitbox_radius = self.hitbox.width // 2
 		self.hitbox_template = self.base_image.get_bounding_rect(min_alpha=24).inflate(-18, -18)
-		print(self.hitbox_radius)
 		c.PLAYER_HITBOX_RADIUS = self.hitbox_radius
 		self.particles = pg.sprite.Group()
 		self.all_sprites = pg.sprite.LayeredUpdates()
@@ -67,15 +87,22 @@ class Player(pg.sprite.Sprite):
 		self.shield_sound = pg.mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "ding.mp3"))
 		self.shield_sound.set_volume(0.7)
 		self.vulcan_timer = 0
+		self.vulcan_overheat = 0
+		self.vulcan_overheat_max = 3.0
+		self.vulcan_overheat_timer = 0
+		self.vulcan_overheat_cooldown = 0
+		self.vulcan_overheat_cooldown_max = 1.5
 		self.vulcan_cooldown = 0.028
 		self.killer = "No-one"
 		self.vulcan_side = -1
 		self.vulcan_counter = 0
 		self.vulcan_sound_timer = 0
 		self.vulcan_sound_delay = 1
+		self.vulcan_cooling = False
 		self.minigun_sound = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "m61continued.ogg"))
 		self.minigun_sound.set_volume(1.0)
 		self.visible = True
+		self.flash_timer = 0
 
 	def make_flash_image(self, image):
 		flash = pg.Surface(image.get_size(), pg.SRCALPHA)
@@ -89,67 +116,60 @@ class Player(pg.sprite.Sprite):
 
 		return flash
 
-	def shoot_vulcan(self, dt):
-		self.vulcan_timer -= dt
+	def ease_out_cubic(self, t):
+		return 1 - pow(1 - t, 3)
 
-		if self.vulcan_timer > 0:
-			return
+	def rebuild_visuals(self, scale, center):
+		width = max(1, int(self.original_image.get_width() * scale))
+		height = max(1, int(self.original_image.get_height() * scale))
 
-		self.vulcan_timer = self.vulcan_cooldown
-		self.vulcan_counter += 1
-
-		mx, my = pg.mouse.get_pos()
-
-		# alternate left / right muzzle
-		if self.vulcan_side == 0:
-			muzzle = pg.Vector2(self.rect.centerx - 12, self.rect.centery - 26)
-			self.vulcan_side = 1
-		else:
-			muzzle = pg.Vector2(self.rect.centerx + 12, self.rect.centery - 26)
-			self.vulcan_side = 0
-
-		target = pg.Vector2(mx, my)
-		direction = target - muzzle
-
-		if direction.length_squared() == 0:
-			direction = pg.Vector2(0, -1)
-		else:
-			direction = direction.normalize()
-
-		# slight inaccuracy = more realistic vulcan spread
-		spread_angle = random.uniform(-4, 4)
-		direction = direction.rotate(spread_angle)
-
-		bullet_speed = 1400
-		velocity = direction * bullet_speed
-		angle = math.atan2(direction.y, direction.x)
-
-		tracer = (self.vulcan_counter % 5 == 0)
-
-		bullet = PlayerBullet(
-			self.game,
-			muzzle,
-			angle,
-			velocity=velocity,
-			tracer=tracer
+		self.base_image = pg.transform.smoothscale(
+			self.original_image,
+			(width, height)
 		)
 
-		self.game.player_bullets.add(bullet)
-		self.game.all_sprites.add(bullet)
+		self.flash_image = self.make_flash_image(self.base_image)
+		self.image = self.base_image
+		self.rect = self.image.get_rect(center=center)
 
-		# small muzzle flash particles, not 500
-		for _ in range(4):
-			particle = Particle(self.game, muzzle)
-			particle.velocity = pg.Vector2(
-				random.uniform(-60, 60),
-				random.uniform(-120, 30)
-			)
-			particle.life = random.uniform(0.04, 0.12)
-			particle.max_life = particle.life
-			self.game.effects.add(particle)
-			self.game.all_sprites.add(particle)
+	def update_intro(self, dt):
+		self.intro_timer += dt
 
-		self.game.play_sound(self.minigun_sound, 0.2)
+		if self.intro_phase == "rise":
+			t = min(1, self.intro_timer / c.PLAYER_INTRO_RISE_TIME)
+			t = self.ease_out_cubic(t)
+
+			self.pos = self.spawn_pos.lerp(self.target_pos, t)
+			self.rect.center = self.pos
+
+			if t >= 1:
+				self.intro_phase = "scale_down"
+				self.intro_timer = 0
+
+		elif self.intro_phase == "scale_down":
+			t = min(1, self.intro_timer / c.PLAYER_INTRO_SCALE_TIME)
+			t = self.ease_out_cubic(t)
+
+			self.current_scale = self.intro_scale + (
+					self.final_scale - self.intro_scale
+			) * t
+
+			self.pos = self.target_pos.copy()
+			self.rebuild_visuals(self.current_scale, self.pos)
+
+			if t >= 1:
+				self.current_scale = self.final_scale
+				self.rebuild_visuals(self.current_scale, self.target_pos)
+
+				self.pos = self.target_pos.copy()
+				self.rect.center = self.pos
+
+				self.intro_active = False
+				self.intro_done = True
+				self.hitbox = self.rect.inflate(-96, -96)
+				self.hitbox_radius = self.hitbox.width // 2
+				self.hitbox_template = self.base_image.get_bounding_rect(min_alpha=24).inflate(-18, -18)
+				self.invincible_timer = max(self.invincible_timer, 1.2)
 
 	def shoot_railgun(self):
 		self.image = pg.transform.scale(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "laser-red.png"))), size=(30, 120))
@@ -266,12 +286,34 @@ class Player(pg.sprite.Sprite):
 			self.shield_amount += self.game.level.player_shield_amount
 
 	def shoot_vulcan(self, dt):
+		if self.vulcan_overheat > self.vulcan_overheat_max:
+			self.vulcan_overheat = self.vulcan_overheat_max
+			self.vulcan_overheat_cooldown = self.vulcan_overheat_cooldown_max
+			self.vulcan_cooling = True
+			return
+		if 0 > self.vulcan_overheat_cooldown <= self.vulcan_overheat_cooldown_max and self.vulcan_cooling:
+			self.vulcan_overheat_cooldown -= dt
+			return
+		if self.vulcan_overheat_cooldown <= 0 and self.vulcan_cooling:
+			self.vulcan_overheat_cooldown = 0
+			self.vulcan_overheat = 0
+			self.vulcan_cooling = False
+		if self.vulcan_overheat_cooldown < 0:
+			self.vulcan_overheat_cooldown = 0
+			self.vulcan_cooling = False
+		if self.vulcan_overheat_cooldown <= 0 and not self.vulcan_cooling and self.vulcan_overheat < self.vulcan_overheat_max:
+				print("vulcan status ok")
+
 		if self.vulcan_timer > 0:
 			return
+		self.vulcan_timer -= dt
+		self.vulcan_overheat += dt
 
-		self.vulcan_timer = self.vulcan_cooldown
+		ic(self.vulcan_overheat)
+
+		# self.vulcan_timer = self.vulcan_cooldown
 		self.vulcan_counter += 1
-
+		ic(f"Ammo spent: {self.vulcan_counter}")
 		muzzle = self.get_vulcan_muzzle()
 		direction = self.get_mouse_aim_direction(muzzle)
 
@@ -308,7 +350,8 @@ class Player(pg.sprite.Sprite):
 			self.rect.centery + y_offset,
 		)
 
-	def get_mouse_aim_direction(self, muzzle):
+	@staticmethod
+	def get_mouse_aim_direction(muzzle):
 		mx, my = pg.mouse.get_pos()
 		target = pg.Vector2(mx, my)
 
@@ -367,6 +410,16 @@ class Player(pg.sprite.Sprite):
 		self.hit(killer=killer)
 
 	def update(self, dt):
+		if self.intro_active:
+			self.update_intro(dt)
+			return
+
+		if self.vulcan_cooling:
+			self.vulcan_overheat_cooldown -= dt
+			ic(self.vulcan_overheat_cooldown)
+		elif self.vulcan_overheat_cooldown <= 0:
+			self.vulcan_cooling = False
+
 		if self.visible == True:
 			keys = pg.key.get_pressed()
 			mouse = pg.mouse.get_pressed()
