@@ -570,6 +570,23 @@ class Game:
 						self.end_game(victory=False)
 					break
 
+		# Asteroids vs player
+		if self.player.alive and self.player.invincible_timer <= 0:
+			for asteroid in list(self.asteroids):
+				asteroid_hitbox = getattr(asteroid, "hitbox", asteroid.rect)
+
+				if asteroid_hitbox.colliderect(self.player.rect):
+					lives_before = self.player.lives
+					self.player.receive_hit()
+
+					if lives_before > 0 and self.player.lives <= 0:
+						enemy_name = getattr(asteroid, "name", "a Rock")
+						self.killed_by = enemy_name
+						self.player.alive = False
+						self.game_over = True
+
+					break
+
 		# Enemy / boss body vs player
 		if self.player.alive and self.player.invincible_timer <= 0:
 			for enemy in list(self.enemies):
