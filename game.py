@@ -660,6 +660,8 @@ class Game:
 						c.event = Event.PLAYING
 					elif c.event != Event.PAUSE:
 						c.event = Event.PAUSE
+				if event.type == pg.KEYDOWN and event.key == pg.K_LALT:
+					self.player.activate_shield()
 				if self.entering_highscore:
 					if event.type == pg.TEXTINPUT:
 						if len(self.highscore_name) < self.max_name_length:

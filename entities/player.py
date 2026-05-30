@@ -8,6 +8,7 @@ from entities.bullet import PlayerBullet
 from entities.explosion import Explosion
 from entities.particle import Particle
 from entities.thruster_particle import ThrusterParticle
+from entities.shield import Shield
 from pygame.transform import rotate, smoothscale_by
 import random
 from entities.powerup import PowerUp
@@ -101,6 +102,7 @@ class Player(pg.sprite.Sprite):
 		self.minigun_sound = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "m61continued.ogg"))
 		self.minigun_sound.set_volume(1.0)
 		self.visible = True
+		self.ending_active = False
 		self.flash_timer = 0
 
 	def make_flash_image(self, image):
@@ -170,6 +172,24 @@ class Player(pg.sprite.Sprite):
 				self.hitbox_template = self.base_image.get_bounding_rect(min_alpha=24).inflate(-18, -18)
 				self.invincible_timer = max(self.invincible_timer, 1.2)
 
+	def activate_shield(self):
+		if self.shield_active:
+			return False
+
+		if self.shield_amount <= 0:
+			return False
+
+		self.shield_amount -= 1
+		self.shield_active = True
+
+		shield = Shield(self.game, self)
+
+		self.game.effects.add(shield)
+		self.game.all_sprites.add(shield)
+
+		print("Shield activated. Charges left:", self.shield_amount)
+
+		return True
 	def shoot_railgun(self):
 		self.image = pg.transform.scale(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "laser-red.png"))), size=(30, 120))
 		self.image2 = pg.transform.scale(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "laser-red.png"))), size=(30, 120))
@@ -379,7 +399,6 @@ class Player(pg.sprite.Sprite):
 			return
 
 		if self.shield_active:
-			print("Shield absorbed hit")
 			if self.shield_hit_timer <= 0:
 				self.shield_hit_timer = self.shield_hit_cooldown
 
@@ -388,6 +407,7 @@ class Player(pg.sprite.Sprite):
 				else:
 					self.shield_sound.play()
 
+			print("Shield absorbed hit")
 			return
 
 		self.hit(killer=killer)
