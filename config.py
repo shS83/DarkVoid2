@@ -173,7 +173,50 @@ MSG_FONT = pg.font.Font(
 GOTHIC_FONT = pg.font.Font(
     resource_path(Path(HOME_DIR, "assets", "fonts", "VL-Gothic-Regular.ttf")), 36
 )
-FINAL_BOSS_LEVEL = 4
-FINAL_BOSS_NAME = "Void Dreadnought"
-BOSS = make_boss_list()
+SPACE_FINAL_BOSS_LEVEL = 4
+SPACE_FINAL_BOSS_NAME = "Void Dreadnought"
+
+BOSS = [
+    {
+        "name": "Dark Crusader",
+        "pos": (WIDTH // 2, -200),
+        "lvl": 1,
+        "boss_hp": 300,
+        "boss_time": 3000,
+        "boss_image": BOSS1,
+    },
+    {
+        "name": "Eldritch Marauder",
+        "pos": (WIDTH // 2, -400),
+        "lvl": 2,
+        "boss_hp": 400,
+        "boss_time": 4000,
+        "boss_image": BOSS2,
+    },
+    {
+        "name": "Aural Alien",
+        "lvl": 3,
+        "pos": (WIDTH // 2, -300),
+        "boss_hp": 500,
+        "boss_time": 5000,
+        "boss_image": BOSS3,
+    },
+    {
+        "name": "Void Dreadnought",
+        "pos": (WIDTH // 2, -360),
+        "lvl": 4,
+        "boss_hp": 750,
+        "boss_time": 6500,
+        "boss_image": BOSS4,
+    },
+    {
+        "name": "Terrain Automaton",
+        "pos": (WIDTH // 2, -300),
+        "lvl": 5,
+        "boss_hp": 900,
+        "boss_time": 7000,
+        "boss_image": BOSS5
+        }
+]
+# make_boss_list()
 event = Event.DRUMROLL

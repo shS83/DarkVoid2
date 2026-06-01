@@ -366,7 +366,7 @@ class Boss(pg.sprite.Sprite):
         self.game.boss_spawned_this_level = False
 
         final_boss_dead = (
-            self.lvl >= c.FINAL_BOSS_LEVEL or self.name == c.FINAL_BOSS_NAME
+            self.lvl >= c.SPACE_FINAL_BOSS_LEVEL or self.name == c.SPACE_FINAL_BOSS_NAME
         )
 
         self.kill()

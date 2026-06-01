@@ -49,14 +49,14 @@
     },
     {
         "name": "shS",
-        "score": 14950,
-        "level": 3,
+        "score": 15000,
+        "level": 5,
         "killed_by": "the Illithids"
     },
     {
         "name": "shS",
-        "score": 13650,
-        "level": 4,
+        "score": 14950,
+        "level": 3,
         "killed_by": "the Illithids"
     }
 ]

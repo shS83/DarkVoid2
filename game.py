@@ -291,17 +291,20 @@ class Game:
 				self.world_timer = 0
 
 		elif self.world_phase == "terrain_fade_in":
+			raw_t = min(1, self.world_timer / 2.0)
 			self.map_manager.update(dt)
 			t = min(1, self.world_timer / 1.0)
 			self.fade_alpha = int(255 * (1 - t))
 
-			if t >= 1:
+			if raw_t >= 1:
 				self.world_phase = "terrain"
-				self.stage_banner_text = "STAGE 5"
-				self.draw_stage_banner()
+				self.stage_banner_text = None
+				self.stage_banner_timer = 2.0
+				self.stage_banner_stage = self.level.stage
+				if self.stage_banner_timer > 0:
+					self.draw_stage_banner()
 				self.boss_spawn_delay = c.BOSS_SPAWN_DELAY
 				self.boss_spawned_this_level = False
-				c.BOSS = None
 
 		elif self.world_phase == "terrain":
 			self.map_manager.update(dt)
@@ -315,9 +318,22 @@ class Game:
 				self.enemy_spawn_delay = random.uniform(0.35, 1.7)
 				self.spawn_enemy()
 
+			if not c.BOSS_TIME and self.boss is None:
+				self.level_timer += dt
+
+				if self.level_timer >= self.boss_spawn_delay and c.BOSS:
+					boss_dict = c.BOSS.pop(0)
+					self.boss_spawn(
+						name=boss_dict.get("name", "unknown"),
+						lvl=boss_dict.get("lvl", self.level.stage),
+						image=boss_dict.get("boss_image"),
+						hp=boss_dict.get("boss_hp", self.level.boss_hp),
+						pos=boss_dict.get("pos", (c.WIDTH // 2, -160)),
+					)
+			print("terrain", self.level_timer, self.boss_spawn_delay, len(c.BOSS), c.BOSS_TIME, self.boss)
+
 			self.handle_collisions()
 
-		print("after transition update:", self.world_phase, self.world_timer)
 	def damage_player(self, killer="Hermaeus Mora"):
 		if not self.player.alive:
 			self.player.killer = killer
@@ -461,12 +477,12 @@ class Game:
 		return self.boss
 
 	def update(self, dt):
-		self.stars.update(dt)
-
 		if self.world_phase != "space":
 			self.update_world_transition(dt)
+			self.update_stage_banner(dt)
 			return
 
+		self.stars.update(dt)
 		self.all_sprites.update(dt)
 		if self.player.intro_active:
 			return
@@ -652,6 +668,10 @@ class Game:
 		self.screen.blit(sub, sub_rect)
 
 	pg.display.flip()
+
+	def update_stage_banner(self, dt):
+		if self.stage_banner_timer > 0:
+			self.stage_banner_timer = max(0, self.stage_banner_timer - dt)
 
 	def draw_stage_banner(self):
 		if self.stage_banner_timer <= 0:

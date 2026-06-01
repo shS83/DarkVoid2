@@ -578,6 +578,12 @@ class Player(pg.sprite.Sprite):
                 self.game.level.stage = 4
                 self.game.boss_time = True
                 self.game.boss_timer = 0
+                if len(c.BOSS) > 4:
+                    boss = c.BOSS.pop(0)
+                    boss = c.BOSS.pop(0)
+                    boss = c.BOSS.pop(0)
+                print(c.BOSS)
+
             if keys[pg.K_F2]:
                 ...
             if keys[pg.K_F3]:
