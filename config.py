@@ -36,17 +36,11 @@ ENEMY_BULLET_SPEED = 180
 ENEMY_BULLET_COOLDOWN = 0.01
 PLAYER_BULLET_SPEED = 400
 PLAYER_HITBOX_RADIUS = 24
-EARTH = pg.image.load(
-    resource_path(Path(HOME_DIR, "assets", "rocks", "earth.png"))).convert_alpha()
-BOSS1 = pg.image.load(
-    resource_path(Path(HOME_DIR, "assets", "ships", "bosses", "dark-crusader.png"))
-).convert_alpha()
-BOSS2 = pg.image.load(
-    resource_path(Path(HOME_DIR, "assets", "ships", "bosses", "boss-2.png"))
-).convert_alpha()
-BOSS3 = pg.image.load(
-    resource_path(Path(HOME_DIR, "assets", "ships", "bosses", "foobarhead1.png"))
-).convert_alpha()
+EARTH = pg.image.load(resource_path(Path(HOME_DIR, "assets", "rocks", "earth.png"))).convert_alpha()
+BOSS1 = pg.image.load(resource_path(Path(HOME_DIR, "assets", "ships", "bosses", "dark-crusader.png"))).convert_alpha()
+BOSS2 = pg.image.load(resource_path(Path(HOME_DIR, "assets", "ships", "bosses", "boss-2.png"))).convert_alpha()
+BOSS3 = pg.image.load(resource_path(Path(HOME_DIR, "assets", "ships", "bosses", "foobarhead1.png"))).convert_alpha()
+BOSS4 = pg.image.load(resource_path(Path(HOME_DIR, "assets", "ships", "bosses", "stage4_boss_void_dreadnought_full.png"))).convert_alpha()
 ROCK1 = pg.image.load(
     resource_path(Path(HOME_DIR, "assets", "rocks", "rock_1.png"))
 ).convert_alpha()
@@ -116,7 +110,8 @@ WIDTH = 1920
 HEIGHT = 1080
 BOSS_TIMER = 2000
 # {"name": "Mr. Robot", "pos": (WIDTH // 2, -200), "lvl": 0, "boss_hp": 1, "boss_time": 500, "boss_image": pg.Surface((100,100))},
-BOSS = [
+def make_boss_list():
+    return [
     {
         "name": "Dark Crusader",
         "pos": (WIDTH // 2, -200),
@@ -141,19 +136,6 @@ BOSS = [
         "boss_time": 5000,
         "boss_image": BOSS3,
     },
-]
-
-BOSS4 = pg.image.load(
-    Path(
-        HOME_DIR,
-        "assets",
-        "ships",
-        "bosses",
-        "stage4_boss_void_dreadnought_full.png",
-    )
-).convert_alpha()
-
-BOSS.append(
     {
         "name": "Void Dreadnought",
         "pos": (WIDTH // 2, -360),
@@ -162,7 +144,7 @@ BOSS.append(
         "boss_time": 6500,
         "boss_image": BOSS4,
     }
-)
+]
 
 DEBUG = True
 DEBUG_PLAYER_LIVES = 100
@@ -184,4 +166,5 @@ GOTHIC_FONT = pg.font.Font(
 )
 FINAL_BOSS_LEVEL = 4
 FINAL_BOSS_NAME = "Void Dreadnought"
+BOSS = make_boss_list()
 event = Event.DRUMROLL

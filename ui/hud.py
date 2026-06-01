@@ -331,7 +331,7 @@ class HUD:
 		if self.game.entering_highscore:
 			self.draw_highscore_input(screen, panel_y + panel_height - 90)
 		else:
-			hint = self.small_nerd.render("PRESS ESC TO QUIT", True, (170, 170, 210))
+			hint = self.small_nerd.render("PRESS ESC TO QUIT OR SPACE TO RESTART", True, (170, 170, 210))
 			hint_rect = hint.get_rect(center=(c.WIDTH // 2, panel_y + panel_height - 32))
 			screen.blit(hint, hint_rect)
 

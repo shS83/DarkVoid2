@@ -140,6 +140,23 @@ def alpha():
 
         return False
 
+def run_app():
+    while True:
+        if not alpha():
+            break
+
+        result = Game().run()
+
+        if result != "restart":
+            break
+
+    pg.quit()
+    pg.mixer.quit()
+
+
 if __name__ == "__main__":
-    if alpha():
-        Game().run()
+    run_app()
+
+
+if __name__ == "__main__":
+    run_app()

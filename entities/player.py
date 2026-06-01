@@ -576,12 +576,9 @@ class Player(pg.sprite.Sprite):
         # For debugging
         if c.DEBUG:
             if keys[pg.K_F1]:
-                self.ending_active = True
-                self.game.level.stage = 5
-                self.game.end_game(victory=True)
-                self.game.draw_ending_banner()
+                self.game.level.stage = 4
             if keys[pg.K_F2]:
-                c.DEBUG = not c.DEBUG
+                ...
             if keys[pg.K_F3]:
                 self.game.player.alive = False
                 self.game.draw_game_over()

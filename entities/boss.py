@@ -372,6 +372,6 @@ class Boss(pg.sprite.Sprite):
         self.kill()
 
         if final_boss_dead:
-            self.game.end_game(victory=True)
+            self.game.start_world_transition()
         else:
             self.game.level.up()

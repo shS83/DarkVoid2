@@ -13,8 +13,9 @@ from entities.level import Level
 from entities.events import Event
 from pathlib import Path
 from entities.shield import Shield
+from systems.world_manager import MapManager
 import config as c
-
+import math
 
 def mixing():
 	mixer.init()
@@ -50,6 +51,13 @@ class Game:
 		self.level.stage = 1
 		c.event = Event.INITIATION
 		c.HOME_DIR = Path(__file__).parent.absolute()
+		c.BOSS = c.make_boss_list()
+		c.BOSS_TIME = False
+		self.map_manager = None
+		self.world_phase = "space"
+		self.world_timer = 0
+		self.fade_alpha = 0
+		self.stage_banner_text = None
 		self.bosses = []
 		self.highscores = HighScoreTable(Path(c.HOME_DIR, "highscores.json"))
 		self.score_saved = False
@@ -172,6 +180,7 @@ class Game:
 		self.show_highscores = False
 		self.entering_highscore = False
 		self.highscore_sequence_started = False
+		self.restart_requested = False
 
 		for _ in range(200):
 			self.stars.add(Star())
@@ -183,6 +192,109 @@ class Game:
 		if channel:
 			sound.set_volume(volume)
 			channel.play(sound)
+
+	def start_world_transition(self):
+		self.world_phase = "boss_explosion"
+		self.world_timer = 0
+		self.fade_alpha = 0
+		self.stage_banner_text = None
+		self.earth = None
+
+		for group in [
+			self.enemies,
+			self.asteroids,
+			self.enemy_bullets,
+			self.player_bullets,
+			self.powerups,
+		]:
+			for sprite in list(group):
+				sprite.kill()
+
+	def set_transition_player_visual(self, center, scale, angle):
+		width = max(1, int(self.player.original_image.get_width() * scale))
+		height = max(1, int(self.player.original_image.get_height() * scale))
+
+		image = pg.transform.smoothscale(self.player.original_image, (width, height))
+		self.player.image = pg.transform.rotozoom(image, angle, 1)
+		self.player.rect = self.player.image.get_rect(center=center)
+		self.player.pos = pg.Vector2(center)
+
+	def update_world_transition(self, dt):
+		self.world_timer += dt
+
+		if self.world_phase == "boss_explosion":
+			self.effects.update(dt)
+
+			if self.world_timer >= 2.0:
+				self.earth = Earth()
+				self.stage_banner_text = "ADVANCING TO TERRAIN"
+				self.stage_banner_timer = 3.0
+				self.world_phase = "earth_enter"
+				self.world_timer = 0
+
+			return
+
+		if self.world_phase == "earth_enter":
+			self.earth.update(dt)
+
+			if self.earth.rect.centery >= c.HEIGHT // 2 - 2:
+				self.world_phase = "ship_grow"
+				self.world_timer = 0
+
+		elif self.world_phase == "ship_grow":
+			t = min(1, self.world_timer / 0.8)
+			scale = c.PLAYER_SCALE + (0.22 - c.PLAYER_SCALE) * t
+			self.player.rebuild_visuals(scale, self.player.pos)
+
+			if t >= 1:
+				self.world_phase = "ship_to_earth"
+				self.world_timer = 0
+				self.transition_ship_start = self.player.pos.copy()
+
+		elif self.world_phase == "ship_to_earth":
+			raw_t = min(1, self.world_timer / 2.0)
+			t = raw_t * raw_t * (3 - 2 * raw_t)
+
+			start = self.transition_ship_start
+			control = pg.Vector2(c.WIDTH * 0.28, c.HEIGHT * 0.42)
+			target = pg.Vector2(self.earth.rect.center)
+
+			pos = start.lerp(control, t).lerp(control.lerp(target, t), t)
+			tangent = 2 * (1 - t) * (control - start) + 2 * t * (target - control)
+
+			angle = -math.degrees(math.atan2(tangent.y, tangent.x)) - 90
+			scale = 0.22 + (0.02 - 0.22) * t
+
+			self.set_transition_player_visual(pos, scale, angle)
+
+			if t >= 1:
+				self.world_phase = "fade_out"
+				self.world_timer = 0
+
+		elif self.world_phase == "fade_out":
+			t = min(1, self.world_timer / 1.0)
+			self.fade_alpha = int(255 * t)
+
+			if t >= 1:
+				self.map_manager = MapManager(self)
+				self.level.stage = 5
+				self.player.pos = pg.Vector2(c.WIDTH // 2, c.HEIGHT - 120)
+				self.player.rebuild_visuals(c.PLAYER_SCALE, self.player.pos)
+				self.world_phase = "terrain_fade_in"
+				self.world_timer = 0
+
+		elif self.world_phase == "terrain_fade_in":
+			self.map_manager.update(dt)
+			t = min(1, self.world_timer / 1.0)
+			self.fade_alpha = int(255 * (1 - t))
+
+			if t >= 1:
+				self.world_phase = "terrain"
+				self.stage_banner_text = None
+
+		elif self.world_phase == "terrain":
+			self.map_manager.update(dt)
+			self.all_sprites.update(dt)
 
 	def damage_player(self, killer="Hermaeus Mora"):
 		if not self.player.alive:
@@ -328,6 +440,11 @@ class Game:
 
 	def update(self, dt):
 		self.stars.update(dt)
+
+		if self.world_phase != "space":
+			self.update_world_transition(dt)
+			return
+
 		self.all_sprites.update(dt)
 		if self.player.intro_active:
 			return
@@ -415,10 +532,16 @@ class Game:
 			self.end_game(victory=False)
 
 	def draw(self):
-		self.screen.blit(self.background, (0, 0))
-		self.stars.draw(self.screen)
+		if self.world_phase in ("terrain_fade_in", "terrain"):
+			self.map_manager.draw(self.screen)
+		else:
+			self.screen.blit(self.background, (0, 0))
+			self.stars.draw(self.screen)
+		if self.world_phase in ("earth_enter", "ship_grow", "ship_to_earth", "fade_out"):
+			self.earth.draw(self.screen)
 		self.all_sprites.draw(self.screen)
 		self.hud.draw(self.screen)
+
 
 		if c.DEBUG:
 			if self.boss is not None:
@@ -440,6 +563,11 @@ class Game:
 			pause_rect = pausetext.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2))
 			pausesurface.blit(pausetext, pause_rect)
 			self.screen.blit(pausesurface, (0, 0))
+
+		if self.fade_alpha > 0:
+			overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
+			overlay.fill((0, 0, 0, self.fade_alpha))
+			self.screen.blit(overlay, (0, 0))
 
 		pg.display.flip()
 
@@ -516,9 +644,10 @@ class Game:
 		white_rect = pg.Rect(0, 10, c.WIDTH, 120)
 		pg.draw.rect(banner, (255, 255, 255, alpha), white_rect)
 
-		stage_text = self.stage_font.render(
-			f"STAGE {self.level.stage}", True, (0, 0, 0)
-		)
+
+		label = self.stage_banner_text or f"STAGE {self.level.stage}"
+		stage_text = self.stage_font.render(label, True, (0, 0, 0))
+
 		stage_text.set_alpha(alpha)
 		stage_rect = stage_text.get_rect(center=(c.WIDTH // 2, banner_height // 2))
 		banner.blit(stage_text, stage_rect)
@@ -735,6 +864,12 @@ class Game:
 					self.highscore_name = "shS"
 					self.submit_highscore()
 					self.running = False
+				if self.show_highscores and not self.entering_highscore:
+					if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+						self.restart_requested = True
+						self.running = False
+						break
+
 				if event.type == pg.KEYDOWN and event.key == pg.K_PAUSE:
 					if c.event == Event.PAUSE:
 						mixer.music.play(-1)
@@ -763,10 +898,6 @@ class Game:
 							and self.player.shield_amount > 0
 							and not self.player.shield_active
 						):
-							print(
-								"Shield activated. Charges left:",
-								self.player.shield_amount,
-							)
 							self.player.shield_active = True
 							self.player.shield_amount -= 1
 
@@ -788,8 +919,7 @@ class Game:
 				self.update(dt)
 			self.draw()
 
-	pg.quit()
-	mixer.quit()
+		return "restart" if self.restart_requested else "quit"
 
 
 if __name__ == "__main__":
