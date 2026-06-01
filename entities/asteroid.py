@@ -17,6 +17,7 @@ class Meteor(pg.sprite.Sprite):
 		self.pos.y = -100
 		self.max_asteroids = level.max_asteroids
 		self.image = random.choice(c.ROCK_IMAGES)
+		self.mask = pg.mask.from_surface(self.image)
 		scale = random.uniform(0.35, 1.05)
 
 		w = int(self.image.get_width() * scale)
@@ -56,23 +57,22 @@ class Meteor(pg.sprite.Sprite):
 
 	def update(self, dt):
 		self.pos += self.velocity * dt
-
 		self.rotation += self.rotation_speed * dt
-		center = self.pos
-
-		self.image = pg.transform.rotozoom(
-			self.base_image,
-			self.rotation,
-			1
-		)
 
 		if self.flash_timer > 0:
 			self.flash_timer -= dt
-			self.image = self.flash_image
+			source_image = self.flash_image
 		else:
-			self.image = self.base_image
+			source_image = self.base_image
 
-		self.rect = self.image.get_rect(center=center)
+		self.image = pg.transform.rotozoom(
+			source_image,
+			self.rotation,
+			1
+		)
+		self.mask = pg.mask.from_surface(self.image)
+
+		self.rect = self.image.get_rect(center=self.pos)
 		self.hitbox = self.rect.inflate(-40, -40)
 
 		if self.rect.top > c.HEIGHT + 80:

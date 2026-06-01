@@ -132,6 +132,7 @@ class Player(pg.sprite.Sprite):
         self.default_fire_cooldown = self.fire_cooldown
         self.default_fire_cooldown2 = self.fire_cooldown2
         self.default_speed = self.speed
+        self.super_speed = False
 
     def make_flash_image(self, image):
         flash = pg.Surface(image.get_size(), pg.SRCALPHA)
@@ -336,12 +337,10 @@ class Player(pg.sprite.Sprite):
             self.power_timer = 12.0
 
         elif kind == "speed":
-            self.reset_powerups()
-            self.speed = 1200
+            self.super_speed = 1200
             self.power_timer = 12.0
 
         elif kind == "laser":
-            self.reset_powerups()
             self.fire_cooldown2 = 0.001
             self.power_timer = 12.0
 
@@ -352,6 +351,10 @@ class Player(pg.sprite.Sprite):
             self.railgun_timer = self.railgun_duration
             self.power_timer = self.railgun_duration
             self.fire_cooldown = 0.001
+
+        elif kind == "piercing":
+            self.bullet.piercing = True
+            self.power_timer = 25.0
 
         elif kind == "health":
             self.lives += 3
@@ -491,7 +494,7 @@ class Player(pg.sprite.Sprite):
     def reset_powerups(self):
         self.shoot_mode = "normal"
         self.railgun_active = False
-
+        self.bullet.piercing = False
         self.speed = self.default_speed
         self.fire_cooldown = self.default_fire_cooldown
         self.fire_cooldown2 = self.default_fire_cooldown2
@@ -545,7 +548,7 @@ class Player(pg.sprite.Sprite):
             if keys[pg.K_LSHIFT]:
                 self.speed = c.PLAYER_FOCUS_SPEED
             if not keys[pg.K_LSHIFT]:
-                self.speed = c.PLAYER_SPEED
+                self.speed = self.super_speed or self.default_speed
             firing_vulcan = mouse[2] or mouse[1]
 
             self.update_vulcan_heat(dt, firing_vulcan)
@@ -584,7 +587,7 @@ class Player(pg.sprite.Sprite):
                     self.game,
                     (random.randrange(0, 1920), 0),
                     kind=random.choice(
-                        ["health", "speed", "spread", "laser", "cannon", "shield"]
+                        ["health", "speed", "spread", "laser", "cannon", "shield", "piercing"]
                     ),
                 )
                 self.game.powerups.add(powerup)
@@ -594,25 +597,15 @@ class Player(pg.sprite.Sprite):
             if keys[pg.K_F10]:
                 c.BOSS_TIME = True
 
-        # if self.power_timer > 0:
-        #     self.power_timer -= dt
-        #
-        # if self.power_timer <= 0:
-        #     self.shoot_mode = "normal"
-        #     if self.shield_amount > 0:
-        #         self.shield = True
-        #
-        #     self.speed = c.PLAYER_SPEED
-        #     self.fire_cooldown2 = 0.07
         self.thruster_timer -= dt
 
         if self.thruster_timer <= 0:
             self.thruster_timer = 0.008
 
-            engine_left = (self.rect.centerx - 18, self.rect.centery + 45)
-            engine_left2 = (self.rect.centerx - 36, self.rect.centery + 45)
-            engine_right = (self.rect.centerx + 18, self.rect.centery + 45)
-            engine_right2 = (self.rect.centerx + 36, self.rect.centery + 45)
+            engine_left = (self.rect.centerx - 14, self.rect.centery + 45)
+            engine_left2 = (self.rect.centerx - 34, self.rect.centery + 45)
+            engine_right = (self.rect.centerx + 14, self.rect.centery + 45)
+            engine_right2 = (self.rect.centerx + 34, self.rect.centery + 45)
 
             for engine_pos in [engine_left, engine_right, engine_left2, engine_right2]:
                 # hot core

@@ -555,38 +555,62 @@ class Game:
 		self.screen.blit(small_text, small_text_rect)
 	pg.display.flip()
 
+	def mask_collide(self, sprite_a, sprite_b):
+		if not hasattr(sprite_a, "mask"):
+			sprite_a.mask = pg.mask.from_surface(sprite_a.image)
+
+		if not hasattr(sprite_b, "mask"):
+			sprite_b.mask = pg.mask.from_surface(sprite_b.image)
+
+		offset = (
+			sprite_b.rect.left - sprite_a.rect.left,
+			sprite_b.rect.top - sprite_a.rect.top
+		)
+
+		return sprite_a.mask.overlap(sprite_b.mask, offset) is not None
+
 	def handle_collisions(self):
-		# Player bullets vs asteroids
-		for asteroid in list(self.asteroids):
-			asteroid_hitbox = getattr(asteroid, "hitbox", asteroid.rect)
-
-			for bullet in list(self.player_bullets):
-				if asteroid_hitbox.colliderect(bullet.rect):
-					bullet.kill()
-
-					if hasattr(asteroid, "damage"):
-						asteroid.damage(1)
-					else:
-						asteroid.kill()
-					break
-
 		# Player bullets vs enemies and bosses
 		for enemy in list(self.enemies):
-			enemy_hitbox = getattr(enemy, "hitbox", enemy.rect)
-
 			for bullet in list(self.player_bullets):
-				if enemy_hitbox.colliderect(bullet.rect):
-					damage = getattr(bullet, "damage", 1)
+				if not enemy.rect.colliderect(bullet.rect):
+					continue
 
-					if not getattr(bullet, "piercing", False):
-						bullet.kill()
+				if not self.mask_collide(enemy, bullet):
+					continue
 
-					if hasattr(enemy, "damage"):
-						enemy.damage(damage)
-					else:
-						enemy.kill()
+				damage = getattr(bullet, "damage", 1)
 
-					break
+				if not getattr(bullet, "piercing", False):
+					bullet.kill()
+
+				if hasattr(enemy, "damage"):
+					enemy.damage(damage)
+				else:
+					enemy.kill()
+
+				break
+
+		# Player bullets vs asteroids
+		for asteroid in list(self.asteroids):
+			for bullet in list(self.player_bullets):
+				if not asteroid.rect.colliderect(bullet.rect):
+					continue
+
+				if not self.mask_collide(asteroid, bullet):
+					continue
+
+				damage = getattr(bullet, "damage", 1)
+
+				if not getattr(bullet, "piercing", False):
+					bullet.kill()
+
+				if hasattr(asteroid, "damage"):
+					asteroid.damage(damage)
+				else:
+					asteroid.kill()
+
+				break
 
 		# Enemy bullets vs player
 		if self.player.alive and self.player.invincible_timer <= 0:

@@ -13,6 +13,8 @@ class PlayerBullet(pg.sprite.Sprite):
 	def __init__(self, game, pos, image=pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "laser.png"))).convert_alpha(), velocity=(0, -800)):
 		super().__init__()
 		self.image = image
+		self.mask = pg.mask.from_surface(self.image)
+		self.piercing = False
 		self.game = game
 		self.pos = pg.Vector2(pos)
 		self.rect = self.image.get_rect(center=self.pos)
@@ -63,6 +65,7 @@ class EnemyBullet(pg.sprite.Sprite):
 		self.anim_speed = 0.045
 
 		self.image = EnemyBullet.frames[self.frame_index]
+		self.mask = pg.mask.from_surface(self.image)
 		self.rect = self.image.get_rect(center=self.pos)
 
 	def make_bullet_frames(self):

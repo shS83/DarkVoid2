@@ -162,7 +162,7 @@ BOSS.append(
     }
 )
 
-DEBUG = False
+DEBUG = True
 DEBUG_PLAYER_LIVES = 100
 NEXTBOSS = False
 SHIELD = False
