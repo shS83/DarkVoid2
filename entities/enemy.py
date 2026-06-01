@@ -149,20 +149,20 @@ class Enemy(pg.sprite.Sprite):
 		self.shoot_timer = enemy_data.get("shoot_timer", 1.0)
 		self.shoot_delay = enemy_data.get("shoot_delay", 1.4)
 
-		if c.BOSS_TIME:
-			self.boss_time = True
-		else:
-			self.boss_time = False
-		if self.boss_time:
-			self.boss = rotozoom(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships","bosses", "dark-crusader.png"))).convert_alpha(), 180, 1)
-		self.boss_hp = 150
+		# if c.BOSS_TIME:
+		# 	self.boss_time = True
+		# else:
+		# 	self.boss_time = False
+		# if self.boss_time:
+		# 	self.boss = rotozoom(pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "ships","bosses", "dark-crusader.png"))).convert_alpha(), 180, 1)
+		# self.boss_hp = 150
 
-		if self.boss_time:
-			self.image = self.boss
-			self.base_image = self.boss.copy()
-		else:
-			self.image = random.choice(self.images)
-			self.base_image = self.image.copy()
+		# if self.boss_time:
+		# 	self.image = self.boss
+		# 	self.base_image = self.boss.copy()
+		# else:
+		self.image = random.choice(self.images)
+		self.base_image = self.image.copy()
 		self.flash_image = self.make_flash_image(self.base_image)
 		self.flash_timer = 0.05
 		self.rect = self.image.get_rect(center=pos)
@@ -175,9 +175,9 @@ class Enemy(pg.sprite.Sprite):
 		self.aim_direction = pg.Vector2(0, 1)
 		self.mask = pg.mask.from_surface(self.image)
 
-		if c.BOSS_TIME:
-			self.hp = self.game.level.boss_hp
-			self.speed = 40
+		# if c.BOSS_TIME:
+		# 	self.hp = self.game.level.boss_hp
+		# 	self.speed = 40
 
 	def make_flash_image(self, image):
 		flash = pg.Surface(image.get_size(), pg.SRCALPHA)

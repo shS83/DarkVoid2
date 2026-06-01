@@ -155,7 +155,7 @@ def make_boss_list():
         }
 ]
 
-DEBUG = True
+DEBUG = False
 DEBUG_PLAYER_LIVES = 100
 NEXTBOSS = False
 SHIELD = False

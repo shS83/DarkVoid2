@@ -413,7 +413,8 @@ class Game:
 				return
 
 	def spawn_enemy(self):
-		c.NEXTBOSS: dict | None = None
+		if c.BOSS_TIME or self.boss is not None:
+			return
 		if self.level.stage < 5 and random.random() < 0.15:
 			self.spawn_rocks()
 

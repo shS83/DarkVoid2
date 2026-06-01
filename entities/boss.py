@@ -365,12 +365,17 @@ class Boss(pg.sprite.Sprite):
         self.game.level_timer = 0
         self.game.boss_spawned_this_level = False
 
+        terrain_boss_dead = self.name == "Terrain Automaton"
+
         final_boss_dead = (
-            self.lvl >= c.SPACE_FINAL_BOSS_LEVEL or self.name == c.SPACE_FINAL_BOSS_NAME
+            self.lvl == c.SPACE_FINAL_BOSS_LEVEL or self.name == c.SPACE_FINAL_BOSS_NAME
         )
 
         self.kill()
 
+        if terrain_boss_dead:
+            self.game.end_game(victory=True)
+            self.game.player.visible = False
         if final_boss_dead:
             self.game.start_world_transition()
         else:
