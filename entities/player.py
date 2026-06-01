@@ -155,7 +155,6 @@ class Player(pg.sprite.Sprite):
         height = max(1, int(self.original_image.get_height() * scale))
 
         self.base_image = pg.transform.smoothscale(self.original_image, (width, height))
-
         self.flash_image = self.make_flash_image(self.base_image)
         self.image = self.base_image
         self.rect = self.image.get_rect(center=center)
@@ -577,6 +576,8 @@ class Player(pg.sprite.Sprite):
         if c.DEBUG:
             if keys[pg.K_F1]:
                 self.game.level.stage = 4
+                self.game.boss_time = True
+                self.game.boss_timer = 0
             if keys[pg.K_F2]:
                 ...
             if keys[pg.K_F3]:

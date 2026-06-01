@@ -168,8 +168,8 @@ def show_controls(screen, bigfont, font):
     def randomize():
         randomizer = random.choice(([r, random.choice([0, r, 255]), random.choice([r, random.choice([0, r, 255])]),
                              random.choice([r, random.choice([0, r, 255])])]))
-        pat = (random.choice([(255, 0, randomizer), (255, 0, randomizer), (255, 0, randomizer)]))
-        print(pat)
+
+        pat = random.choice([(r, r, r), (randomizer, r, r), (r, randomizer, r)])
         return pat
 
     def colorize():
@@ -193,12 +193,12 @@ def show_controls(screen, bigfont, font):
         return text
 
     while running:
-        text = colorize()
+        minor_text = colorize()
         screen.fill((0, 0, 0, 255))
         major_text = bigfont.render("Control instructions:", True, (255, 255, 255))
 
         screen.blit(major_text, (1920 // 2 - major_text.get_width() // 2, 200))
-        for i, t in enumerate(text):
+        for i, t in enumerate(minor_text):
             screen.blit(t, (1920 // 2 - 500, 350 + i * 60))
 
         r += r_d

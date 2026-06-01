@@ -145,13 +145,13 @@ def make_boss_list():
         "boss_time": 6500,
         "boss_image": BOSS4,
     },
-        {
-            "name": "Terrain Automaton",
-            "pos": (WIDTH // 2, -300),
-            "lvl": 5,
-            "boss_hp": 900,
-            "boss_time": 7000,
-            "boss_image": BOSS5
+    {
+        "name": "Terrain Automaton",
+        "pos": (WIDTH // 2, -300),
+        "lvl": 5,
+        "boss_hp": 900,
+        "boss_time": 7000,
+        "boss_image": BOSS5
         }
 ]
 

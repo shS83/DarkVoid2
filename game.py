@@ -223,7 +223,7 @@ class Game:
 		self.player.pos = pg.Vector2(center)
 
 	def update_world_transition(self, dt):
-		self.player.image = self.player.base_image
+		# self.player.image = self.player.base_image
 		self.world_timer += dt
 
 		if self.world_phase == "boss_explosion":
@@ -274,7 +274,7 @@ class Game:
 
 			self.set_transition_player_visual(pos, scale, angle)
 
-			if t >= 1:
+			if raw_t >= 1:
 				self.world_phase = "fade_out"
 				self.world_timer = 0
 
@@ -297,7 +297,11 @@ class Game:
 
 			if t >= 1:
 				self.world_phase = "terrain"
-				self.stage_banner_text = None
+				self.stage_banner_text = "STAGE 5"
+				self.draw_stage_banner()
+				self.boss_spawn_delay = c.BOSS_SPAWN_DELAY
+				self.boss_spawned_this_level = False
+				c.BOSS = None
 
 		elif self.world_phase == "terrain":
 			self.map_manager.update(dt)
@@ -313,6 +317,7 @@ class Game:
 
 			self.handle_collisions()
 
+		print("after transition update:", self.world_phase, self.world_timer)
 	def damage_player(self, killer="Hermaeus Mora"):
 		if not self.player.alive:
 			self.player.killer = killer
@@ -467,7 +472,7 @@ class Game:
 			return
 
 		if self.earth_updates:
-			self.earth.update()
+			self.earth.update(dt)
 
 		if self.level.stage != self.stage_banner_stage:
 			self.stage_banner_stage = self.level.stage
@@ -926,9 +931,6 @@ class Game:
 							self.player.speed = c.PLAYER_SPEED
 
 						if c.DEBUG:
-							if self.player.visible:
-								if event.type == pg.KEYDOWN and event.key == pg.K_F2:
-									self.boss_spawn(c.BOSS.pop(0))
 							if event.type == pg.KEYDOWN and event.key == pg.K_F11:
 								self.player.alive = False
 
