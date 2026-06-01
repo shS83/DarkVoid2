@@ -37,6 +37,12 @@
     },
     {
         "name": "shS",
+        "score": 14950,
+        "level": 3,
+        "killed_by": "the Illithids"
+    },
+    {
+        "name": "shS",
         "score": 8800,
         "level": 2,
         "killed_by": "John Dark Void"
@@ -52,11 +58,5 @@
         "score": 8250,
         "level": 2,
         "killed_by": "the Illithids"
-    },
-    {
-        "name": "shS",
-        "score": 7700,
-        "level": 2,
-        "killed_by": "robotector"
     }
 ]

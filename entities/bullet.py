@@ -14,13 +14,16 @@ class PlayerBullet(pg.sprite.Sprite):
 		super().__init__()
 		self.image = image
 		self.mask = pg.mask.from_surface(self.image)
-		self.piercing = False
 		self.game = game
 		self.pos = pg.Vector2(pos)
 		self.rect = self.image.get_rect(center=self.pos)
 		self.velocity = pg.Vector2(velocity)
 		self.damage = 1
 		self.mask = pg.mask.from_surface(self.image)
+		if self.game.player.bullets_piercing:
+			self.piercing = True
+		else:
+			self.piercing = False
 
 	def update(self, dt = pg.time.Clock().tick(60)/1000):
 		self.pos += self.velocity * dt

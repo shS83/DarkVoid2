@@ -133,6 +133,7 @@ class Player(pg.sprite.Sprite):
         self.default_fire_cooldown2 = self.fire_cooldown2
         self.default_speed = self.speed
         self.super_speed = False
+        self.bullets_piercing = False
 
     def make_flash_image(self, image):
         flash = pg.Surface(image.get_size(), pg.SRCALPHA)
@@ -337,7 +338,7 @@ class Player(pg.sprite.Sprite):
             self.power_timer = 12.0
 
         elif kind == "speed":
-            self.super_speed = 1200
+            self.super_speed = 800
             self.power_timer = 12.0
 
         elif kind == "laser":
@@ -353,7 +354,7 @@ class Player(pg.sprite.Sprite):
             self.fire_cooldown = 0.001
 
         elif kind == "piercing":
-            self.bullet.piercing = True
+            self.bullets_piercing = True
             self.power_timer = 25.0
 
         elif kind == "health":
@@ -494,7 +495,7 @@ class Player(pg.sprite.Sprite):
     def reset_powerups(self):
         self.shoot_mode = "normal"
         self.railgun_active = False
-        self.bullet.piercing = False
+        self.bullets_piercing = False
         self.speed = self.default_speed
         self.fire_cooldown = self.default_fire_cooldown
         self.fire_cooldown2 = self.default_fire_cooldown2

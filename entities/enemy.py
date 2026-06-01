@@ -8,7 +8,7 @@ from entities.particle import Particle
 from entities.bullet import EnemyBullet, RedPellet, BlueLaser
 from entities.thruster_particle import ThrusterParticle
 from entities.powerup import PowerUp
-
+import math
 
 class Enemy(pg.sprite.Sprite):
 	def __init__(self, game, pos, weapon_type:str = "normal" or "red_pellet" or "blue_laser", hp=5, shoot_delay=1.0, shoot_timer=1.4, name="Fred Grunt", image=pg.image.load(Path(c.HOME_DIR, "assets", "ships", "redhawk.png")), boss=False):
@@ -148,7 +148,6 @@ class Enemy(pg.sprite.Sprite):
 		self.hp = enemy_data.get("hp", 5)
 		self.shoot_timer = enemy_data.get("shoot_timer", 1.0)
 		self.shoot_delay = enemy_data.get("shoot_delay", 1.4)
-		self.mask = pg.mask.from_surface(self.image)
 
 		if c.BOSS_TIME:
 			self.boss_time = True
@@ -171,10 +170,13 @@ class Enemy(pg.sprite.Sprite):
 		self.pos = pg.Vector2(self.rect.center)
 		self.speed = 80
 		self.hp = 5
-		self.rotation = 180
+		self.rotation = 0
+		self.rotation_offset = 90
+		self.aim_direction = pg.Vector2(0, 1)
+		self.mask = pg.mask.from_surface(self.image)
 
 		if c.BOSS_TIME:
-			self.hp = c.level.boss_hp
+			self.hp = self.game.level.boss_hp
 			self.speed = 40
 
 	def make_flash_image(self, image):
@@ -189,37 +191,60 @@ class Enemy(pg.sprite.Sprite):
 
 		return flash
 
-	def update(self, dt):
-		self.pos.y += self.speed * dt
+	def get_direction_to_player(self):
 		direction = self.game.player.pos - self.pos
 
 		if direction.length_squared() == 0:
-			direction = pg.Vector2(0, 1)
+			return pg.Vector2(0, 1)
+
+		return direction.normalize()
+
+	def get_rotation_from_direction(self, direction):
+		angle = -math.degrees(
+			math.atan2(direction.y, direction.x)
+		)
+
+		return angle + self.rotation_offset
+
+	def spawn_thruster(self):
+		forward = self.aim_direction
+
+		if forward.length_squared() == 0:
+			forward = pg.Vector2(0, 1)
 		else:
-			direction = direction.normalize()
-		self.rotation = direction.angle_to(self.game.player.pos)
-		self.mask = pg.mask.from_surface(self.image)
+			forward = forward.normalize()
 
-		self.rect = self.image.get_rect(center=self.pos)
-		self.hitbox = self.rect.inflate(-40, -40)
-		self.rect.center = self.pos
-		self.hitbox.center = self.rect.center
+		rear_direction = -forward
+
+		rear_distance = max(
+			self.base_image.get_width(),
+			self.base_image.get_height()
+		) * 0.32
+
+		rear_pos = self.pos + rear_direction * rear_distance
+
+		particle = ThrusterParticle(
+			self.game,
+			rear_pos,
+			direction=rear_direction,
+			color=(255, 120, 40)
+		)
+
+		self.game.effects.add(particle)
+		self.game.all_sprites.add(particle)
+
+	def update(self, dt):
+		self.pos.y += self.speed * dt
+
+		self.aim_direction = self.get_direction_to_player()
+		self.rotation = self.get_rotation_from_direction(self.aim_direction)
+
 		self.shoot_timer -= dt
-
 		self.thruster_timer -= dt
 
 		if self.thruster_timer <= 0:
 			self.thruster_timer = 0.04
-
-			particle = ThrusterParticle(
-				self.game,
-				self.rect.midtop,
-				direction=(0, -1),
-				color=(255, 120, 40)
-			)
-
-			self.game.effects.add(particle)
-			self.game.all_sprites.add(particle)
+			self.spawn_thruster()
 
 		if self.shoot_timer <= 0:
 			self.shoot_timer = self.shoot_delay
@@ -236,9 +261,11 @@ class Enemy(pg.sprite.Sprite):
 			self.rotation,
 			1
 		)
-		self.rect.center = self.pos
+
+		self.rect = self.image.get_rect(center=self.pos)
+		self.hitbox = self.rect.inflate(-56, -56)
 		self.mask = pg.mask.from_surface(self.image)
-		self.hitbox.center = self.rect.center
+
 		if self.rect.top > c.HEIGHT:
 			self.kill()
 
@@ -284,9 +311,9 @@ class Enemy(pg.sprite.Sprite):
 		self.hp -= amount
 		self.flash_timer = 0.005
 		pg.mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "clink.wav")).play()
-		COLORS = [(255, 0, 0), (255, 120, 40), (255, 255, 0), (255, 0, 255),
-		          (0, 255, 255), (255, 255, 255)]
-		colors = random.choice(COLORS)
+		damage_colors = [(255, 0, 0), (255, 255, 0), (255, 255, 255), (0, 0, 0)]
+		colors = random.choice(damage_colors)
+
 		for _ in range(50):
 			particle = Particle(self.game, self.rect.center, colors)
 			self.game.effects.add(particle)
