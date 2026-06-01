@@ -2,6 +2,8 @@ import math
 import pygame as pg
 from game import Game
 from pathlib import Path
+import random
+
 
 def _load_font(path, size, fallback=None):
     if Path(path).exists():
@@ -74,6 +76,9 @@ def alpha():
                         pg.mixer.music.fadeout(500)
                         return True
 
+                    if event.key == pg.K_F1:
+                        show_controls(screen, subtitle_font, prompt_font)
+
                     if event.key == pg.K_ESCAPE:
                         return False
 
@@ -130,7 +135,7 @@ def alpha():
 
             if fade_in >= 1:
                 prompt_alpha = 150 + int(math.sin(elapsed * 4.0) * 80)
-                prompt = prompt_font.render("press SPACE to avoid", True, (210, 230, 255))
+                prompt = prompt_font.render("press SPACE to avoid or F1 for controls", True, (210, 230, 255))
                 prompt.set_alpha(prompt_alpha)
                 prompt_rect = prompt.get_rect(center=(x_res // 2, y_res - 120))
                 screen.blit(prompt, prompt_rect)
@@ -154,8 +159,61 @@ def run_app():
     pg.mixer.quit()
 
 
-if __name__ == "__main__":
-    run_app()
+def show_controls(screen, bigfont, font):
+    r = 255
+    r_d = -1
+    running = True
+    clock = pg.time.Clock()
+
+    def randomize():
+        randomizer = random.choice(([r, random.choice([0, r, 255]), random.choice([r, random.choice([0, r, 255])]),
+                             random.choice([r, random.choice([0, r, 255])])]))
+        pat = (random.choice([(255, 0, randomizer), (255, 0, randomizer), (255, 0, randomizer)]))
+        print(pat)
+        return pat
+
+    def colorize():
+        text = []
+        pattern = randomize()
+        text.append(font.render("WASD or Arrows - Move the ship.", True, pattern))
+        pattern = randomize()
+        text.append(font.render("SPACE or Mouse button 1 - Fire main gun.", True, pattern))
+        pattern = randomize()
+        text.append(font.render("Mouse button 2 - Fire Vulcan cannon.", True, pattern))
+        pattern = randomize()
+        text.append(font.render("Left CTRL - Railgun if railgun powerup has been received.", True, pattern))
+        pattern = randomize()
+        text.append(font.render("Left ALT - Shield if shield powerup has been received.", True, pattern))
+        pattern = randomize()
+        text.append(font.render("Left SHIFT - Focus moving mode.", True, pattern))
+        pattern = randomize()
+        text.append(font.render("SPACE - Exit the controls screen.", True, pattern))
+        pattern = randomize()
+        text.append(font.render("ESC - Quit!", True, pattern))
+        return text
+
+    while running:
+        text = colorize()
+        screen.fill((0, 0, 0, 255))
+        major_text = bigfont.render("Control instructions:", True, (255, 255, 255))
+
+        screen.blit(major_text, (1920 // 2 - major_text.get_width() // 2, 200))
+        for i, t in enumerate(text):
+            screen.blit(t, (1920 // 2 - 500, 350 + i * 60))
+
+        r += r_d
+        if r < 1 or r > 254:
+            r_d = -r_d
+        for event in pg.event.get():
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    pg.mixer.quit()
+                    pg.quit()
+                if event.key == pg.K_SPACE:
+                    running = False
+
+        dt = clock.tick(45) / 1000
+        pg.display.flip()
 
 
 if __name__ == "__main__":

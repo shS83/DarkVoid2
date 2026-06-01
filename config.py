@@ -41,6 +41,7 @@ BOSS1 = pg.image.load(resource_path(Path(HOME_DIR, "assets", "ships", "bosses", 
 BOSS2 = pg.image.load(resource_path(Path(HOME_DIR, "assets", "ships", "bosses", "boss-2.png"))).convert_alpha()
 BOSS3 = pg.image.load(resource_path(Path(HOME_DIR, "assets", "ships", "bosses", "foobarhead1.png"))).convert_alpha()
 BOSS4 = pg.image.load(resource_path(Path(HOME_DIR, "assets", "ships", "bosses", "stage4_boss_void_dreadnought_full.png"))).convert_alpha()
+BOSS5 = pg.image.load(resource_path(Path(HOME_DIR, "assets", "ships", "bosses", "stage5_terrain_automaton.png"))).convert_alpha()
 ROCK1 = pg.image.load(
     resource_path(Path(HOME_DIR, "assets", "rocks", "rock_1.png"))
 ).convert_alpha()
@@ -143,7 +144,15 @@ def make_boss_list():
         "boss_hp": 750,
         "boss_time": 6500,
         "boss_image": BOSS4,
-    }
+    },
+        {
+            "name": "Terrain Automaton",
+            "pos": (WIDTH // 2, -300),
+            "lvl": 5,
+            "boss_hp": 900,
+            "boss_time": 7000,
+            "boss_image": BOSS5
+        }
 ]
 
 DEBUG = True

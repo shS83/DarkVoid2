@@ -181,6 +181,7 @@ class Game:
 		self.entering_highscore = False
 		self.highscore_sequence_started = False
 		self.restart_requested = False
+		self.transition_ship_start = None
 
 		for _ in range(200):
 			self.stars.add(Star())
@@ -199,6 +200,8 @@ class Game:
 		self.fade_alpha = 0
 		self.stage_banner_text = None
 		self.earth = None
+		self.transition_ship_start = pg.Vector2(self.player.rect.center)
+		self.player.pos = self.transition_ship_start.copy()
 
 		for group in [
 			self.enemies,
@@ -220,6 +223,7 @@ class Game:
 		self.player.pos = pg.Vector2(center)
 
 	def update_world_transition(self, dt):
+		self.player.image = self.player.base_image
 		self.world_timer += dt
 
 		if self.world_phase == "boss_explosion":
@@ -228,7 +232,7 @@ class Game:
 			if self.world_timer >= 2.0:
 				self.earth = Earth()
 				self.stage_banner_text = "ADVANCING TO TERRAIN"
-				self.stage_banner_timer = 3.0
+				self.stage_banner_timer = 1.4
 				self.world_phase = "earth_enter"
 				self.world_timer = 0
 
@@ -238,13 +242,16 @@ class Game:
 			self.earth.update(dt)
 
 			if self.earth.rect.centery >= c.HEIGHT // 2 - 2:
+				self.stage_banner_timer = 0
+				self.stage_banner_text = None
 				self.world_phase = "ship_grow"
 				self.world_timer = 0
 
 		elif self.world_phase == "ship_grow":
 			t = min(1, self.world_timer / 0.8)
 			scale = c.PLAYER_SCALE + (0.22 - c.PLAYER_SCALE) * t
-			self.player.rebuild_visuals(scale, self.player.pos)
+			self.player.rebuild_visuals(scale, self.transition_ship_start)
+			self.player.pos = self.transition_ship_start.copy()
 
 			if t >= 1:
 				self.world_phase = "ship_to_earth"
@@ -295,6 +302,16 @@ class Game:
 		elif self.world_phase == "terrain":
 			self.map_manager.update(dt)
 			self.all_sprites.update(dt)
+			self.enemy_spawn_timer += dt
+			if (
+					self.enemy_spawn_timer >= self.enemy_spawn_delay
+					and len(self.enemies) < self.level.max_enemies
+			):
+				self.enemy_spawn_timer = 0
+				self.enemy_spawn_delay = random.uniform(0.35, 1.7)
+				self.spawn_enemy()
+
+			self.handle_collisions()
 
 	def damage_player(self, killer="Hermaeus Mora"):
 		if not self.player.alive:
@@ -376,7 +393,7 @@ class Game:
 
 	def spawn_enemy(self):
 		c.NEXTBOSS: dict | None = None
-		if random.random() < 0.15:
+		if self.level.stage < 5 and random.random() < 0.15:
 			self.spawn_rocks()
 
 		clock = pg.time.Clock()
@@ -498,7 +515,7 @@ class Game:
 				self.asteroid_spawn_timer = 0
 				self.asteroid_spawn_delay = random.uniform(0.40, 3.2)
 
-				if len(self.asteroids) < self.level.max_asteroids:
+				if self.level.stage < 5 and len(self.asteroids) < self.level.max_asteroids:
 					self.spawn_asteroid()
 
 			if self.ending_active:
