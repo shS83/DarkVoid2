@@ -2,14 +2,32 @@
     {
         "name": "shS",
         "score": 31150,
-        "level": 5,
-        "killed_by": "the Illithids"
+        "level": 4,
+        "killed_by": "No-one"
     },
     {
         "name": "shS",
         "score": 30500,
-        "level": 5,
-        "killed_by": "the Illithids"
+        "level": 4,
+        "killed_by": "No-one"
+    },
+    {
+        "name": "shS",
+        "score": 29300,
+        "level": 4,
+        "killed_by": "No-one"
+    },
+    {
+        "name": "shS",
+        "score": 29300,
+        "level": 4,
+        "killed_by": "No-one"
+    },
+    {
+        "name": "shS",
+        "score": 27850,
+        "level": 4,
+        "killed_by": "No-one"
     },
     {
         "name": "shS",
@@ -40,23 +58,5 @@
         "score": 7500,
         "level": 2,
         "killed_by": "Turbo"
-    },
-    {
-        "name": "shS",
-        "score": 7200,
-        "level": 2,
-        "killed_by": "Fred Grunt"
-    },
-    {
-        "name": "shS",
-        "score": 7200,
-        "level": 2,
-        "killed_by": "the Illithids"
-    },
-    {
-        "name": "shS",
-        "score": 7100,
-        "level": 2,
-        "killed_by": "the Illithids"
     }
 ]

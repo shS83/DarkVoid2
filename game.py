@@ -20,16 +20,29 @@ import config as c
 
 def mixing():
 	mixer.init()
-	tunes = ["1000 Handz - Reps.mp3", "1000 Handz - Announcement.mp3", "1000 Handz - No Option.mp3",
-	         "Colorcast - Coffee Break.mp3", "Colorcast - Drown.mp3", "Colorcast - Need.mp3",
-	         "Jahzzar - Forest Pan.mp3", "Jahzzar - Pink Fluid.mp3", "Lightning Traveler - Celestial Drift.mp3",
-	         "Lightning Traveler - Eclipse Horizon.mp3", "Lightning Traveler - Event Horizon.mp3",
-	         "Lightning Traveler - Lunar Echo.mp3", "Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3"]
-	mixer.music.load(c.resource_path(Path(c.HOME_DIR, "assets", "audio", random.choice(tunes))))
+	tunes = [
+		"1000 Handz - Reps.mp3",
+		"1000 Handz - Announcement.mp3",
+		"1000 Handz - No Option.mp3",
+		"Colorcast - Coffee Break.mp3",
+		"Colorcast - Drown.mp3",
+		"Colorcast - Need.mp3",
+		"Jahzzar - Forest Pan.mp3",
+		"Jahzzar - Pink Fluid.mp3",
+		"Lightning Traveler - Celestial Drift.mp3",
+		"Lightning Traveler - Eclipse Horizon.mp3",
+		"Lightning Traveler - Event Horizon.mp3",
+		"Lightning Traveler - Lunar Echo.mp3",
+		"Ov Moi Omm - The Dictator’s Transmission (YSMHB).mp3",
+	]
+	mixer.music.load(
+		c.resource_path(Path(c.HOME_DIR, "assets", "audio", random.choice(tunes)))
+	)
 	mixer.music.play(-1)
 	mixer.init(48000, -16, 2, 4096)
 	mixer.music.set_volume(0.2)
 	mixer.set_num_channels(32)
+
 
 class Game:
 	def __init__(self):
@@ -39,10 +52,8 @@ class Game:
 		self.level.stage = 1
 		c.event = Event.INITIATION
 		c.HOME_DIR = Path(__file__).parent.absolute()
-		self.bosses=[]
-		self.highscores = HighScoreTable(
-			Path(c.HOME_DIR, "highscores.json")
-		)
+		self.bosses = []
+		self.highscores = HighScoreTable(Path(c.HOME_DIR, "highscores.json"))
 		self.score_saved = False
 		self.screen = pg.display.set_mode((c.WIDTH, c.HEIGHT), pg.SRCALPHA, 32)
 		self.clock = pg.time.Clock()
@@ -75,25 +86,45 @@ class Game:
 		self.asteroid_spawn_delay = random.uniform(5, 20)
 		self.rock_images = []
 		for i in range(1, 5):
-			img = pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "rocks", f"rock_{i}.png"))).convert_alpha()
+			img = pg.image.load(
+				c.resource_path(Path(c.HOME_DIR, "assets", "rocks", f"rock_{i}.png"))
+			).convert_alpha()
 			self.rock_images.append(img)
 		for i in range(1, 32):
-			img = pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "explosions", f"exp_{i}.png"))).convert_alpha()
+			img = pg.image.load(
+				c.resource_path(
+					Path(c.HOME_DIR, "assets", "explosions", f"exp_{i}.png")
+				)
+			).convert_alpha()
 			img = pg.transform.scale(img, (320, 320))
 			self.explosion_frames.append(img)
 		for i in range(1, 32):
-			img = pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "explosions", f"exp_{i}.png"))).convert_alpha()
+			img = pg.image.load(
+				c.resource_path(
+					Path(c.HOME_DIR, "assets", "explosions", f"exp_{i}.png")
+				)
+			).convert_alpha()
 			img = pg.transform.scale(img, (640, 640))
 			self.boss_explosion_frames.append(img)
-		self.background = pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "backgrounds", "space_background.png"))).convert()
+		self.background = pg.image.load(
+			c.resource_path(
+				Path(c.HOME_DIR, "assets", "backgrounds", "space_background.png")
+			)
+		).convert()
 		self.background = pg.transform.scale(self.background, (c.WIDTH, c.HEIGHT))
 		self.direction = 1
 		self.px = c.WIDTH // 2
 		self.py = -42
 		self.dt = 0
 		self.all_sprites = pg.sprite.LayeredUpdates()
-		self.game_over_font = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "JetBrainsMonoNerdFont-SemiBold.ttf"), 96)
-		self.stage_font = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "JetBrainsMonoNerdFont-SemiBold.ttf"), 96)
+		self.game_over_font = pg.font.Font(
+			Path(c.HOME_DIR, "assets", "fonts", "JetBrainsMonoNerdFont-SemiBold.ttf"),
+			96,
+		)
+		self.stage_font = pg.font.Font(
+			Path(c.HOME_DIR, "assets", "fonts", "JetBrainsMonoNerdFont-SemiBold.ttf"),
+			96,
+		)
 		self.stage_banner_duration = 2.4
 		self.final_banner_timer = 20
 		self.stage_banner_timer = self.stage_banner_duration
@@ -105,10 +136,22 @@ class Game:
 		self.gameoversound_played = False
 		self.show_highscores = False
 		self.victory = False
-		self.nerd_font = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 128)
-		self.medium_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 56)
-		self.small_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 20)
-		self.tiny_nerd = pg.font.Font(Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"), 16)
+		self.nerd_font = pg.font.Font(
+			Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"),
+			128,
+		)
+		self.medium_nerd = pg.font.Font(
+			Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"),
+			56,
+		)
+		self.small_nerd = pg.font.Font(
+			Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"),
+			20,
+		)
+		self.tiny_nerd = pg.font.Font(
+			Path(c.HOME_DIR, "assets", "fonts", "MonaspiceXeNerdFontPropo-Light.otf"),
+			16,
+		)
 		self.game_over_text = self.nerd_font.render("YOU DIED", True, (255, 40, 40))
 		self.player = Player(self, (c.WIDTH // 2, c.HEIGHT - 90))
 		self.all_sprites.add(self.player)
@@ -192,7 +235,9 @@ class Game:
 
 	def spawn_rocks(self):
 		for _ in range(8):
-			asteroid = Meteor(self, (random.randint(0, c.WIDTH), random.randrange(-150, -50)))
+			asteroid = Meteor(
+				self, (random.randint(0, c.WIDTH), random.randrange(-150, -50))
+			)
 			x = random.randint(50, c.WIDTH - 50)
 			y = -100
 
@@ -204,7 +249,10 @@ class Game:
 			for asteroid in self.asteroids:
 				if test_rect.colliderect(asteroid.rect.inflate(20, 20)):
 					overlap = True
-				if self.player.rect.colliderect(asteroid.rect) and not self.player.invincible_timer > 0:
+				if (
+					self.player.rect.colliderect(asteroid.rect)
+					and not self.player.invincible_timer > 0
+				):
 					self.damage_player(killer="The Rock")
 					break
 
@@ -213,7 +261,6 @@ class Game:
 				self.asteroids.add(asteroid)
 				self.all_sprites.add(asteroid)
 				return
-
 
 	def spawn_enemy(self):
 		c.NEXTBOSS: dict | None = None
@@ -236,7 +283,10 @@ class Game:
 			for enemy in self.enemies:
 				if test_rect.colliderect(enemy.rect.inflate(20, 20)):
 					overlap = True
-				if self.player.rect.colliderect(enemy.rect) and not self.player.invincible_timer > 0:
+				if (
+					self.player.rect.colliderect(enemy.rect)
+					and not self.player.invincible_timer > 0
+				):
 					self.damage_player(killer=f"Collision with {enemy.name}")
 					break
 
@@ -269,8 +319,10 @@ class Game:
 
 		print(f"Boss spawned: {name}, lvl={lvl}, hp={hp}, pos={pos}")
 
-
-		if self.player.rect.colliderect(self.boss.rect) and not self.player.invincible_timer > 0:
+		if (
+			self.player.rect.colliderect(self.boss.rect)
+			and not self.player.invincible_timer > 0
+		):
 			self.damage_player(killer=self.boss.name)
 		return self.boss
 
@@ -313,8 +365,8 @@ class Game:
 			self.enemy_spawn_timer += dt
 
 			if (
-					self.enemy_spawn_timer >= self.enemy_spawn_delay
-					and len(self.enemies) < self.level.max_enemies
+				self.enemy_spawn_timer >= self.enemy_spawn_delay
+				and len(self.enemies) < self.level.max_enemies
 			):
 				self.enemy_spawn_timer = 0
 				self.enemy_spawn_delay = random.uniform(0.4, 3.0)
@@ -333,17 +385,14 @@ class Game:
 				self.ending_timer += dt
 
 				if (
-						self.ending_timer >= self.highscore_delay
-						and not self.highscore_sequence_started
+					self.ending_timer >= self.highscore_delay
+					and not self.highscore_sequence_started
 				):
 					self.highscore_sequence_started = True
 					self.show_highscores = True
 					self.start_highscore_entry()
 
-			if (
-					self.level_timer >= self.boss_spawn_delay
-					and self.boss is None
-			):
+			if self.level_timer >= self.boss_spawn_delay and self.boss is None:
 				if c.BOSS:
 					boss_dict = c.BOSS.pop(0)
 					self.boss_spawn(
@@ -394,10 +443,7 @@ class Game:
 	def draw_ending_banner(self):
 		if not self.ending_active:
 			return
-		if not self.level.stage == 5:
-			self.draw_game_over()
-			return
-		if not self.player.alive and not self.victory:
+		if self.game_over and not self.victory:
 			self.draw_game_over()
 			return
 
@@ -427,25 +473,21 @@ class Game:
 			self.killed_by = "No-one"
 		else:
 			main_text = "YOU DIED"
-			sub_text = f"YOU HAVE BEEN HUMILIATED BY {self.killed_by or self.player.killed_by}"
+			sub_text = (
+				f"YOU HAVE BEEN HUMILIATED BY {self.killed_by or self.player.killed_by}"
+			)
 			self.draw_game_over()
 
 		self.screen.blit(banner, (0, banner_y))
 
-		pg.draw.line(
-			self.screen,
-			frame_color,
-			(0, banner_y),
-			(c.WIDTH, banner_y),
-			10
-		)
+		pg.draw.line(self.screen, frame_color, (0, banner_y), (c.WIDTH, banner_y), 10)
 
 		pg.draw.line(
 			self.screen,
 			frame_color,
 			(0, banner_y + banner_height),
 			(c.WIDTH, banner_y + banner_height),
-			10
+			10,
 		)
 
 		text = self.nerd_font.render(main_text, True, main_color)
@@ -455,6 +497,8 @@ class Game:
 		sub = self.medium_nerd.render(sub_text, True, sub_color)
 		sub_rect = sub.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2 + 80))
 		self.screen.blit(sub, sub_rect)
+
+	pg.display.flip()
 
 	def draw_stage_banner(self):
 		if self.stage_banner_timer <= 0:
@@ -469,7 +513,9 @@ class Game:
 		white_rect = pg.Rect(0, 10, c.WIDTH, 120)
 		pg.draw.rect(banner, (255, 255, 255, alpha), white_rect)
 
-		stage_text = self.stage_font.render(f"STAGE {self.level.stage}", True, (0, 0, 0))
+		stage_text = self.stage_font.render(
+			f"STAGE {self.level.stage}", True, (0, 0, 0)
+		)
 		stage_text.set_alpha(alpha)
 		stage_rect = stage_text.get_rect(center=(c.WIDTH // 2, banner_height // 2))
 		banner.blit(stage_text, stage_rect)
@@ -477,13 +523,6 @@ class Game:
 		self.screen.blit(banner, (0, c.HEIGHT // 2 - banner_height // 2))
 
 	def draw_game_over(self):
-		if not self.game_over:
-			return
-
-		if self.victory:
-			self.draw_ending_banner()
-			return
-
 		overlay_alpha = min(180, 80 + int(self.game_over_timer * 90))
 		overlay = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
 		overlay.fill((0, 0, 0, overlay_alpha))
@@ -505,12 +544,16 @@ class Game:
 		text = pg.transform.smoothscale_by(self.game_over_text, scale)
 		text_rect = text.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2))
 		self.screen.blit(text, text_rect)
-		small_text = self.small_nerd.render(f"You were humiliated by {self.player.killer or self.killed_by}", True, (255, 255, 255))
-		small_text_rect = small_text.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2 + 100))
+		small_text = self.small_nerd.render(
+			f"You were humiliated by {self.player.killer or self.killed_by}",
+			True,
+			(255, 255, 255),
+		)
+		small_text_rect = small_text.get_rect(
+			center=(c.WIDTH // 2, c.HEIGHT // 2 + 100)
+		)
 		self.screen.blit(small_text, small_text_rect)
-
-		if self.game_over and not self.score_saved:
-			self.end_game(victory=True)
+	pg.display.flip()
 
 	def handle_collisions(self):
 		# Player bullets vs asteroids
@@ -550,9 +593,7 @@ class Game:
 			for bullet in list(self.enemy_bullets):
 				bullet_pos = getattr(bullet, "pos", pg.Vector2(bullet.rect.center))
 				bullet_radius = getattr(
-					bullet,
-					"radius",
-					max(bullet.rect.width, bullet.rect.height) // 2
+					bullet, "radius", max(bullet.rect.width, bullet.rect.height) // 2
 				)
 
 				distance = self.player.pos.distance_to(bullet_pos)
@@ -605,11 +646,7 @@ class Game:
 					break
 
 		# Powerups vs player
-		powerup_hits = pg.sprite.spritecollide(
-			self.player,
-			self.powerups,
-			True
-		)
+		powerup_hits = pg.sprite.spritecollide(self.player, self.powerups, True)
 
 		for powerup in powerup_hits:
 			self.player.apply_powerup(powerup.kind)
@@ -651,7 +688,7 @@ class Game:
 			name=name,
 			score=self.score,
 			level=self.level.stage,
-			killed_by=self.killed_by or self.player.killed_by or "the Illithids"
+			killed_by=self.killed_by or self.player.killed_by or "the Illithids",
 		)
 
 		self.highscore_saved = True
@@ -694,12 +731,15 @@ class Game:
 						if event.key == pg.K_LSHIFT:
 							self.player.speed = self.player.focus_speed
 						if (
-								event.type == pg.KEYDOWN
-								and event.key == pg.K_LALT
-								and self.player.shield_amount > 0
-								and not self.player.shield_active
+							event.type == pg.KEYDOWN
+							and event.key == pg.K_LALT
+							and self.player.shield_amount > 0
+							and not self.player.shield_active
 						):
-							print("Shield activated. Charges left:", self.player.shield_amount)
+							print(
+								"Shield activated. Charges left:",
+								self.player.shield_amount,
+							)
 							self.player.shield_active = True
 							self.player.shield_amount -= 1
 
@@ -723,6 +763,7 @@ class Game:
 
 	pg.quit()
 	mixer.quit()
+
 
 if __name__ == "__main__":
 	game = Game()

@@ -9,4 +9,5 @@ uv run python -m PyInstaller ^
 	--onedir ^
 	--name DarkVoid2 ^
 	--add-data "assets;assets" ^
+	--add-data "highscores.json;highscores.json" ^
 	main.py
