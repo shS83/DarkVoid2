@@ -43,6 +43,12 @@
     },
     {
         "name": "shS",
+        "score": 9050,
+        "level": 2,
+        "killed_by": "Redhawk"
+    },
+    {
+        "name": "shS",
         "score": 8800,
         "level": 2,
         "killed_by": "John Dark Void"
@@ -52,11 +58,5 @@
         "score": 8500,
         "level": 2,
         "killed_by": "John Dark Void"
-    },
-    {
-        "name": "shS",
-        "score": 8250,
-        "level": 2,
-        "killed_by": "the Illithids"
     }
 ]

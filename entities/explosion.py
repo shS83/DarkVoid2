@@ -48,7 +48,7 @@ class Series_of_Explosions(pg.sprite.Sprite):
 					self.rect = self.image.get_rect(center=center)
 					self.rect2 = self.image2.get_rect(midtop=center2)
 			except IndexError:
-				print("boohoo")
+				print("boohoo, the index was errorneous...")
 
 
 class Explosion(pg.sprite.Sprite):
@@ -62,10 +62,7 @@ class Explosion(pg.sprite.Sprite):
 			self.frames = self.game.boss_explosion_frames
 		self.index = 0
 		self.timer = 0
-		if not boss:
-			self.frame_time = 0.045
-		else:
-			self.frame_time = 0.045
+		self.frame_time = 0.045
 
 		self.image = self.frames[self.index]
 		self.rect = self.image.get_rect(center=pos)

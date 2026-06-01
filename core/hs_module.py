@@ -64,7 +64,7 @@ class HighScore:
 					handle.write(scr + "\n")
 				return True
 			except OSError:
-				print("Could not open/read highscore file")
+				print("Could not open/read highscore file!")
 				return False
 
 		def blend_fill(self, screen, fade_to):

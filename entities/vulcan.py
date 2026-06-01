@@ -5,13 +5,14 @@ import config as c
 
 
 class VulcanBullet(pg.sprite.Sprite):
-    def __init__(self, game, pos, velocity, tracer=False):
+    def __init__(self, game, pos, velocity, tracer=False, piercing=False):
         super().__init__()
 
         self.game = game
         self.pos = pg.Vector2(pos)
         self.velocity = pg.Vector2(velocity)
         self.damage = 1
+        self.piercing = piercing
         self.tracer = tracer
 
         if tracer:

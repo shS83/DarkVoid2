@@ -19,7 +19,7 @@ class Player(pg.sprite.Sprite):
         super().__init__()
         pg.mixer.init()
         self.mixer = mixer
-        self.bullet = PlayerBullet(game, pos, velocity=(0, -1000))
+        self.bullet = None
         self.game = game
         self.shoot_mode = "normal"
         self.power_timer = 0
@@ -132,7 +132,7 @@ class Player(pg.sprite.Sprite):
         self.default_fire_cooldown = self.fire_cooldown
         self.default_fire_cooldown2 = self.fire_cooldown2
         self.default_speed = self.speed
-        self.super_speed = False
+        self.super_speed = 700
         self.bullets_piercing = False
 
     def make_flash_image(self, image):
@@ -216,8 +216,6 @@ class Player(pg.sprite.Sprite):
         self.game.effects.add(shield)
         self.game.all_sprites.add(shield)
 
-        print("Shield activated. Charges left:", self.shield_amount)
-
         return True
 
     def shoot_railgun(self):
@@ -246,7 +244,11 @@ class Player(pg.sprite.Sprite):
                 self.image3, (0, 0), special_flags=pg.BLEND_RGBA_MULT | pg.BLEND_ADD
             )
         self.bullet = PlayerBullet(
-            self.game, self.rect.midtop, self.image, velocity=(0, -2000)
+            self.game,
+            self.rect.midtop,
+            self.image,
+            velocity=(0, -2000),
+            piercing=self.bullets_piercing,
         )
 
         if self.fire_timer > 0:
@@ -260,7 +262,12 @@ class Player(pg.sprite.Sprite):
         self.game.all_sprites.add(self.bullet)
 
     def shoot_normal(self):
-        bullet = PlayerBullet(self.game, self.rect.midtop, velocity=(0, -800))
+        bullet = PlayerBullet(
+            self.game,
+            self.rect.midtop,
+            velocity=(0, -800),
+            piercing=self.bullets_piercing,
+        )
         if self.fire_timer > 0:
             return
         if self.rect.y - bullet.rect.y < 0:
@@ -285,7 +292,12 @@ class Player(pg.sprite.Sprite):
         for pos, velocity in bullet_data:
             if self.pos.y + 20 < 0:
                 bullet.kill()
-            bullet = PlayerBullet(self.game, pos, velocity=velocity)
+            bullet = PlayerBullet(
+                self.game,
+                pos,
+                velocity=velocity,
+                piercing=self.bullets_piercing,
+            )
             self.game.player_bullets.add(bullet)
             self.game.all_sprites.add(bullet)
 
@@ -338,7 +350,7 @@ class Player(pg.sprite.Sprite):
             self.power_timer = 12.0
 
         elif kind == "speed":
-            self.super_speed = 800
+            self.game.player.speed = self.super_speed
             self.power_timer = 12.0
 
         elif kind == "laser":
@@ -393,6 +405,7 @@ class Player(pg.sprite.Sprite):
             muzzle,
             velocity,
             tracer=tracer,
+            piercing=self.bullets_piercing,
         )
 
         self.game.player_bullets.add(bullet)
@@ -467,7 +480,6 @@ class Player(pg.sprite.Sprite):
                 else:
                     self.shield_sound.play()
 
-            print("Shield absorbed hit")
             return
 
         self.hit(killer=killer)

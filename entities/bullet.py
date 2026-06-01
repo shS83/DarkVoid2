@@ -10,7 +10,14 @@ from entities.thruster_particle import ThrusterParticle
 c.HOME_DIR = Path(__file__).parent.parent.absolute()
 
 class PlayerBullet(pg.sprite.Sprite):
-	def __init__(self, game, pos, image=pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "laser.png"))).convert_alpha(), velocity=(0, -800)):
+	def __init__(
+		self,
+		game,
+		pos,
+		image=pg.image.load(c.resource_path(Path(c.HOME_DIR, "assets", "laser.png"))).convert_alpha(),
+		velocity=(0, -800),
+		piercing=False
+	):
 		super().__init__()
 		self.image = image
 		self.mask = pg.mask.from_surface(self.image)
@@ -20,10 +27,7 @@ class PlayerBullet(pg.sprite.Sprite):
 		self.velocity = pg.Vector2(velocity)
 		self.damage = 1
 		self.mask = pg.mask.from_surface(self.image)
-		if self.game.player.bullets_piercing:
-			self.piercing = True
-		else:
-			self.piercing = False
+		self.piercing = piercing
 
 	def update(self, dt = pg.time.Clock().tick(60)/1000):
 		self.pos += self.velocity * dt
