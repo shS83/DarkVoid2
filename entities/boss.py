@@ -376,6 +376,7 @@ class Boss(pg.sprite.Sprite):
         if terrain_boss_dead:
             self.game.end_game(victory=True)
             self.game.player.visible = False
+            self.game.highscore_sequence_started = True
         if final_boss_dead:
             self.game.start_world_transition()
         else:
