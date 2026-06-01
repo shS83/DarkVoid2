@@ -26,6 +26,7 @@ FPS = 60
 OVERLAY_TIMER = 5000
 BOSS_SPAWN_DELAY = 30
 PLAYER_SPEED = 500
+PLAYER_SUPER_SPEED = 700
 PLAYER_FOCUS_SPEED = 180
 PLAYER_FIRE_COOLDOWN = 0.08
 PLAYER_FIRE_COOLDOWN2 = 0.10
@@ -35,7 +36,8 @@ ENEMY_BULLET_SPEED = 180
 ENEMY_BULLET_COOLDOWN = 0.01
 PLAYER_BULLET_SPEED = 400
 PLAYER_HITBOX_RADIUS = 24
-
+EARTH = pg.image.load(
+    resource_path(Path(HOME_DIR, "assets", "rocks", "earth.png"))).convert_alpha()
 BOSS1 = pg.image.load(
     resource_path(Path(HOME_DIR, "assets", "ships", "bosses", "dark-crusader.png"))
 ).convert_alpha()

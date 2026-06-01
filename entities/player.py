@@ -12,7 +12,7 @@ from entities.shield import Shield
 from pygame.transform import rotate, smoothscale_by
 import random
 from entities.powerup import PowerUp
-
+from entities import earth
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game, pos):
@@ -131,7 +131,7 @@ class Player(pg.sprite.Sprite):
         self.railgun_duration = 12.0
         self.default_fire_cooldown = self.fire_cooldown
         self.default_fire_cooldown2 = self.fire_cooldown2
-        self.default_speed = self.speed
+        self.default_speed = c.PLAYER_SPEED
         self.super_speed = 700
         self.bullets_piercing = False
 
@@ -350,7 +350,7 @@ class Player(pg.sprite.Sprite):
             self.power_timer = 12.0
 
         elif kind == "speed":
-            self.game.player.speed = self.super_speed
+            self.speed = self.super_speed
             self.power_timer = 12.0
 
         elif kind == "laser":
@@ -561,7 +561,7 @@ class Player(pg.sprite.Sprite):
             if keys[pg.K_LSHIFT]:
                 self.speed = c.PLAYER_FOCUS_SPEED
             if not keys[pg.K_LSHIFT]:
-                self.speed = self.super_speed or self.default_speed
+                self.speed = self.default_speed
             firing_vulcan = mouse[2] or mouse[1]
 
             self.update_vulcan_heat(dt, firing_vulcan)
@@ -588,11 +588,13 @@ class Player(pg.sprite.Sprite):
             if keys[pg.K_F4]:
                 self.game.player.lives = 100
             if keys[pg.K_F5]:
-                ...
+                self.game.earth_updates = True
             if keys[pg.K_F6]:
-                self.game.boss.destroy()
+                if self.game.boss:
+                    self.game.boss.destroy()
             if keys[pg.K_F7]:
-                ...
+                self.game.victory = True
+                self.game.end_game(victory=True)
             if keys[pg.K_F8]:
                 ...
             if keys[pg.K_F9]:

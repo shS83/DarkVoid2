@@ -1,8 +1,6 @@
 import random
-from errno import EOWNERDEAD
-
 from systems.highscores import HighScoreTable
-from icecream import ic
+from entities.earth import Earth
 from pygame import mixer
 import pygame as pg
 from entities.player import Player
@@ -84,6 +82,8 @@ class Game:
 		self.asteroids = pg.sprite.Group()
 		self.asteroid_spawn_timer = 0
 		self.asteroid_spawn_delay = random.uniform(5, 20)
+		self.earth = Earth()
+		self.earth_updates = False
 		self.rock_images = []
 		for i in range(1, 5):
 			img = pg.image.load(
@@ -331,6 +331,9 @@ class Game:
 		self.all_sprites.update(dt)
 		if self.player.intro_active:
 			return
+
+		if self.earth_updates:
+			self.earth.update()
 
 		if self.level.stage != self.stage_banner_stage:
 			self.stage_banner_stage = self.level.stage

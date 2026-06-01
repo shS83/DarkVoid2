@@ -1,7 +1,7 @@
 import random
 import pygame as pg
 import config as c
-
+from pathlib import Path
 
 class MapManager:
     def __init__(self, game):
