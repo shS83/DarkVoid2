@@ -3,16 +3,17 @@ import pygame.gfxdraw
 import random
 import math
 import pygame.transform as tf
-from core.spritegroups import particles_group
+import config as c
 
 x_res = 1920
 y_res = 1080
 NOW_MS = 0
 timer = pygame.time.Clock()
 pygame.init()
-
+particles_group = pygame.sprite.Group()
 
 class Particle(pygame.sprite.Sprite):
+	global particles_group
 	GRAVITY = -7.8
 
 	def __init__(self, x, y, color, direction, tolerance, psizemax, opacitydelta, gravity):
@@ -23,6 +24,7 @@ class Particle(pygame.sprite.Sprite):
 		self.color = color
 		self.size = random.randint(1, psizemax)
 		self.circle = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
+		self.image = pygame.Surface((c.WIDTH, c.HEIGHT), pygame.SRCALPHA)
 		pygame.gfxdraw.aacircle(self.circle, int(self.size / 2), int(self.size / 2), int(self.size / 2 - 1), self.color)
 		pygame.gfxdraw.filled_circle(self.circle, int(self.size / 2), int(self.size / 2), int(self.size / 2 - 1),
 		                             self.color)
@@ -40,7 +42,7 @@ class Particle(pygame.sprite.Sprite):
 		else:
 			self.rotdelta = random.randint(-360, 360)
 			self.rotdeltach = random.randint(1, 10)
-		self.image = self.surface
+		self.image.blit(self.surface, (c.WIDTH // 2, c.HEIGHT // 2))
 		self.opacity = 255
 		self.opacitydelta = random.randint(5, 20) / 10 * opacitydelta
 		# self.opacitydelta = opacitydelta
@@ -93,7 +95,8 @@ class Particle(pygame.sprite.Sprite):
 					self.kill()
 
 	def draw(self, screen):
-		screen.blit(self.image, self.rect)
+		screen.fill((0, 0, 0))
+		screen.blit(self.image, (0, 0))
 
 	def move(self, screen):
 		self.update(screen)
@@ -107,7 +110,11 @@ def add_stream(x, y, amount, color, direction, tolerance, psizemax, opacitydelta
 		else:
 			particles_group.add(Particle(x, y, color, direction, tolerance, psizemax, opacitydelta, gravity))
 
+running = True
+add_stream(700, 700, 90, (255, 180, 0), 180, 10, 12, 0.6)
 
-particles_group.add(add_stream(700, 700, 90, (255, 180, 0), 180, 10, 12, 0.6))
-
-startTime = pygame.time.get_ticks()
+while running:
+	for i in particles_group:
+		i.update(c.screen)
+		i.draw(c.screen)
+	startTime = pygame.time.get_ticks()

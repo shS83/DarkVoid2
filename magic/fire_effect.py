@@ -1,9 +1,6 @@
 import random
 import pygame as pg
 import config as c
-from core.commons import clock
-from core.spritegroups import effects_group, all_sprites
-
 
 class FireEffect(pg.sprite.Sprite):
 	def __init__(self, pos, size=(220, 160), pixel_size=3):
@@ -110,6 +107,8 @@ fire = FireEffect(
 				# self.effects.add(fire)
 				# self.all_sprites.add(fire)
 running=True
+clock = pg.Clock()
+
 while running:
 	dt = clock.tick(60) / 1000
 	for event in pg.event.get():

@@ -1,3 +1,2 @@
-black
 pillow
-pygame
+pygame-ce
