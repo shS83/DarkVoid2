@@ -347,6 +347,9 @@ class Boss(pg.sprite.Sprite):
             self.destroy()
 
     def destroy(self):
+        if getattr(self, "_destroyed", False):
+            return
+        self._destroyed = True
         explosion = Explosion(self.game, self.rect.center, boss=True)
         self.game.effects.add(explosion)
         self.game.all_sprites.add(explosion)
@@ -375,9 +378,7 @@ class Boss(pg.sprite.Sprite):
 
         if terrain_boss_dead:
             self.game.end_game(victory=True)
-            self.game.player.visible = False
-            self.game.highscore_sequence_started = True
-        if final_boss_dead:
+        elif final_boss_dead:
             self.game.start_world_transition()
         else:
             self.game.level.up()

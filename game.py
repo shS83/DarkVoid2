@@ -12,8 +12,8 @@ from entities.asteroid import Meteor
 from entities.level import Level
 from entities.events import Event
 from pathlib import Path
-from entities.shield import Shield
 from systems.world_manager import MapManager
+from ui.developer_console import DeveloperConsole
 import config as c
 import math
 
@@ -186,6 +186,11 @@ class Game:
 		for _ in range(200):
 			self.stars.add(Star())
 
+		console_font = pg.font.Font(
+			Path(c.HOME_DIR, "assets", "fonts", "JetBrainsMonoNerdFont-SemiBold.ttf"), 24
+		)
+		self.console = DeveloperConsole(self, console_font)
+
 	@staticmethod
 	def play_sound(sound, volume=1.0):
 		channel = pg.mixer.find_channel(True)
@@ -193,6 +198,124 @@ class Game:
 		if channel:
 			sound.set_volume(volume)
 			channel.play(sound)
+
+	def execute_console_command(self, command):
+		parts = command.lower().split()
+		if not parts:
+			return ""
+		if parts == ["help"]:
+			return ("god | impulse 9 | warp <stage> | powerup <type> | clear\n"
+					"Powerups: shield, speed, health, spread, laser, cannon, piercing")
+		if parts[0] == "god":
+			if len(parts) != 1:
+				raise ValueError("Usage: god")
+			self.player.godmode = not self.player.godmode
+			return "God mode " + ("ON" if self.player.godmode else "OFF")
+		if parts[0] == "impulse":
+			if parts != ["impulse", "9"]:
+				raise ValueError("Usage: impulse 9")
+			powerup = random.choice(["spread", "laser", "cannon", "piercing"])
+			self.player.apply_powerup(powerup)
+			self.player.vulcan_unlimited = True
+			self.player.vulcan_heat = 0.0
+			self.player.vulcan_overheated = False
+			self.player.vulcan_timer = 0
+			return "Weapon upgrade: " + powerup + "\nVulcan cooling disabled"
+		if parts[0] == "powerup":
+			kinds = ("shield", "speed", "health", "spread", "laser", "cannon", "piercing")
+			if len(parts) != 2 or parts[1] not in kinds:
+				raise ValueError("Usage: powerup <" + "|".join(kinds) + ">")
+			kind = parts[1]
+			shields_before = self.player.shield_amount
+			self.player.apply_powerup(kind)
+			if kind == "shield":
+				added = self.player.shield_amount - shields_before
+				return f"Shield charges: +{added} (total {self.player.shield_amount})"
+			return "Powerup granted: " + kind
+		if parts[0] == "warp":
+			if len(parts) != 2:
+				raise ValueError("Usage: warp <stage>")
+			try:
+				stage = int(parts[1])
+			except ValueError:
+				raise ValueError("Stage must be an integer") from None
+			self.warp_to_stage(stage)
+			return f"STAGE {stage}"
+		raise ValueError("Unknown command. Type help for commands.")
+
+	def warp_to_stage(self, stage):
+		bosses = c.make_boss_list()
+		if stage not in {boss["lvl"] for boss in bosses}:
+			raise ValueError(f"Stage must be between 1 and {max(boss['lvl'] for boss in bosses)}")
+		level = Level()
+		for _ in range(stage - 1):
+			level.up()
+		map_manager = MapManager(self) if stage > c.SPACE_FINAL_BOSS_LEVEL else None
+
+		for group in (
+			self.enemies, self.boss_group, self.asteroids, self.enemy_bullets,
+			self.player_bullets, self.powerups, self.effects,
+		):
+			for sprite in list(group):
+				sprite.kill()
+		self.level = level
+		c.BOSS = [boss for boss in bosses if boss["lvl"] >= stage]
+		c.BOSS_TIME = False
+		if c.event != Event.PAUSE:
+			c.event = Event.PLAYING
+		self.boss = None
+		self.bosses.clear()
+		self.boss_time = False
+		self.boss_timer = level.boss_timer
+		c.BOSS_TIMER = self.boss_timer
+		self.boss_spawned_this_level = False
+		self.boss_spawn_delay = c.BOSS_SPAWN_DELAY
+		self.level_timer = 0
+		self.enemy_spawn_timer = 0
+		self.asteroid_spawn_timer = 0
+		self.map_manager = map_manager
+		self.world_phase = "terrain" if map_manager is not None else "space"
+		self.world_timer = 0
+		self.fade_alpha = 0
+		self.earth_updates = False
+		self.transition_ship_start = None
+		self.stage_banner_text = None
+		self.stage_banner_stage = stage
+		self.stage_banner_timer = self.stage_banner_duration
+		self.game_over = False
+		self.game_over_timer = 0
+		self.gameoversound_played = False
+		self.victory = False
+		self.ending_active = False
+		self.ending_timer = 0
+		self.highscore_sequence_started = False
+		self.show_highscores = False
+		self.entering_highscore = False
+		self.highscore_name = ""
+		self.highscore_saved = False
+		self.score_saved = False
+		self.killed_by = None
+		self.restart_requested = False
+		self.player.alive = True
+		self.player.visible = True
+		self.player.lives = max(1, self.player.lives) if self.player.lives > 0 else c.PLAYER_LIVES
+		self.player.killer = "No-one"
+		self.player.killed_by = None
+		self.player.intro_active = False
+		self.player.intro_done = True
+		self.player.current_scale = c.PLAYER_SCALE
+		self.player.shield_active = False
+		self.player.invincible_timer = 1.2
+		self.player.flash_toggle_timer = 0
+		self.player.pos = pg.Vector2(c.WIDTH // 2, c.HEIGHT - 120)
+		self.player.rebuild_visuals(c.PLAYER_SCALE, self.player.pos)
+		self.player.hitbox = self.player.rect.inflate(-96, -96)
+		self.player.hitbox_radius = max(1, self.player.hitbox.width // 2)
+		self.player.hitbox_template = self.player.base_image.get_bounding_rect(min_alpha=24).inflate(-18, -18)
+		self.player.mask = pg.mask.from_surface(self.player.base_image)
+		self.all_sprites.add(self.player)
+		if not self.console.open:
+			pg.key.stop_text_input()
 
 	def start_world_transition(self):
 		self.world_phase = "boss_explosion"
@@ -309,6 +432,8 @@ class Game:
 		elif self.world_phase == "terrain":
 			self.map_manager.update(dt)
 			self.all_sprites.update(dt)
+			if self.game_over or self.ending_active:
+				return
 			self.enemy_spawn_timer += dt
 			if (
 					self.enemy_spawn_timer >= self.enemy_spawn_delay
@@ -330,29 +455,21 @@ class Game:
 						hp=boss_dict.get("boss_hp", self.level.boss_hp),
 						pos=boss_dict.get("pos", (c.WIDTH // 2, -160)),
 					)
-			print("terrain", self.level_timer, self.boss_spawn_delay, len(c.BOSS), c.BOSS_TIME, self.boss)
-
 			self.handle_collisions()
 
 	def damage_player(self, killer="Hermaeus Mora"):
 		if not self.player.alive:
-			self.player.killer = killer
 			return
 
 		if hasattr(self.player, "receive_hit"):
-			self.player.receive_hit(killer=self.player.killer)
+			self.player.receive_hit(killer=killer)
 		else:
-			self.player.hit(killer=self.player.killer)
+			self.player.hit(killer=killer)
 
 		if self.player.lives <= 0 or not self.player.alive:
 			self.player.alive = False
+			self.killed_by = killer
 			self.end_game(victory=False)
-
-			if self.highscores.is_high_score(self.score):
-				self.entering_highscore = True
-				self.highscore_name = ""
-			else:
-				self.highscore_saved = True
 
 	def bullet_hits_target(self, bullet, target):
 		target_hitbox = getattr(target, "hitbox", target.rect)
@@ -478,6 +595,22 @@ class Game:
 		return self.boss
 
 	def update(self, dt):
+		if self.console.active:
+			return
+
+		# Every world reaches the same ending and name-entry sequence.
+		if self.game_over or self.ending_active or not self.player.alive:
+			if not self.ending_active:
+				self.end_game(victory=self.victory)
+			self.effects.update(dt)
+			self.game_over_timer += dt
+			self.ending_timer += dt
+			if self.ending_timer >= self.highscore_delay and not self.highscore_sequence_started:
+				self.highscore_sequence_started = True
+				self.show_highscores = True
+				self.start_highscore_entry()
+			return
+
 		if self.world_phase != "space":
 			self.update_world_transition(dt)
 			self.update_stage_banner(dt)
@@ -485,6 +618,8 @@ class Game:
 
 		self.stars.update(dt)
 		self.all_sprites.update(dt)
+		if self.game_over or self.ending_active:
+			return
 		if self.player.intro_active:
 			return
 
@@ -498,25 +633,6 @@ class Game:
 
 		if self.stage_banner_timer > 0:
 			self.stage_banner_timer = max(0, self.stage_banner_timer - dt)
-
-		if self.game_over:
-			self.game_over_timer += dt
-
-			if self.ending_active:
-				self.ending_timer += dt
-
-				if (
-					self.ending_timer >= self.highscore_delay
-					and not self.highscore_sequence_started
-				):
-					self.highscore_sequence_started = True
-					self.show_highscores = True
-					self.start_highscore_entry()
-			return
-
-		if not self.player.alive:
-			self.end_game(victory=False)
-			return
 
 		if not c.BOSS_TIME and self.boss is None:
 			self.level_timer += dt
@@ -539,17 +655,6 @@ class Game:
 
 				if self.level.stage < 5 and len(self.asteroids) < self.level.max_asteroids:
 					self.spawn_asteroid()
-
-			if self.ending_active:
-				self.ending_timer += dt
-
-				if (
-					self.ending_timer >= self.highscore_delay
-					and not self.highscore_sequence_started
-				):
-					self.highscore_sequence_started = True
-					self.show_highscores = True
-					self.start_highscore_entry()
 
 			if self.level_timer >= self.boss_spawn_delay and self.boss is None:
 				if c.BOSS:
@@ -587,17 +692,17 @@ class Game:
 				pg.draw.rect(self.screen, (255, 0, 0), self.boss.hitbox, 3)
 			pg.draw.rect(self.screen, (255, 0, 0), self.player.hitbox, 3)
 
-		self.draw_stage_banner()
+		if not self.ending_active:
+			self.draw_stage_banner()
 
-		if self.ending_active:
+		if self.ending_active and not self.show_highscores:
 			self.draw_ending_banner()
 		if self.show_highscores:
 			self.hud.draw_highscores(self.screen)
 
-		if c.event == Event.PAUSE:
+		if c.event == Event.PAUSE and not self.console.active:
 			pausesurface = pg.Surface((c.WIDTH, c.HEIGHT), pg.SRCALPHA)
 			pausesurface.fill((0, 0, 0, 120))
-			mixer.fadeout(1000)
 			pausetext = self.game_over_font.render("| |", True, (255, 255, 255))
 			pause_rect = pausetext.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2))
 			pausesurface.blit(pausetext, pause_rect)
@@ -608,6 +713,7 @@ class Game:
 			overlay.fill((0, 0, 0, self.fade_alpha))
 			self.screen.blit(overlay, (0, 0))
 
+		self.console.draw(self.screen)
 		pg.display.flip()
 
 	def draw_ending_banner(self):
@@ -668,8 +774,6 @@ class Game:
 		sub_rect = sub.get_rect(center=(c.WIDTH // 2, c.HEIGHT // 2 + 80))
 		self.screen.blit(sub, sub_rect)
 
-	pg.display.flip()
-
 	def update_stage_banner(self, dt):
 		if self.stage_banner_timer > 0:
 			self.stage_banner_timer = max(0, self.stage_banner_timer - dt)
@@ -704,11 +808,8 @@ class Game:
 		self.screen.blit(overlay, (0, 0))
 		if not self.gameoversound_played:
 			self.gameoversound_played = True
-			mixer.set_num_channels(2)
 			gameover = mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav"))
-			mixer.Sound(gameover).set_volume(0.4)
-			gameover.play()
-			mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "gameover.wav")).play()
+			self.play_sound(gameover, 0.4)
 
 		banner_height = 180
 		banner = pg.Surface((c.WIDTH, banner_height), pg.SRCALPHA)
@@ -728,8 +829,6 @@ class Game:
 			center=(c.WIDTH // 2, c.HEIGHT // 2 + 100)
 		)
 		self.screen.blit(small_text, small_text_rect)
-	pg.display.flip()
-
 	def mask_collide(self, sprite_a, sprite_b):
 		if not hasattr(sprite_a, "mask"):
 			sprite_a.mask = pg.mask.from_surface(sprite_a.image)
@@ -745,6 +844,8 @@ class Game:
 		return sprite_a.mask.overlap(sprite_b.mask, offset) is not None
 
 	def handle_collisions(self):
+		if self.game_over or not self.player.alive:
+			return
 		# Player bullets vs enemies and bosses
 		for enemy in list(self.enemies):
 			for bullet in list(self.player_bullets):
@@ -801,7 +902,7 @@ class Game:
 					bullet.kill()
 
 					lives_before = self.player.lives
-					self.player.receive_hit()
+					self.player.receive_hit(killer=getattr(bullet, "owner", "the Illithids"))
 
 					if lives_before > 0 and self.player.lives <= 0:
 						killer_name = getattr(bullet, "owner", "the Illithids")
@@ -817,7 +918,7 @@ class Game:
 
 				if asteroid_hitbox.colliderect(self.player.rect):
 					lives_before = self.player.lives
-					self.player.receive_hit()
+					self.player.receive_hit(killer=getattr(asteroid, "name", "a Rock"))
 
 					if lives_before > 0 and self.player.lives <= 0:
 						enemy_name = getattr(asteroid, "name", "a Rock")
@@ -834,7 +935,7 @@ class Game:
 
 				if enemy_hitbox.colliderect(self.player.rect):
 					lives_before = self.player.lives
-					self.player.receive_hit()
+					self.player.receive_hit(killer=getattr(enemy, "name", "the Illithids"))
 
 					if lives_before > 0 and self.player.lives <= 0:
 						enemy_name = getattr(enemy, "name", "the Illithids")
@@ -849,6 +950,9 @@ class Game:
 
 		for powerup in powerup_hits:
 			self.player.apply_powerup(powerup.kind)
+			self.console.write("Powerup collected: " + powerup.kind)
+			if powerup.kind == "shield":
+				self.console.write(f"Shield charges: {self.player.shield_amount}")
 
 	def end_game(self, victory=False):
 		if self.ending_active:
@@ -863,6 +967,20 @@ class Game:
 		self.entering_highscore = False
 		self.highscore_sequence_started = False
 
+		c.BOSS_TIME = False
+		self.boss = None
+		self.player.visible = False
+		self.player.alive = False
+		self.player.kill()
+		for group in (self.enemies, self.boss_group, self.asteroids,
+				  self.enemy_bullets, self.player_bullets, self.powerups):
+			for sprite in list(group):
+				sprite.kill()
+		if victory:
+			self.killed_by = "No-one"
+		else:
+			self.killed_by = self.killed_by or self.player.killed_by or "the Illithids"
+
 	def start_highscore_entry(self):
 		if self.score_saved or self.entering_highscore:
 			return
@@ -875,7 +993,7 @@ class Game:
 			self.score_saved = True
 
 	def submit_highscore(self):
-		if self.highscore_saved:
+		if self.highscore_saved or not self.entering_highscore:
 			return
 
 		name = self.highscore_name.strip()
@@ -896,69 +1014,65 @@ class Game:
 		self.show_highscores = True
 		pg.key.stop_text_input()
 
+	def handle_event(self, event):
+		if event.type == pg.QUIT:
+			self.running = False
+			return
+		if self.console.handle_event(event):
+			return
+		if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+			self.running = False
+			return
+		if self.entering_highscore:
+			if event.type == pg.TEXTINPUT:
+				text = "".join(char for char in event.text if char.isprintable())
+				self.highscore_name = (self.highscore_name + text)[:self.max_name_length]
+			elif event.type == pg.KEYDOWN:
+				if event.key == pg.K_BACKSPACE:
+					self.highscore_name = self.highscore_name[:-1]
+				elif event.key in (pg.K_RETURN, pg.K_KP_ENTER):
+					self.submit_highscore()
+			return
+		if self.show_highscores:
+			if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+				self.restart_requested = True
+				self.running = False
+			return
+		if event.type == pg.KEYDOWN and event.key == pg.K_PAUSE:
+			c.event = Event.PLAYING if c.event == Event.PAUSE else Event.PAUSE
+		elif (event.type == pg.KEYDOWN and event.key == pg.K_LALT
+			  and c.event != Event.PAUSE and not self.game_over):
+			self.player.activate_shield()
+
 	def run(self):
+		audio_paused = False
 		while self.running:
 			dt = self.clock.tick(c.FPS) / 1000
-
 			for event in pg.event.get():
-				if event.type == pg.QUIT:
-					self.running = False
-				if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
-					self.highscore_name = "shS"
-					self.submit_highscore()
-					self.running = False
-				if self.show_highscores and not self.entering_highscore:
-					if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-						self.restart_requested = True
-						self.running = False
-						break
+				self.handle_event(event)
+				if not self.running:
+					break
+			if not self.running:
+				break
 
-				if event.type == pg.KEYDOWN and event.key == pg.K_PAUSE:
-					if c.event == Event.PAUSE:
-						mixer.music.play(-1)
-						c.event = Event.PLAYING
-					elif c.event != Event.PAUSE:
-						c.event = Event.PAUSE
-				if event.type == pg.KEYDOWN and event.key == pg.K_LALT:
-					self.player.activate_shield()
-				if self.entering_highscore:
-					if event.type == pg.TEXTINPUT:
-						if len(self.highscore_name) < self.max_name_length:
-							if event.text.isprintable():
-								self.highscore_name += event.text
-
-					elif event.type == pg.KEYDOWN:
-						if event.key == pg.K_BACKSPACE:
-							self.highscore_name = self.highscore_name[:-1]
-						elif event.key == pg.K_RETURN:
-							self.submit_highscore()
-					if event.type == pg.KEYDOWN:
-						if event.key == pg.K_LSHIFT:
-							self.player.speed = self.player.focus_speed
-						if (
-							event.type == pg.KEYDOWN
-							and event.key == pg.K_LALT
-							and self.player.shield_amount > 0
-							and not self.player.shield_active
-						):
-							self.player.shield_active = True
-							self.player.shield_amount -= 1
-
-							shield = Shield(self, self.player)
-
-							self.effects.add(shield)
-							self.all_sprites.add(shield)
-						if event.type == pg.KEYUP:
-							self.player.speed = c.PLAYER_SPEED
-
-						if c.DEBUG:
-							if event.type == pg.KEYDOWN and event.key == pg.K_F11:
-								self.player.alive = False
-
-			if c.event != Event.PAUSE:
+			self.console.update(dt)
+			paused = self.console.active or c.event == Event.PAUSE
+			if paused != audio_paused:
+				if paused:
+					mixer.pause()
+					mixer.music.pause()
+				else:
+					mixer.unpause()
+					mixer.music.unpause()
+				audio_paused = paused
+			if not paused:
 				self.update(dt)
 			self.draw()
 
+		if audio_paused:
+			mixer.unpause()
+			mixer.music.unpause()
+		pg.key.stop_text_input()
 		return "restart" if self.restart_requested else "quit"
 
 
