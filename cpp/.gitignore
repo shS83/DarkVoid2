@@ -1,0 +1,4 @@
+build*/
+*.bmp
+*.png
+highscores*.json
