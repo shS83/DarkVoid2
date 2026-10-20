@@ -2,7 +2,7 @@ import math
 import pygame as pg
 from game import Game
 from pathlib import Path
-import random
+from ui.rainbow_text import RainbowText
 
 
 def _load_font(path, size, fallback=None):
@@ -77,7 +77,8 @@ def alpha():
                         return True
 
                     if event.key == pg.K_F1:
-                        show_controls(screen, subtitle_font, prompt_font)
+                        if not show_controls(screen, subtitle_font, prompt_font):
+                            return False
 
                     if event.key == pg.K_ESCAPE:
                         return False
@@ -146,73 +147,62 @@ def alpha():
         return False
 
 def run_app():
-    while True:
-        if not alpha():
-            break
-
-        result = Game().run()
-
-        if result != "restart":
-            break
+    if alpha():
+        while True:
+            result = Game().run()
+            if result != "restart":
+                break
 
     pg.quit()
     pg.mixer.quit()
 
 
 def show_controls(screen, bigfont, font):
-    r = 255
-    r_d = -1
-    running = True
     clock = pg.time.Clock()
+    lines = [
+        "WASD or Arrows - Move the ship.",
+        "SPACE or Mouse button 1 - Fire main gun.",
+        "Mouse button 2 - Fire Vulcan cannon.",
+        "Left CTRL - Railgun if railgun powerup has been received.",
+        "Left ALT - Shield if shield powerup has been received.",
+        "Left SHIFT - Focus moving mode.",
+        "SPACE - Exit the controls screen.",
+        "ESC - Quit!",
+    ]
+    text_lines = [font.render(line, True, (255, 255, 255)) for line in lines]
+    line_height = max(font.get_linesize(), 60)
+    text_mask = pg.Surface(
+        (max(line.get_width() for line in text_lines), line_height * len(lines)),
+        pg.SRCALPHA,
+    )
+    for index, line in enumerate(text_lines):
+        text_mask.blit(line, (0, index * line_height))
+    title = bigfont.render("Control instructions:", True, (255, 255, 255))
+    width, height = screen.get_size()
+    scale = min(1, (width - 120) / text_mask.get_width(), (height - 300) / text_mask.get_height())
+    if scale < 1:
+        text_mask = pg.transform.smoothscale_by(text_mask, scale)
+    if title.get_width() > width - 120:
+        title = pg.transform.smoothscale_by(title, (width - 120) / title.get_width())
+    text_rect = text_mask.get_rect(center=(width // 2, height // 2 + 70))
+    title_rect = title.get_rect(midbottom=(width // 2, text_rect.top - 45))
+    rainbow = RainbowText(text_mask)
+    elapsed = 0
 
-    def randomize():
-        randomizer = random.choice(([r, random.choice([0, r, 255]), random.choice([r, random.choice([0, r, 255])]),
-                             random.choice([r, random.choice([0, r, 255])])]))
-
-        pat = random.choice([(r, r, r), (randomizer, r, r), (r, randomizer, r)])
-        return pat
-
-    def colorize():
-        text = []
-        pattern = randomize()
-        text.append(font.render("WASD or Arrows - Move the ship.", True, pattern))
-        pattern = randomize()
-        text.append(font.render("SPACE or Mouse button 1 - Fire main gun.", True, pattern))
-        pattern = randomize()
-        text.append(font.render("Mouse button 2 - Fire Vulcan cannon.", True, pattern))
-        pattern = randomize()
-        text.append(font.render("Left CTRL - Railgun if railgun powerup has been received.", True, pattern))
-        pattern = randomize()
-        text.append(font.render("Left ALT - Shield if shield powerup has been received.", True, pattern))
-        pattern = randomize()
-        text.append(font.render("Left SHIFT - Focus moving mode.", True, pattern))
-        pattern = randomize()
-        text.append(font.render("SPACE - Exit the controls screen.", True, pattern))
-        pattern = randomize()
-        text.append(font.render("ESC - Quit!", True, pattern))
-        return text
-
-    while running:
-        minor_text = colorize()
-        screen.fill((0, 0, 0, 255))
-        major_text = bigfont.render("Control instructions:", True, (255, 255, 255))
-
-        screen.blit(major_text, (1920 // 2 - major_text.get_width() // 2, 200))
-        for i, t in enumerate(minor_text):
-            screen.blit(t, (1920 // 2 - 500, 350 + i * 60))
-
-        r += r_d
-        if r < 1 or r > 254:
-            r_d = -r_d
+    while True:
         for event in pg.event.get():
+            if event.type == pg.QUIT:
+                return False
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
-                    pg.mixer.quit()
-                    pg.quit()
+                    return False
                 if event.key == pg.K_SPACE:
-                    running = False
+                    return True
 
-        dt = clock.tick(45) / 1000
+        elapsed += clock.tick(60) / 1000
+        screen.fill((0, 0, 0))
+        screen.blit(title, title_rect)
+        screen.blit(rainbow.render(elapsed), text_rect)
         pg.display.flip()
 
 

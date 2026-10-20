@@ -110,11 +110,13 @@ class Player(pg.sprite.Sprite):
         self.vulcan_heat = 0.0
         self.vulcan_heat_max = 3.0
         self.vulcan_overheated = False
+        self.vulcan_unlimited = False
         self.vulcan_heat_rate = 0.65
         self.vulcan_cool_rate = 0.35
         self.vulcan_recover_threshold = 0.25
         self.vulcan_cooldown = 0.05
         self.killer = "No-one"
+        self.godmode = False
         self.vulcan_side = -1
         self.vulcan_counter = 0
         self.vulcan_sound_timer = 0
@@ -133,6 +135,7 @@ class Player(pg.sprite.Sprite):
         self.default_fire_cooldown2 = self.fire_cooldown2
         self.default_speed = c.PLAYER_SPEED
         self.super_speed = 700
+        self.speed_boost_active = False
         self.bullets_piercing = False
 
     def make_flash_image(self, image):
@@ -301,14 +304,15 @@ class Player(pg.sprite.Sprite):
             self.game.all_sprites.add(bullet)
 
     def hit(self, killer=None):
-        self.killer = killer
-        if self.invincible_timer > 0 or not self.alive:
+        if self.godmode or self.invincible_timer > 0 or not self.alive:
             return
 
         if self.shield_active:
             pg.mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "ding.mp3")).play()
             return
 
+        self.killer = killer
+        self.killed_by = killer
         self.flash_timer = 0.05
         pg.mixer.Sound(Path(c.HOME_DIR, "assets", "audio", "clink.wav")).play()
         self.lives -= 1
@@ -323,7 +327,7 @@ class Player(pg.sprite.Sprite):
             self.die(killer=killer)
 
     def die(self, killer):
-        if not self.alive:
+        if self.godmode or not self.alive:
             return
 
         explosion_sound = f"{c.HOME_DIR}/assets/audio/explosion1-long.wav"
@@ -340,6 +344,7 @@ class Player(pg.sprite.Sprite):
         self.alive = False
         self.game.game_over = True
         self.killer = killer
+        self.killed_by = killer
         self.kill()
 
     def apply_powerup(self, kind):
@@ -349,6 +354,7 @@ class Player(pg.sprite.Sprite):
             self.power_timer = 12.0
 
         elif kind == "speed":
+            self.speed_boost_active = True
             self.speed = self.super_speed
             self.power_timer = 12.0
 
@@ -381,11 +387,12 @@ class Player(pg.sprite.Sprite):
         if self.vulcan_timer > 0:
             return
 
-        if self.vulcan_overheated:
+        if self.vulcan_overheated and not self.vulcan_unlimited:
             return
 
         self.vulcan_timer = self.vulcan_cooldown
-        self.vulcan_heat += dt
+        if not self.vulcan_unlimited:
+            self.vulcan_heat += dt
         self.vulcan_counter += 1
         # ic(f"Ammo spent: {self.vulcan_counter}")
         muzzle = self.get_vulcan_muzzle()
@@ -467,7 +474,7 @@ class Player(pg.sprite.Sprite):
             self.minigun_sound.play()
 
     def receive_hit(self, killer=None):
-        if self.invincible_timer > 0:
+        if self.godmode or self.invincible_timer > 0 or not self.alive:
             return
 
         if self.shield_active:
@@ -484,6 +491,11 @@ class Player(pg.sprite.Sprite):
         self.hit(killer=killer)
 
     def update_vulcan_heat(self, dt, firing):
+        if self.vulcan_unlimited:
+            self.vulcan_heat = 0.0
+            self.vulcan_overheated = False
+            return
+
         if firing and not self.vulcan_overheated:
             self.vulcan_heat += self.vulcan_heat_rate * dt
 
@@ -507,6 +519,7 @@ class Player(pg.sprite.Sprite):
         self.shoot_mode = "normal"
         self.railgun_active = False
         self.bullets_piercing = False
+        self.speed_boost_active = False
         self.speed = self.default_speed
         self.fire_cooldown = self.default_fire_cooldown
         self.fire_cooldown2 = self.default_fire_cooldown2
@@ -527,13 +540,16 @@ class Player(pg.sprite.Sprite):
                 self.railgun_active = False
 
     def update(self, dt):
+        if not self.alive or not self.visible or self.game.game_over:
+            return
+
         if self.intro_active:
             self.update_intro(dt)
             return
 
         self.update_powerups(dt)
 
-        if self.vulcan_heat >= self.vulcan_heat_max:
+        if not self.vulcan_unlimited and self.vulcan_heat >= self.vulcan_heat_max:
             self.vulcan_overheated = True
 
         if self.visible == True:
@@ -559,8 +575,8 @@ class Player(pg.sprite.Sprite):
                     self.shoot_normal()
             if keys[pg.K_LSHIFT]:
                 self.speed = c.PLAYER_FOCUS_SPEED
-            if not keys[pg.K_LSHIFT]:
-                self.speed = self.default_speed
+            else:
+                self.speed = self.super_speed if self.speed_boost_active else self.default_speed
             firing_vulcan = mouse[2] or mouse[1]
 
             self.update_vulcan_heat(dt, firing_vulcan)
@@ -570,8 +586,6 @@ class Player(pg.sprite.Sprite):
 
                 self.vulcan_timer -= dt
                 self.vulcan_sound_timer -= dt
-            if keys[pg.K_ESCAPE]:
-                pg.quit()
         # For debugging
         if c.DEBUG:
             if keys[pg.K_F1]:
