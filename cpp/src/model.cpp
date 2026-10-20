@@ -104,7 +104,7 @@ void Model::reset(int initial_stage, bool skip_intro) {
     game_over = victory = paused = false;
     banner = 2.4;
     enemies.clear(); bullets.clear(); particles.clear(); pickups.clear(); explosions.clear();
-    sounds.clear(); stars.clear(); ocean.clear();
+    sounds.clear(); messages.clear(); stars.clear(); ocean.clear();
     ocean_index_ = 1;
     enemy_timer_ = rock_timer_ = 0;
     enemy_delay_ = random(1.5, 10); rock_delay_ = random(5, 20);
@@ -118,6 +118,28 @@ void Model::reset(int initial_stage, bool skip_intro) {
                         static_cast<double>(random_int(1, 3))});
     if (stage == 5) update_ocean(0);
 }
+void Model::warp_to_stage(int target) {
+    if (target < 1 || target > 5) throw std::invalid_argument("Stage must be between 1 and 5");
+    const auto inventory = player;
+    const int previous_score = score;
+    const bool was_paused = paused;
+    const double previous_elapsed = elapsed;
+    reset(target, true);
+    player = inventory;
+    player.alive = true;
+    player.lives = player.lives > 0 ? player.lives : 3;
+    player.killer = "No-one";
+    player.intro_active = false;
+    player.intro = 0;
+    player.scale = .12;
+    player.shield_timer = 0;
+    player.invincible = 1.2;
+    player.body = {"ships/finnfighter.png", {width / 2, height - 120},
+                   image_size(catalog, "ships/finnfighter.png", player.scale), 0};
+    score = previous_score;
+    paused = was_paused;
+    elapsed = previous_elapsed;
+}
 void Model::emit(Vec pos, Vec velocity, Color color, double life, double size,
                  double drag, double gravity) {
     // Bound transient allocations during long bullet-heavy fights.
@@ -130,8 +152,14 @@ void Model::burst(Vec pos, int count, Color color) {
              color, random(.25, .95), random(2, 5), .96, 100);
 }
 void Model::reset_powers() {
-    player.spread = player.fast = player.rapid = player.piercing = false;
+    player.spread = player.arsenal_unlimited;
+    player.fast = player.rapid = player.piercing = false;
     player.rail_timer = 0;
+}
+void Model::grant_unlimited_arsenal() {
+    player.arsenal_unlimited = player.spread = player.vulcan_unlimited = true;
+    player.overheated = false;
+    player.heat = player.vulcan_timer = player.fire_timer = 0;
 }
 void Model::apply_power(Power kind) {
     switch (kind) {
@@ -155,7 +183,7 @@ bool Model::activate_shield() {
     return true;
 }
 void Model::hit_player(const std::string& killer) {
-    if (!player.alive || player.intro_active || player.invincible > 0) return;
+    if (game_over || player.godmode || !player.alive || player.intro_active || player.invincible > 0) return;
     if (player.shield_timer > 0) {
         sounds.push_back({"ding.mp3", .5});
         return;
@@ -178,6 +206,9 @@ void Model::end_game(bool won) {
     game_over = true;
     victory = won;
     ending_time = 0;
+    player.alive = false;
+    // Mark objects instead of erasing them: collision loops may still hold references.
+    clear_combat();
     if (won) player.killer = "No-one";
     else sounds.push_back({"gameover.wav", .4});
 }
@@ -203,6 +234,7 @@ void Model::enemy_bullet(Vec pos, Vec velocity, Weapon kind, const std::string& 
                        kind == Weapon::Blue ? 4.0 : 6.0, 0, false, false, false});
 }
 void Model::update_player(double dt, const Input& input) {
+    if (!player.alive || game_over) return;
     if (player.intro_active) {
         player.intro += dt;
         if (player.intro < 2.45) {
@@ -230,7 +262,7 @@ void Model::update_player(double dt, const Input& input) {
     player.body.pos.y = std::clamp(player.body.pos.y, 32.0, height - 32);
     player.fire_timer -= dt;
     const Vec muzzle = player.body.pos + Vec{0, -player.body.size.y / 2};
-    if (input.rail && player.rail_timer > 0 && player.fire_timer <= 0) {
+    if (input.rail && (player.rail_timer > 0 || player.arsenal_unlimited) && player.fire_timer <= 0) {
         player_bullet(muzzle, {0, -2000}, Weapon::Rail);
         sounds.push_back({"lasercont.wav", .3});
         player.fire_timer = .001;
@@ -247,7 +279,10 @@ void Model::update_player(double dt, const Input& input) {
         }
         sounds.push_back({player.spread ? "lasersound.wav" : "lasersound2.wav", .4});
     }
-    if (input.vulcan && !player.overheated) {
+    if (player.vulcan_unlimited) {
+        player.heat = 0;
+        player.overheated = false;
+    } else if (input.vulcan && !player.overheated) {
         player.heat = std::min(3.0, player.heat + .65 * dt);
         if (player.heat >= 3) player.overheated = true;
     } else {
@@ -450,6 +485,7 @@ void Model::clear_combat() {
     for (auto& pickup : pickups) pickup.dead = true;
 }
 void Model::damage_enemy(std::size_t index, int damage) {
+    if (game_over) return;
     auto& e = enemies.at(index);
     if (e.dead || (e.boss && e.entering)) return;
     e.hp -= damage; e.flash = e.rock ? .05 : .005;
@@ -465,7 +501,7 @@ void Model::damage_enemy(std::size_t index, int damage) {
     score += e.boss ? 5000 : e.rock ? 50 : 100;
     if (e.boss) {
         stage_time = 0;
-        if (stage == 5) { end_game(true); clear_combat(); }
+        if (stage == 5) end_game(true);
         else if (stage == 4) start_transition();
         else { ++stage; banner = 2.4; }
     } else if (random(0, 1) < .15) {
@@ -508,6 +544,9 @@ void Model::collide() {
         for (auto& pickup : pickups)
             if (!pickup.dead && player.body.bounds().overlaps(pickup.body.bounds())) {
                 apply_power(pickup.kind); pickup.dead = true;
+                messages.push_back("Powerup collected: " + power_names[static_cast<std::size_t>(pickup.kind)]);
+                if (pickup.kind == Power::Shield)
+                    messages.push_back("Shield charges: " + std::to_string(player.shields));
             }
 }
 void Model::update_effects(double dt) {

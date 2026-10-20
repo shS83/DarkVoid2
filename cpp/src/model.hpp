@@ -64,6 +64,8 @@ struct Player {
     double heat = 0, vulcan_timer = 0, sound_timer = 0, thruster_timer = 0;
     bool alive = true, intro_active = true, overheated = false;
     bool spread = false, fast = false, rapid = false, piercing = false;
+    bool godmode = false, vulcan_unlimited = false;
+    bool arsenal_unlimited = false;
     std::string killer = "No-one";
 };
 struct Bullet {
@@ -104,6 +106,9 @@ class Model {
 public:
     explicit Model(const Catalog& catalog, std::uint32_t seed = std::random_device{}());
     void reset(int initial_stage = 1, bool skip_intro = false);
+    void warp_to_stage(int target);
+    std::string execute_console_command(const std::string& command);
+    void grant_unlimited_arsenal();
     void update(double dt, const Input& input);
     void apply_power(Power kind);
     bool activate_shield();
@@ -127,6 +132,7 @@ public:
     std::vector<Star> stars;
     std::vector<OceanChunk> ocean;
     std::vector<SoundEvent> sounds;
+    std::vector<std::string> messages;
     Phase phase = Phase::Space;
     int stage = 1, score = 0;
     double elapsed = 0, stage_time = 0, banner = 2.4, ending_time = 0;

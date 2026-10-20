@@ -1,8 +1,8 @@
 #include "view.hpp"
+#include "session.hpp"
 #include <charconv>
 #include <chrono>
 #include <iostream>
-#include <optional>
 #include <thread>
 
 namespace {
@@ -70,24 +70,6 @@ std::filesystem::path score_path(const Options& options) {
     if (!path) throw std::runtime_error(SDL_GetError());
     return std::filesystem::path(path.get()) / "highscores.json";
 }
-void append_name(std::string& name, const std::string& text) {
-    auto length = [](const std::string& s) {
-        return std::count_if(s.begin(), s.end(), [](unsigned char c) { return (c & 0xc0) != 0x80; });
-    };
-    for (std::size_t i = 0; i < text.size();) {
-        const unsigned char c = static_cast<unsigned char>(text[i]);
-        const std::size_t bytes = c < 0x80 ? 1 : c < 0xe0 ? 2 : c < 0xf0 ? 3 : 4;
-        if (i + bytes > text.size()) break;
-        if (c >= 32 && c != 127 && length(name) < 12) name.append(text, i, bytes);
-        i += bytes;
-    }
-}
-void backspace(std::string& name) {
-    if (name.empty()) return;
-    auto i = name.size() - 1;
-    while (i > 0 && (static_cast<unsigned char>(name[i]) & 0xc0) == 0x80) --i;
-    name.erase(i);
-}
 }
 
 int main(int argc, char* argv[]) {
@@ -132,96 +114,39 @@ int main(int argc, char* argv[]) {
         dv::Model game(runtime.catalog, options.seed);
         game.reset(options.stage, options.skip_intro);
         if (options.boss) game.spawn_boss();
-        enum class Screen { Title, Controls, Playing, Scores };
-        Screen screen = options.start ? Screen::Playing : Screen::Title;
-        Screen before_controls = screen;
-        bool running = true, entering = false, saved = false, was_paused = false;
-        std::string name, score_error;
-        double title_time = 0, total_time = 0;
+        dv::Session session(game, scores, options.start);
+        bool audio_paused = false;
         auto play_game_music = [&]() {
             const auto& names = dv::Audio::music_names();
             audio.music(names[static_cast<std::size_t>(game.random_int(0, static_cast<int>(names.size()) - 1))]);
         };
         if (options.start) play_game_music();
         else audio.music("1000 Handz - Announcement.mp3");
-        auto start = [&]() {
-            game.reset();
-            screen = Screen::Playing;
-            entering = saved = false;
-            name.clear(); score_error.clear();
-            audio.stop_effects(); audio.pause(false);
-            play_game_music();
-        };
-        auto save_score = [&]() {
-            if (!entering || saved) return;
-            try {
-                const auto first = name.find_first_not_of(' ');
-                const auto last = name.find_last_not_of(' ');
-                const auto trimmed = first == std::string::npos ? "???" : name.substr(first, last - first + 1);
-                scores.add({trimmed, game.score, game.stage, game.player.killer});
-                saved = true; entering = false; score_error.clear();
-                SDL_StopTextInput();
-            } catch (const std::exception& error) {
-                score_error = error.what();
-                std::cerr << "Score save failed: " << error.what() << '\n';
-            }
-        };
         using Clock = std::chrono::steady_clock;
         auto previous = Clock::now();
         std::uint64_t frames = 0;
-        while (running) {
+        while (session.running) {
             const auto frame_start = Clock::now();
             const double dt = options.headless ? 1.0 / 60.0
                 : std::clamp(std::chrono::duration<double>(frame_start - previous).count(), 0.0, .05);
             previous = frame_start;
-            total_time += dt;
             SDL_Event event;
             while (SDL_PollEvent(&event)) {
-                if (event.type == SDL_QUIT) running = false;
-                if (screen == Screen::Scores && entering && event.type == SDL_TEXTINPUT)
-                    append_name(name, event.text.text);
-                if (event.type != SDL_KEYDOWN || event.key.repeat) continue;
-                const auto key = event.key.keysym.sym;
-                if (key == SDLK_ESCAPE) { running = false; continue; }
-                if (key == SDLK_F11) {
+                const auto action = session.handle_event(event);
+                if (action == dv::AppAction::ToggleFullscreen) {
                     const bool fullscreen = SDL_GetWindowFlags(runtime.window()) & SDL_WINDOW_FULLSCREEN_DESKTOP;
                     dv::sdl_check(SDL_SetWindowFullscreen(runtime.window(),
                         fullscreen ? 0U : static_cast<Uint32>(SDL_WINDOW_FULLSCREEN_DESKTOP)));
                 }
-                if (screen == Screen::Title) {
-                    if ((key == SDLK_SPACE || key == SDLK_RETURN) && title_time > 6.2) start();
-                    else if (key == SDLK_F1) {
-                        before_controls = screen; screen = Screen::Controls;
-                    }
-                } else if (screen == Screen::Controls) {
-                    if (key == SDLK_SPACE || key == SDLK_F1) {
-                        screen = before_controls;
-                        if (screen == Screen::Playing) {
-                            game.paused = was_paused; audio.pause(was_paused);
-                        }
-                    }
-                } else if (screen == Screen::Playing) {
-                    if ((key == SDLK_PAUSE || key == SDLK_p) && !game.game_over) {
-                        game.paused = !game.paused; audio.pause(game.paused);
-                    } else if (key == SDLK_LALT && !game.paused) game.activate_shield();
-                    else if (key == SDLK_F1 && !game.game_over) {
-                        was_paused = game.paused; game.paused = true; audio.pause(true);
-                        before_controls = screen; screen = Screen::Controls;
-                    }
-                } else if (screen == Screen::Scores) {
-                    if (entering) {
-                        if (key == SDLK_BACKSPACE) backspace(name);
-                        else if (key == SDLK_RETURN || key == SDLK_KP_ENTER) save_score();
-                    } else if (key == SDLK_SPACE) {
-                        screen = Screen::Title; title_time = 0; audio.stop_effects();
-                        audio.pause(false); audio.music("1000 Handz - Announcement.mp3");
-                    }
+                if (action == dv::AppAction::StartGame) {
+                    audio.stop_effects();
+                    play_game_music();
                 }
+                if (!session.running) break;
             }
-            if (!running) break;
-            if (screen == Screen::Title) title_time += dt;
-            else if (screen == Screen::Playing) {
-                dv::Input input;
+            if (!session.running) break;
+            dv::Input input;
+            if (session.screen == dv::Screen::Playing && !session.console.active()) {
                 const auto* keys = SDL_GetKeyboardState(nullptr);
                 const Uint32 mouse = SDL_GetMouseState(nullptr, nullptr);
                 input.move = {
@@ -234,30 +159,20 @@ int main(int argc, char* argv[]) {
                 input.vulcan = mouse & (SDL_BUTTON_RMASK | SDL_BUTTON_MMASK);
                 input.focus = keys[SDL_SCANCODE_LSHIFT];
                 input.rail = keys[SDL_SCANCODE_LCTRL];
-                game.update(dt, input);
-                for (const auto& sound : game.sounds) audio.play(sound.name, sound.volume);
-                game.sounds.clear();
-                if (game.game_over && game.ending_time >= 5) {
-                    screen = Screen::Scores;
-                    entering = scores.qualifies(game.score);
-                    saved = false; name.clear();
-                    if (entering) SDL_StartTextInput();
-                }
             }
+            session.update(dt, input);
+            if (session.audio_paused() != audio_paused) {
+                audio_paused = session.audio_paused();
+                audio.pause(audio_paused);
+            }
+            for (const auto& sound : game.sounds) audio.play(sound.name, sound.volume);
+            game.sounds.clear();
             runtime.begin();
-            switch (screen) {
-            case Screen::Title: dv::draw_title(runtime, title_time); break;
-            case Screen::Controls: dv::draw_controls(runtime); break;
-            case Screen::Playing: dv::draw_game(runtime, game); break;
-            case Screen::Scores:
-                dv::draw_game(runtime, game);
-                dv::draw_scores(runtime, scores, name, entering, total_time, score_error);
-                break;
-            }
+            dv::draw_session(runtime, session);
             ++frames;
             if (options.frames > 0 && frames >= static_cast<std::uint64_t>(options.frames)) {
                 if (!options.screenshot.empty()) runtime.screenshot(options.screenshot);
-                running = false;
+                session.running = false;
             }
             runtime.present();
             if (!options.headless)

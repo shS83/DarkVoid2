@@ -12,10 +12,10 @@ pkg_check_modules(SNDFILE REQUIRED IMPORTED_TARGET sndfile>=1.1)
 find_package(PNG REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
-add_library(darkvoid_model src/model.cpp src/scores.cpp)
+add_library(darkvoid_model src/model.cpp src/scores.cpp src/commands.cpp)
 target_include_directories(darkvoid_model PUBLIC src)
 target_link_libraries(darkvoid_model PUBLIC nlohmann_json::nlohmann_json)
-add_library(darkvoid_runtime src/runtime.cpp src/view.cpp)
+add_library(darkvoid_runtime src/runtime.cpp src/view.cpp src/console.cpp src/session.cpp)
 target_link_libraries(darkvoid_runtime PUBLIC darkvoid_model PkgConfig::SDL2
     PkgConfig::TTF PkgConfig::SNDFILE PNG::PNG)
 add_executable(darkvoid2 src/main.cpp)
@@ -41,12 +41,20 @@ if(BUILD_TESTING)
     target_link_libraries(darkvoid_tests PRIVATE darkvoid_model)
     add_executable(darkvoid_render_tests tests/render_tests.cpp)
     target_link_libraries(darkvoid_render_tests PRIVATE darkvoid_runtime)
+    add_executable(darkvoid_session_tests tests/session_tests.cpp)
+    target_link_libraries(darkvoid_session_tests PRIVATE darkvoid_runtime)
     add_test(NAME gameplay COMMAND darkvoid_tests)
     add_test(NAME rendering-and-audio COMMAND darkvoid_render_tests
         "${CMAKE_CURRENT_SOURCE_DIR}/../assets" "${CMAKE_CURRENT_BINARY_DIR}/test-artifacts")
-    add_test(NAME title-smoke COMMAND darkvoid2 --headless --frames 3 --mute)
-    add_test(NAME gameplay-smoke COMMAND darkvoid2 --headless --frames 360 --start --mute)
-    add_test(NAME terrain-smoke COMMAND darkvoid2 --headless --frames 5 --stage 5 --mute)
-    set_tests_properties(gameplay rendering-and-audio title-smoke gameplay-smoke terrain-smoke
+    add_test(NAME session-and-developer-tools COMMAND darkvoid_session_tests
+        "${CMAKE_CURRENT_SOURCE_DIR}/../assets" "${CMAKE_CURRENT_BINARY_DIR}/test-artifacts")
+    add_test(NAME title-smoke COMMAND darkvoid2 --headless --frames 3 --mute
+        --scores "${CMAKE_CURRENT_BINARY_DIR}/test-artifacts/title-smoke-scores.json")
+    add_test(NAME gameplay-smoke COMMAND darkvoid2 --headless --frames 360 --start --mute
+        --scores "${CMAKE_CURRENT_BINARY_DIR}/test-artifacts/gameplay-smoke-scores.json")
+    add_test(NAME terrain-smoke COMMAND darkvoid2 --headless --frames 5 --stage 5 --mute
+        --scores "${CMAKE_CURRENT_BINARY_DIR}/test-artifacts/terrain-smoke-scores.json")
+    set_tests_properties(gameplay rendering-and-audio session-and-developer-tools
+        title-smoke gameplay-smoke terrain-smoke
         PROPERTIES TIMEOUT 60)
 endif()

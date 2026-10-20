@@ -1,4 +1,5 @@
 #include "view.hpp"
+#include "text_input.hpp"
 #include <iomanip>
 #include <sstream>
 
@@ -35,9 +36,9 @@ void draw_title(Runtime& r, double time) {
         r.text("press SPACE to avoid or F1 for controls", {width / 2, height - 120}, 42,
                {210, 230, 255, alpha(150 + std::sin(time * 4) * 80)}, true, gothic_font);
 }
-void draw_controls(Runtime& r) {
+void draw_controls(Runtime& r, double time) {
     r.text("Control instructions", {width / 2, 180}, 72, {}, true, title_font);
-    const std::array<const char*, 10> lines{
+    const std::array<const char*, 11> lines{
         "WASD or Arrows - Move the ship",
         "SPACE or Left mouse button - Fire main gun",
         "Right or Middle mouse button - Aim and fire Vulcan cannon",
@@ -46,13 +47,14 @@ void draw_controls(Runtime& r) {
         "Left SHIFT - Focus movement",
         "Pause or P - Pause / resume",
         "F11 - Toggle fullscreen",
+        "§ / ` - Developer console (type help for commands)",
         "SPACE or F1 - Return",
         "ESC - Quit"
     };
     for (std::size_t i = 0; i < lines.size(); ++i)
-        r.text(lines[i], {width / 2, 320.0 + i * 58}, 34, {180, 220, 255, 255}, true, gothic_font);
+        r.text(lines[i], {width / 2, 300.0 + i * 58}, 34, {}, true, gothic_font, width - 120, time);
 }
-void draw_game(Runtime& r, const Model& g) {
+void draw_game(Runtime& r, const Model& g, bool show_ending, bool show_pause) {
     if (g.phase == Phase::Terrain || g.phase == Phase::TerrainFadeIn) {
         for (const auto& chunk : g.ocean)
             r.image({"backgrounds/ocean/stage5_ocean_chunk_" + std::to_string(chunk.image) + ".png",
@@ -123,7 +125,8 @@ void draw_game(Runtime& r, const Model& g) {
         const double ratio = g.player.heat / 3;
         const Color heat{alpha(80 + 350 * ratio), alpha(ratio < .5 ? 220 : 400 - 360 * ratio), 40, 255};
         bar(r, {width - 330, 50, 300, 24}, ratio, heat);
-        std::string label = g.player.overheated ? "VULCAN OVERHEATED" : ratio > 0
+        std::string label = g.player.vulcan_unlimited ? "VULCAN UNLIMITED"
+            : g.player.overheated ? "VULCAN OVERHEATED" : ratio > 0
             ? "VULCAN HEAT " + std::to_string(static_cast<int>(ratio * 100)) + "%" : "VULCAN READY";
         r.text(label, {width - 180, 30}, 20);
         if (g.player.power_timer > 0)
@@ -145,7 +148,7 @@ void draw_game(Runtime& r, const Model& g) {
         r.text(g.phase == Phase::EarthEnter ? "ADVANCING TO TERRAIN" : "STAGE " + std::to_string(g.stage),
                center, 96, {0, 0, 0, a}, true, "JetBrainsMonoNerdFont-SemiBold.ttf");
     }
-    if (g.game_over) {
+    if (g.game_over && show_ending) {
         r.rect({0, 0, width, height}, {0, 0, 0, 150});
         r.rect({0, height / 2 - 170, width, 340},
                g.victory ? Color{20, 60, 90, 210} : Color{0, 0, 0, 220});
@@ -154,12 +157,81 @@ void draw_game(Runtime& r, const Model& g) {
         r.text(g.victory ? "DARK VOID HAS BEEN SILENCED" : "You were humiliated by " + g.player.killer,
                {width / 2, height / 2 + 100}, g.victory ? 48 : 28);
     }
-    if (g.paused) {
+    if (g.paused && show_pause) {
         r.rect({0, 0, width, height}, {0, 0, 0, 140});
         r.text("PAUSED", center, 96);
         r.text("P / Pause to continue  |  F1 for controls", {width / 2, height / 2 + 110}, 28);
     }
     if (g.fade > 0) r.rect({0, 0, width, height}, {0, 0, 0, alpha(g.fade * 255)});
+}
+void draw_console(Runtime& r, DeveloperConsole& console) {
+    if (!console.active()) return;
+    const std::string font = "JetBrainsMonoNerdFont-SemiBold.ttf";
+    constexpr int size = 24;
+    const auto cell = r.text_size("M", size, font);
+    const double line_height = cell.y + 3;
+    const double panel_height = height / 2;
+    const double eased = console.progress * console.progress * (3 - 2 * console.progress);
+    const double top = height - std::round(panel_height * eased);
+    r.rect({0, top, width, panel_height}, {0, 0, 0, 128});
+    r.clip(Rect{0, top, width, panel_height});
+    const double prompt_y = top + panel_height - line_height - 16;
+    const double text_x = 24 + r.text_size("> ", size, font).x;
+    auto visible = console.input;
+    while (!visible.empty() && r.text_size("> " + visible + "_", size, font).x > width - 48)
+        remove_first_character(visible);
+    auto line = [&](const std::string& text, double y) {
+        if (text.rfind("> ", 0) == 0) {
+            r.text("> ", {24, y}, size, {0, 255, 0, 255}, false, font);
+            r.text(text.substr(2), {text_x, y}, size, {}, false, font);
+        } else r.text(text, {24, y}, size, {}, false, font);
+    };
+    line("> " + visible, prompt_y);
+    if (console.open && console.cursor_timer < .5)
+        r.text("_", {text_x + r.text_size(visible, size, font).x, prompt_y}, size, {}, false, font);
+    const auto columns = static_cast<std::size_t>(std::max(1.0, (width - 48) / cell.x));
+    std::vector<std::string> wrapped;
+    for (const auto& text : console.output) {
+        std::string part;
+        std::size_t count = 0;
+        for (const unsigned char c : text) {
+            if ((c & 0xc0) != 0x80 && ++count > columns) {
+                wrapped.push_back(part);
+                part.clear();
+                count = 1;
+            }
+            part += static_cast<char>(c);
+        }
+        wrapped.push_back(part);
+    }
+    const int visible_lines = std::max(0, static_cast<int>((panel_height - 48) / line_height) - 1);
+    console.scroll = std::clamp(console.scroll, 0, std::max(0, static_cast<int>(wrapped.size()) - visible_lines));
+    const int end = static_cast<int>(wrapped.size()) - console.scroll;
+    for (int i = 0; i < visible_lines && end - i - 1 >= 0; ++i)
+        line(wrapped[static_cast<std::size_t>(end - i - 1)], prompt_y - (i + 1) * line_height);
+    r.clip({});
+}
+void draw_session(Runtime& r, Session& session) {
+    switch (session.screen) {
+    case Screen::Title: draw_title(r, session.title_time); break;
+    case Screen::Controls: draw_controls(r, session.controls_time); break;
+    case Screen::Playing:
+        draw_game(r, session.game, true, !session.console.active());
+        if (session.cheat_notice_time > 0 && !session.game.game_over) {
+            const double age = 3 - session.cheat_notice_time;
+            const double zoom = .55 + .5 * (1 - std::exp(-age * 3));
+            const auto opacity = alpha(255 * std::min(1.0, session.cheat_notice_time / 1.2));
+            r.text(session.cheat_notice, {width / 2, height * .42}, 82,
+                   {255, 220, 90, opacity}, true, title_font, width - 100, {}, zoom);
+        }
+        break;
+    case Screen::Scores:
+        draw_game(r, session.game, false, false);
+        draw_scores(r, session.scores, session.name, session.entering,
+                    session.total_time, session.score_error);
+        break;
+    }
+    draw_console(r, session.console);
 }
 void draw_scores(Runtime& r, const Scores& scores, const std::string& name,
                   bool entering, double time, const std::string& error) {

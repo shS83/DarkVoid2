@@ -140,20 +140,55 @@ void Runtime::circle(Vec pos, double radius, Color color) {
         line({pos.x - x, pos.y + y}, {pos.x + x, pos.y + y}, color);
     }
 }
-void Runtime::text(const std::string& label, Vec pos, int size, Color color,
-                   bool centered, const std::string& filename, double max_width) {
-    if (label.empty()) return;
+TTF_Font* Runtime::font(const std::string& filename, int size) {
     const std::string font_key = filename + ":" + std::to_string(size);
     if (!fonts_.count(font_key)) {
         Font font(TTF_OpenFont((assets / "fonts" / filename).string().c_str(), size), TTF_CloseFont);
         if (!font) throw std::runtime_error(TTF_GetError());
         fonts_.emplace(font_key, std::move(font));
     }
+    return fonts_.at(font_key).get();
+}
+Vec Runtime::text_size(const std::string& text, int size, const std::string& filename) {
+    int w = 0, h = 0;
+    if (TTF_SizeUTF8(font(filename, size), text.c_str(), &w, &h) < 0)
+        throw std::runtime_error(TTF_GetError());
+    return {static_cast<double>(w), static_cast<double>(h)};
+}
+void Runtime::clip(std::optional<Rect> bounds) {
+    if (!bounds) {
+        sdl_check(SDL_RenderSetClipRect(renderer_.get(), nullptr));
+        return;
+    }
+    const SDL_Rect rect{static_cast<int>(bounds->x), static_cast<int>(bounds->y),
+                        static_cast<int>(bounds->w), static_cast<int>(bounds->h)};
+    sdl_check(SDL_RenderSetClipRect(renderer_.get(), &rect));
+}
+Color rainbow_color(Vec position, double time) {
+    double hue = std::fmod(position.x + position.y - std::floor(time * 300), 512.0) / 512.0;
+    if (hue < 0) hue += 1;
+    const double sector = hue * 6;
+    const double x = 1 - std::abs(std::fmod(sector, 2.0) - 1);
+    double r = 0, g = 0, b = 0;
+    if (sector < 1) { r = 1; g = x; }
+    else if (sector < 2) { r = x; g = 1; }
+    else if (sector < 3) { g = 1; b = x; }
+    else if (sector < 4) { g = x; b = 1; }
+    else if (sector < 5) { r = x; b = 1; }
+    else { r = 1; b = x; }
+    auto channel = [](double c) { return static_cast<std::uint8_t>(std::lround((.35 + .65 * c) * 255)); };
+    return {channel(r), channel(g), channel(b), 255};
+}
+void Runtime::text(const std::string& label, Vec pos, int size, Color color,
+                   bool centered, const std::string& filename, double max_width,
+                   std::optional<double> rainbow_time, double zoom) {
+    if (label.empty()) return;
+    const std::string font_key = filename + ":" + std::to_string(size);
     const std::string key = font_key + ":" + label;
     if (!text_cache_.count(key)) {
         if (text_cache_.size() > 512) text_cache_.clear();
         std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface(
-            TTF_RenderUTF8_Blended(fonts_.at(font_key).get(), label.c_str(), {255, 255, 255, 255}),
+            TTF_RenderUTF8_Blended(font(filename, size), label.c_str(), {255, 255, 255, 255}),
             SDL_FreeSurface);
         if (!surface) throw std::runtime_error(TTF_GetError());
         Texture texture(SDL_CreateTextureFromSurface(renderer_.get(), surface.get()), SDL_DestroyTexture);
@@ -163,12 +198,37 @@ void Runtime::text(const std::string& label, Vec pos, int size, Color color,
     auto* texture = text_cache_.at(key).get();
     int w = 0, h = 0;
     sdl_check(SDL_QueryTexture(texture, nullptr, nullptr, &w, &h));
-    const double scale = w > max_width ? max_width / w : 1;
+    const double scale = std::min(zoom, max_width / w);
     SDL_FRect target{static_cast<float>(pos.x - (centered ? w * scale / 2 : 0)),
                      static_cast<float>(pos.y - (centered ? h * scale / 2 : 0)),
                      static_cast<float>(w * scale), static_cast<float>(h * scale)};
     sdl_check(SDL_SetTextureColorMod(texture, color.r, color.g, color.b));
     sdl_check(SDL_SetTextureAlphaMod(texture, color.a));
+    if (rainbow_time) {
+        sdl_check(SDL_SetTextureColorMod(texture, 255, 255, 255));
+        sdl_check(SDL_SetTextureAlphaMod(texture, 255));
+        std::vector<SDL_Vertex> vertices;
+        std::vector<int> indices;
+        // Tint the cached white glyph mask; a fixed mesh avoids per-frame font rasterization.
+        constexpr float step = 16;
+        auto vertex = [&](float x, float y) {
+            auto tint = rainbow_color({target.x + x, target.y + y}, *rainbow_time);
+            return SDL_Vertex{{target.x + x, target.y + y}, {tint.r, tint.g, tint.b, color.a},
+                              {x / target.w, y / target.h}};
+        };
+        for (float y = 0; y < target.h; y += step)
+            for (float x = 0; x < target.w; x += step) {
+                const float right = std::min(x + step, target.w);
+                const float bottom = std::min(y + step, target.h);
+                const int first = static_cast<int>(vertices.size());
+                vertices.insert(vertices.end(), {vertex(x, y), vertex(right, y),
+                                                 vertex(right, bottom), vertex(x, bottom)});
+                indices.insert(indices.end(), {first, first + 1, first + 2, first, first + 2, first + 3});
+            }
+        sdl_check(SDL_RenderGeometry(renderer_.get(), texture, vertices.data(),
+            static_cast<int>(vertices.size()), indices.data(), static_cast<int>(indices.size())));
+        return;
+    }
     sdl_check(SDL_RenderCopyF(renderer_.get(), texture, nullptr, &target));
 }
 Vec Runtime::mouse() const {
